@@ -8,7 +8,7 @@ GO_FILES := $(shell \
 
 .PHONY: build
 build:
-	go build github.com/henrywu2019/athenasql/go
+	go build github.com/uber/athenasql/go
 
 .PHONY: install
 install:
@@ -25,7 +25,7 @@ checklic:
 
 .PHONY: test
 test:
-	go test github.com/henrywu2019/athenasql/go
+	go test github.com/uber/athenasql/go
 
 .PHONY: cover
 cover:

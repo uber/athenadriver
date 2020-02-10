@@ -25,7 +25,7 @@ import (
 	"database/sql"
 	"fmt"
 	drv "github.com/henrywu2019/athenasql/go"
-	secret "github.com/uber/athenasql/examples/constants
+	secret "github.com/uber/athenasql/examples/constants"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"

@@ -30,9 +30,9 @@ import (
 	"github.com/cactus/go-statsd-client/statsd"
 	tallystatsd "github.com/uber-go/tally/statsd"
 
+	"github.com/uber-go/tally"
 	secret "github.com/uber/athenasql/examples/constants"
 	drv "github.com/uber/athenasql/go"
-	"github.com/uber-go/tally"
 )
 
 func newScope() (tally.Scope, io.Closer) {
