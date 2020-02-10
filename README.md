@@ -1,13 +1,15 @@
 # :package: AthenaSQL  [![codecov](https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg)](https://codecov.io/gh/henrywu2019/athenasql) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card]
 
 
-<img align="right" height="64" src="resources/logo.png">
+<img align="right" height="100" src="resources/logo.png">
 
 `athenasql` is a fully-featured AWS Athena database driver for Go developed at Uber ATG.
 It provides a hassle-free way of querying AWS Athena database with Go standard
 library. It not only provides basic features of Athena Go SDK, but 
 addresses some SDK's limitation, improves and extends it. It also includes
 advanced features like Athena workgroup and tagging creation, driver read-only mode and so on.
+
+The PDF version of AthenaSQL document is available at: [athenasql.pdf](resources/athenasql.pdf)
 
 ## Features
 
@@ -78,7 +80,37 @@ ok  	github.com/uber/athenasql/go	9.255s	coverage: 100.0% of statements
 
 #### Integration Test
 
-All integration tests are under [`examples`](https://github.com/uber/athenasql/tree/master/examples) folder. Please make sure all prerequisites are met so that you can run the code on your own machine.
+All integration tests are under [`examples`](https://github.com/uber/athenasql/tree/master/examples) folder.
+Please make sure all prerequisites are met so that you can run the code on your own machine.
+
+All the code snippets in `examples` folder are fully tested in our machines. For example, 
+to run some stress and crash test, you can use `examples/perf/concurrency.go`. Build it first:
+
+```scala
+$cd $GOPATH/src/github.com/uber/athenasql
+$go build examples/perf/concurrency.go
+```
+
+Run it, wait for some output but not all, and unplug your network cable:
+
+```scala
+$./concurrency > examples/perf/concurrency.output.`date +"%Y-%m-%d-%H-%M-%S"`.log
+58,13,53,54,78,96,32,48,40,11,35,31,65,61,1,73,74,22,34,49,80,5,69,37,0,79,
+2020/02/09 13:49:29 error [38]RequestError: send request failed
+caused by: Post https://athena.us-east-1.amazonaws.com/: dial tcp: 
+lookup athena.us-east-1.amazonaws.com: no such host
+...
+2020/02/09 13:49:29 error [89]RequestError: send request failed
+caused by: Post https://athena.us-east-1.amazonaws.com/: dial tcp: 
+lookup athena.us-east-1.amazonaws.com: no such host
+```
+You can see `RequestError` is thrown out from the code. The active Athena queries failed because the network is down.
+Now re-plugin your cable and wait for network coming back, you can see the program automatically reconnects to Athena, and resumes to output data correctly:
+
+```scala
+72,25,92,98,15,93,41,7,8,90,81,56,66,2,18,84,87,63,
+44,45,82,99,86,3,52,76,71,16,39,67,23,12,42,17,4,
+```
 
 ## How to use `athenasql`
 
@@ -839,10 +871,11 @@ For the contributors, the following is `athenasql` Package's UML Class Diagram w
 - [Common Pitfalls When Using database/sql in Go](https://www.vividcortex.com/blog/2015/09/22/common-pitfalls-go/)
 - [Implement Sql Database Driver in 100 Lines of Go](https://vyskocil.org/blog/implement-sql-database-driver-in-100-lines-of-go/)
 
+<img align="right" height="64" src="resources/atg-infra.png">
 
 `athenasql` is brought to you by Uber ATG Infrastructure. Copyright (c) 2020 Uber Technologies, Inc.
 
-<img align="right" height="64" src="resources/atg-infra.png">
+
 
 
 [doc-img]: http://img.shields.io/badge/GoDoc-Reference-blue.svg
@@ -851,8 +884,8 @@ For the contributors, the following is `athenasql` Package's UML Class Diagram w
 [release-img]: https://img.shields.io/badge/athenasql-v1.0.0-brightgreen
 [release]: https://github.com/uber/athenasql/releases
 
-[ci-img]: https://api.travis-ci.com/uber/athenasql.svg?branch=master
-[ci]: https://travis-ci.com/uber/athenasql/branches
+[ci-img]: https://api.travis-ci.com/henrywu2019/athenasql.svg?branch=master
+[ci]: https://travis-ci.com/henrywu2019/athenasql/branches
 
 [report-card-img]: https://goreportcard.com/badge/github.com/henrywu2019/athenasql
 [report-card]: https://goreportcard.com/report/github.com/henrywu2019/athenasql
