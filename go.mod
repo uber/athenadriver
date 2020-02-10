@@ -1,4 +1,4 @@
-module github.com/henrywu2019/athenasql
+module github.com/uber/athenasql
 
 go 1.13
 

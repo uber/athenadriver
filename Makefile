@@ -25,12 +25,12 @@ checklic:
 
 .PHONY: test
 test:
-	go test github.com/uber/athenasql/go
+	GOPRIVATE="github.com/uber" go test github.com/uber/athenasql/go
 
 .PHONY: cover
 cover:
-	go test -race -coverprofile=cover.out -coverpkg=go/... go/...
-	go tool cover -html=cover.out -o cover.html
+	GOPRIVATE="github.com/uber" go test -race -coverprofile=cover.out -coverpkg=github.com/uber/athenasql/go/... github.com/uber/athenasql/go/...
+	GOPRIVATE="github.com/uber" go tool cover -html=cover.out -o cover.html
 
 $(GOLINT):
 	go install golang.org/x/lint/golint
@@ -41,9 +41,9 @@ lint: $(GOLINT)
 	@echo "Checking formatting..."
 	@gofmt -d -s $(GO_FILES) 2>&1 | tee lint.log
 	@echo "Checking vet..."
-	@go vet go/... 2>&1 | tee -a lint.log
+	@go vet github.com/uber/athenasql/go/... 2>&1 | tee -a lint.log
 	@echo "Checking lint..."
-	@$(GOLINT) go/... | tee -a lint.log
+	@$(GOLINT) github.com/uber/athenasql/go/... | tee -a lint.log
 	@echo "Checking for unresolved FIXMEs..."
 	@git grep -i fixme | grep -v -e vendor -e Makefile -e .md | tee -a lint.log
 	@[ ! -s lint.log ]
