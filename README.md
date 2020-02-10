@@ -6,10 +6,10 @@
 `athenasql` is a fully-featured AWS Athena database driver for Go developed at Uber ATG.
 It provides a hassle-free way of querying AWS Athena database with Go standard
 library. It not only provides basic features of Athena Go SDK, but 
-addresses some SDK's limitation, improves and extends it. It also includes
+addresses some SDK's limitation, improves and extends it. Moreover, it also includes
 advanced features like Athena workgroup and tagging creation, driver read-only mode and so on.
 
-The PDF version of AthenaSQL document is available at: [athenasql.pdf](resources/athenasql.pdf)
+The PDF version of AthenaSQL document is available at [ :scroll: ](resources/athenasql.pdf)
 
 ## Features
 
@@ -45,7 +45,7 @@ In addition to AWS credentials, you also need an s3 bucket to store query result
 [AWS S3 web console page](https://s3.console.aws.amazon.com/s3/home) to create one.
 In the examples below, the s3 bucket I use is `s3://henrywuqueryresults/`.
 
-In most cases, you need the following 4 prerequisites \:
+In most cases, you need the following 4 prerequisites:
 
 - S3 Output bucket
 - `access key ID`
@@ -824,7 +824,7 @@ No. The reason is the same as answer to the previous question.
   
 To put it simple, YES. But there is some limitation and best practice to follow.
   
-The recommended way is to use `DB.Exec()` to get it. Please refer to \ref{db-exec}.
+The recommended way is to use `DB.Exec()` to get it. Please refer to [ :link: ](#dbexec-and-dbexeccontext).
 
 You can get it with `DB.Query()` too. In the returned `ResultSet`, there is
  an `UpdateCount` member variable. If the query is one of [`CTAS`](https://docs.aws.amazon.com/athena/latest/ug/ctas.html), `CVAS` and `INSERT INTO`, `UpdateCount` will contain meaningful value. The result will be of a one row and one column. The column name is `rows`, and the row is an `int`, which is exactly `UpdateCount`. I would suggest to use `QueryRow` or `QueryRowContext` since it is a one-row result. By the way, the document for [`GetQueryResults`](https://docs.aws.amazon.com/athena/latest/APIReference/API_GetQueryResults.html) seems not very accurate.
