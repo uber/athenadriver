@@ -178,7 +178,7 @@ But you still need to specify correct `OutputBucket` in `athenasql.Config` becau
 `No output location provided. An output location is required either through the Workgroup result configuration setting or as an API input.`
 
 
-The sample code below enforces AWS_SDK_LOAD_CONFIG is set, so `athenasql`'s AWS Session will be created from the configuration values from the shared config (~/.aws/config) and shared credentials (~/.aws/credentials) files.
+The sample code below enforces AWS_SDK_LOAD_CONFIG is set, so `athenasql`'s AWS Session will be created from the configuration values from the shared config (`~/.aws/config`) and shared credentials (`~/.aws/credentials`) files.
 Even if we pass all dummy values as parameters in `NewDefaultConfig()` except `OutputBucket`, they are overridden by
 the values in AWS CLI config files, so it doesn't really matter.
 

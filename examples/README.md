@@ -1,5 +1,4 @@
-This folder contains sample codes for `athenasql`.
+This folder contains sample code, including integration/stress/crash/demo code, for `athenasql`.
 
-For more details, please check [here](https://github.com/uber/athenasql/blob/master/README.pdf).
-
+For more details, please check [ :scroll: ](../resources/athenasql.pdf).
 
