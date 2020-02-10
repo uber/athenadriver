@@ -873,6 +873,8 @@ For the contributors, the following is `athenasql` Package's UML Class Diagram w
 
 <img align="right" height="64" src="resources/atg-infra.png">
 
+----
+
 `athenasql` is brought to you by Uber ATG Infrastructure. Copyright (c) 2020 Uber Technologies, Inc.
 
 
