@@ -720,7 +720,7 @@ We can see there are 3 columns according to `ColumnInfo` under `ResultSetMetadat
 
 For more sample code, please check [util_desc_table.go](https://github.com/uber/athenasql/blob/master/examples/query/util_desc_table.go), [util_desc_view.go](https://github.com/uber/athenasql/blob/master/examples/query/util_desc_view.go), and [util_show.go](https://github.com/uber/athenasql/blob/master/examples/query/util_show.go).
 
-- `awsathendriver`'s Solution:
+- `athenasql`'s Solution:
 
 `athenasql` fixes this issue by splitting `Rows[0].Data[0]` string with tab, and replace the original row with a new row which has the same number of data with columns.
 
@@ -747,7 +747,7 @@ In the above [`CTAS`](https://docs.aws.amazon.com/athena/latest/ug/ctas.html) st
   row, that one column doesn't make sense, or at least is confusing. The same
   issue happens for `INSERT INTO` statement.
 
-- `awsathendriver`'s Solution:
+- `athenasql`'s Solution:
 
 Because this issue happens only in statements [`CTAS`](https://docs.aws.amazon.com/athena/latest/ug/ctas.html), `CVAS`, and `INSERT INTO
 `, where `UpdateCount` is always valid and is the only meaningful information
@@ -780,11 +780,11 @@ The second reason is the difference between Athena data type and Go data type.
 Some Athena builtin data type like `Row`, `DECIMAL(p, s)`, `varbinary`, `interval year to month`
 are not supported in Go standard library. Therefore, there is no way to serialize them in driver level.
 
-- `awsathendriver`'s Solution:
+- `athenasql`'s Solution:
 
-For data types: `array`, `map`, `json`, `char`, `varchar`, `varbinary`, `row`, `string`, `binary`, `struct`, `interval year to month`, `interval day to second`, `decimal`, `awsathendriver` returns the string representation of the data. The developers can firstly retrieve the string representation, and then serialize to user defined type on their own.
+For data types: `array`, `map`, `json`, `char`, `varchar`, `varbinary`, `row`, `string`, `binary`, `struct`, `interval year to month`, `interval day to second`, `decimal`, `athenasql` returns the string representation of the data. The developers can firstly retrieve the string representation, and then serialize to user defined type on their own.
 
-For time and date types: `date`, `time`, `time with time zone`, `timestamp`, `timestamp with time zone`, `awsathendriver` returns Go's [`time.Time`](https://golang.org/pkg/time/#Time).
+For time and date types: `date`, `time`, `time with time zone`, `timestamp`, `timestamp with time zone`, `athenasql` returns Go's [`time.Time`](https://golang.org/pkg/time/#Time).
 
 Some sample code are available at [dml_select_array.go](https://github.com/uber/athenasql/blob/master/examples/query/dml_select_array.go),
 [dml_select_map.go](https://github.com/uber/athenasql/blob/master/examples/query/dml_select_map.go), [dml_select_time.go](https://github.com/uber/athenasql/blob/master/examples/query/dml_select_time.go).
