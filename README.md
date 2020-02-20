@@ -1,4 +1,8 @@
-# :package: AthenaDriver
+
+
+<img align="center" height="120" src="resources/logo.png">
+
+----
 
 [![CodeCov][cov-img]][cov]
 [![GoDoc][doc-img]][doc]
@@ -7,9 +11,11 @@
 [![Go Report Card][report-card-img]][report-card]
 [![FOSSA][fossa-img]][fossa]
 
+----
 
+## Overview
 
-<img align="right" height="100" src="resources/logo.png">
+(This project is stable and being incubated for long-term support.)
 
 `athenadriver` is a fully-featured AWS Athena database driver for Go developed at Uber ATG.
 It provides a hassle-free way of querying AWS Athena database with Go standard
@@ -18,8 +24,6 @@ addresses some SDK's limitation, improves and extends it. Moreover, it also incl
 advanced features like Athena workgroup and tagging creation, driver read-only mode and so on.
 
 The PDF version of AthenaDriver document is available at [ :scroll: ](resources/athenadriver.pdf)
-
-This project is stable and being incubated for long-term support.
 
 ## Features
 
@@ -890,7 +894,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 
 
-[doc-img]: http://img.shields.io/badge/GoDoc-Reference-blue.svg
+[doc-img]: https://img.shields.io/badge/GoDoc-Reference-blue.svg
 [doc]: https://godoc.org/uber/athenadriver
 
 [cov-img]: https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg
