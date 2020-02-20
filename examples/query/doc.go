@@ -40,18 +40,18 @@
 //     secret access key
 //     AWS region
 //
-// For more details on athenasql's support on AWS credentials & S3 query result bucket,
+// For more details on athenadriver's support on AWS credentials & S3 query result bucket,
 // please refer to README section Support Multiple AWS Authorization Methods.
 //
-// 2. Installation athenasql.
+// 2. Installation athenadriver.
 //
-//     go get github.com/uber/athenasql
+//     go get github.com/uber/athenadriver
 //
 // 3. Integration Test.
 //
 // To Build it:
 //
-//     $cd $GOPATH/src/github.com/uber/athenasql
+//     $cd $GOPATH/src/github.com/uber/athenadriver
 //     $go build examples/query/dml_select_simple.go
 //
 //

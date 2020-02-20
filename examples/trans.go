@@ -23,7 +23,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	drv "github.com/uber/athenasql/go"
+	drv "github.com/uber/athenadriver/go"
 	"log"
 )
 

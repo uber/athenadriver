@@ -1,6 +1,6 @@
 sudo: false
 language: go
-go_import_path: github.com/henrywu2019/athenasql
+go_import_path: github.com/henrywu2019/athenadriver
 
 env:
   global:

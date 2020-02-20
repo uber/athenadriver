@@ -32,10 +32,10 @@ StatementType *string `type:"string" enum:"StatementType"`
 
 import (
 	"database/sql"
-	secret "github.com/uber/athenasql/examples/constants"
+	secret "github.com/uber/athenadriver/examples/constants"
 	"log"
 
-	drv "github.com/uber/athenasql/go"
+	drv "github.com/uber/athenadriver/go"
 )
 
 func main() {

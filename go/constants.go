@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package athenasql
+package athenadriver
 
 // TContextKey is a type for key in context.
 type TContextKey string

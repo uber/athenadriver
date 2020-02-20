@@ -1,6 +1,6 @@
 # Contributing
 
-We'd love your help to improve athenasql!
+We'd love your help to improve athenadriver!
 
 Please [open an issue][open-issue] describing your proposal, idea and findings.
 In your issue, pull request, and any other communications,
@@ -18,13 +18,13 @@ you to accept the CLA when you open your pull request.
 ```
 mkdir -p $GOPATH/src/uber
 cd $GOPATH/src/uber
-git clone git@github.com:your_github_username/athenasql.git
-cd athenasql
-git remote add upstream https://github.com/uber/athenasql.git
+git clone git@github.com:your_github_username/athenadriver.git
+cd athenadriver
+git remote add upstream https://github.com/uber/athenadriver.git
 git fetch upstream
 ```
 
-Install athenasql's dependencies:
+Install athenadriver's dependencies:
 
 ```
 make dependencies
@@ -47,7 +47,7 @@ pull request.
 Start by creating a new branch for your changes:
 
 ```
-cd $GOPATH/src/uber/athenasql
+cd $GOPATH/src/uber/athenadriver
 git checkout master
 git fetch upstream
 git rebase upstream/master
@@ -74,7 +74,7 @@ We're much more likely to approve your changes if you:
 * Write a [good commit message][commit-message].
 * Maintain backward compatibility.
 
-[fork]: https://github.com/uber/athenasql/fork
-[open-issue]: https://github.com/uber/athenasql/issues/new
-[cla]: https://cla-assistant.io/uber/athenasql
+[fork]: https://github.com/uber/athenadriver/fork
+[open-issue]: https://github.com/uber/athenadriver/issues/new
+[cla]: https://cla-assistant.io/uber/athenadriver
 [commit-message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html

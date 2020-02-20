@@ -22,12 +22,12 @@ package main
 
 import (
 	"database/sql"
-	secret "github.com/uber/athenasql/examples/constants"
-	drv "github.com/uber/athenasql/go"
+	secret "github.com/uber/athenadriver/examples/constants"
+	drv "github.com/uber/athenadriver/go"
 	"os"
 )
 
-// To use athenasql's Config for authentication
+// To use athenadriver's Config for authentication
 func useAthenaSQLConfigForAuth() {
 	// 1. Set AWS Credential in Driver Config.
 	conf, err := drv.NewDefaultConfig(secret.OutputBucketDev, secret.Region,

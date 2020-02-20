@@ -18,14 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package athenasql is a fully-featured Go database/sql driver for
+// Package athenadriver is a fully-featured Go database/sql driver for
 // Amazon AWS Athena developed at Uber ATG.
 //
 // It provides a hassle-free way of querying AWS Athena database with Go
 // standard library. It not only provides basic features of Athena Go SDK, but
 // addresses some of its limitation, improves and extends it.Except the basic
 // features provided by Go database/sql like error handling, database pool
-// and reconnection, athenasql supports the following features out of box:
+// and reconnection, athenadriver supports the following features out of box:
 //
 //     - Support multiple AWS authorization methods
 //     - Full support of Athena Basic Data Types
@@ -48,4 +48,4 @@
 // for the queries you run. Athena scales automatically—executing queries
 // in parallel—so results are fast, even with large datasets and complex queries.
 //
-package athenasql
+package athenadriver

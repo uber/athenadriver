@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package athenasql
+package athenadriver
 
 // Version of the library.
 const Version = "0.1.0"

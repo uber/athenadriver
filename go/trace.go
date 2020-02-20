@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package athenasql
+package athenadriver
 
 import (
 	"github.com/uber-go/tally"
@@ -42,7 +42,7 @@ const (
 	ErrorLevel = zap.ErrorLevel
 )
 
-// DriverTracer is supported in athenasql builtin.
+// DriverTracer is supported in athenadriver builtin.
 type DriverTracer struct {
 	logger *zap.Logger
 	scope  tally.Scope

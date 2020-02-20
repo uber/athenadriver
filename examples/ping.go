@@ -27,8 +27,8 @@ import (
 
 	"go.uber.org/zap"
 
-	secret "github.com/uber/athenasql/examples/constants"
-	drv "github.com/uber/athenasql/go"
+	secret "github.com/uber/athenadriver/examples/constants"
+	drv "github.com/uber/athenadriver/go"
 )
 
 func main() {
@@ -68,5 +68,5 @@ panic: driver: bad connection
 
 goroutine 1 [running]:
 main.main()
-        /opt/share/go/path/src/github.com/uber/athenasql/examples/ping.go:35 +0x320
+        /opt/share/go/path/src/github.com/uber/athenadriver/examples/ping.go:35 +0x320
 */

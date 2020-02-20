@@ -25,8 +25,8 @@ import (
 	"database/sql"
 	"log"
 
-	secret "github.com/uber/athenasql/examples/constants"
-	drv "github.com/uber/athenasql/go"
+	secret "github.com/uber/athenadriver/examples/constants"
+	drv "github.com/uber/athenadriver/go"
 	"go.uber.org/zap"
 )
 

@@ -1,4 +1,4 @@
-module github.com/uber/athenasql
+module github.com/uber/athenadriver
 
 go 1.13
 

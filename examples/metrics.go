@@ -31,8 +31,8 @@ import (
 	tallystatsd "github.com/uber-go/tally/statsd"
 
 	"github.com/uber-go/tally"
-	secret "github.com/uber/athenasql/examples/constants"
-	drv "github.com/uber/athenasql/go"
+	secret "github.com/uber/athenadriver/examples/constants"
+	drv "github.com/uber/athenadriver/go"
 )
 
 func newScope() (tally.Scope, io.Closer) {
