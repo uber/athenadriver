@@ -8,6 +8,8 @@
 [![Build Status][ci-img]][ci]
 [![Go Report Card][report-card-img]][report-card]
 [![FOSSA][fossa-img]][fossa]
+[![lic][license-img]][license]
+[![made][made-img]][made]
 
 ## Overview
 
@@ -905,10 +907,14 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [report-card-img]: https://goreportcard.com/badge/github.com/uber/athenadriver
 [report-card]: https://goreportcard.com/report/github.com/uber/athenadriver
 
-[license-img]: https://img.shields.io/badge/License-2020%20Uber%20Technologies%2C%20Inc-orange
+[license-img]: https://img.shields.io/badge/License-Apache--2.0-red
 [license]: https://github.com/uber/athenadriver/blob/master/LICENSE
 
 [fossa-img]: https://app.fossa.com/api/projects/custom%2B4458%2Fgit%40github.com%3Auber%2Fathenadriver.git.svg?type=shield
 [fossa]: https://app.fossa.com/attribution/988b94c8-7015-4f6f-9a19-2ba6b240f992
 
 [release-policy]: https://golang.org/doc/devel/release.html#policy
+
+[made-img]: https://img.shields.io/badge/By-Uber%20ATG-yellow
+[made]: https://www.uber.com/us/en/atg/
+
