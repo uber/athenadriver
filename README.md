@@ -1,4 +1,4 @@
-# :package: AthenaDriver  [![codecov](https://codecov.io/gh/uber/athenadriver/branch/uber/graph/badge.svg)](https://codecov.io/gh/uber/athenadriver) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card]
+# :package: AthenaDriver  [![codecov](https://codecov.io/gh/uber/athenadriver/branch/uber/graph/badge.svg)](https://codecov.io/gh/uber/athenadriver) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card] ![FOSSA](https://app.fossa.com/api/projects/custom%2B4458%2Fgit%40github.com%3Auber%2Fathenadriver.git.svg?type=shield)
 
 
 <img align="right" height="100" src="resources/logo.png">
