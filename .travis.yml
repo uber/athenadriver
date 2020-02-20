@@ -1,6 +1,6 @@
 sudo: false
 language: go
-go_import_path: github.com/henrywu2019/athenadriver
+go_import_path: github.com/uber/athenadriver
 
 env:
   global:

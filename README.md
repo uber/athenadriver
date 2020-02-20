@@ -1,4 +1,4 @@
-# :package: AthenaDriver  [![codecov](https://codecov.io/gh/henrywu2019/athenadriver/branch/uber/graph/badge.svg)](https://codecov.io/gh/henrywu2019/athenadriver) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card]
+# :package: AthenaDriver  [![codecov](https://codecov.io/gh/uber/athenadriver/branch/uber/graph/badge.svg)](https://codecov.io/gh/uber/athenadriver) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card]
 
 
 <img align="right" height="100" src="resources/logo.png">
@@ -238,7 +238,7 @@ The sample output:
 with AthenaDriver Config: 123
 ```
 
-The full code is here at [examples/auth.go](https://github.com/henrywu2019/athenadriver/tree/master/examples/auth.go).
+The full code is here at [examples/auth.go](https://github.com/uber/athenadriver/tree/master/examples/auth.go).
 
 ### Full Support of All Data Types 
 
@@ -886,10 +886,10 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [release-img]: https://img.shields.io/badge/athenadriver-v1.0.0-brightgreen
 [release]: https://github.com/uber/athenadriver/releases
 
-[ci-img]: https://api.travis-ci.com/henrywu2019/athenadriver.svg?branch=master
-[ci]: https://travis-ci.com/henrywu2019/athenadriver/branches
+[ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?branch=master
+[ci]: https://travis-ci.com/uber/athenadriver/branches
 
-[report-card-img]: https://goreportcard.com/badge/github.com/henrywu2019/athenadriver
-[report-card]: https://goreportcard.com/report/github.com/henrywu2019/athenadriver
+[report-card-img]: https://goreportcard.com/badge/github.com/uber/athenadriver
+[report-card]: https://goreportcard.com/report/github.com/uber/athenadriver
 
 [release-policy]: https://golang.org/doc/devel/release.html#policy
