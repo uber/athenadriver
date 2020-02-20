@@ -1,8 +1,6 @@
 
+<p align="center"><img src="resources/logo.png" alt="athenadriver Logo" ></p>
 
-<img align="center" height="120" src="resources/logo.png">
-
-----
 
 [![CodeCov][cov-img]][cov]
 [![GoDoc][doc-img]][doc]
@@ -10,8 +8,6 @@
 [![Build Status][ci-img]][ci]
 [![Go Report Card][report-card-img]][report-card]
 [![FOSSA][fossa-img]][fossa]
-
-----
 
 ## Overview
 
