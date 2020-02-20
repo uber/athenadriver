@@ -6,10 +6,6 @@ env:
   global:
     - GO111MODULE=on
 
-before_script:
-  - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
-
-
 matrix:
   include:
   - go: 1.12.x
@@ -22,12 +18,7 @@ install:
 script:
   - test -z "$LINT" || make lint
   - make test
-  - fossa init
-  - cd go && fossa analyze go
-
-notifications:
-  webhooks: https://app.fossa.io/hooks/travisci
 
 after_success:
   - make cover
-  - cd go && fossa test
+  - bash <(curl -s https://codecov.io/bash)
