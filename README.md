@@ -1,4 +1,4 @@
-# :package: AthenaSQL  [![codecov](https://codecov.io/gh/henrywu2019/athenadriver/branch/uber/graph/badge.svg)](https://codecov.io/gh/henrywu2019/athenadriver) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card]
+# :package: AthenaDriver  [![codecov](https://codecov.io/gh/henrywu2019/athenadriver/branch/uber/graph/badge.svg)](https://codecov.io/gh/henrywu2019/athenadriver) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card]
 
 
 <img align="right" height="100" src="resources/logo.png">
@@ -9,7 +9,7 @@ library. It not only provides basic features of Athena Go SDK, but
 addresses some SDK's limitation, improves and extends it. Moreover, it also includes
 advanced features like Athena workgroup and tagging creation, driver read-only mode and so on.
 
-The PDF version of AthenaSQL document is available at [ :scroll: ](resources/athenadriver.pdf)
+The PDF version of AthenaDriver document is available at [ :scroll: ](resources/athenadriver.pdf)
 
 ## Features
 
@@ -216,7 +216,7 @@ The sample code below ensure `AWS_SDK_LOAD_CONFIG` is not set, then pass four va
 
 ```scala
 // To use athenadriver's Config for authentication
-func useAthenaSQLConfigForAuth() {
+func useAthenaDriverConfigForAuth() {
 	os.Unsetenv("AWS_SDK_LOAD_CONFIG")
 	// 1. Set AWS Credential in Driver Config.
 	conf, err := drv.NewDefaultConfig(secret.OutputBucketDev, secret.Region,
@@ -229,13 +229,13 @@ func useAthenaSQLConfigForAuth() {
 	// 3. Query and print results
 	var i int
 	_ = db.QueryRow("SELECT 123").Scan(&i)
-	println("with AthenaSQL Config:", i)
+	println("with AthenaDriver Config:", i)
 }
 ```
 The sample output:
 
 ```scala
-with AthenaSQL Config: 123
+with AthenaDriver Config: 123
 ```
 
 The full code is here at [examples/auth.go](https://github.com/henrywu2019/athenadriver/tree/master/examples/auth.go).

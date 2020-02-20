@@ -28,7 +28,7 @@ import (
 )
 
 // To use athenadriver's Config for authentication
-func useAthenaSQLConfigForAuth() {
+func useAthenaDriverConfigForAuth() {
 	// 1. Set AWS Credential in Driver Config.
 	conf, err := drv.NewDefaultConfig(secret.OutputBucketDev, secret.Region,
 		secret.AccessID, secret.SecretAccessKey)
@@ -40,7 +40,7 @@ func useAthenaSQLConfigForAuth() {
 	// 3. Query and print results
 	var i int
 	_ = db.QueryRow("SELECT 123").Scan(&i)
-	println("with AthenaSQL Config:", i)
+	println("with AthenaDriver Config:", i)
 }
 
 // To use AWS CLI's Config for authentication
@@ -62,12 +62,12 @@ func useAWSCLIConfigForAuth() {
 }
 
 func main() {
-	useAthenaSQLConfigForAuth()
+	useAthenaDriverConfigForAuth()
 	useAWSCLIConfigForAuth()
 }
 
 /*
 Sample Output:
-with AthenaSQL Config: 123
+with AthenaDriver Config: 123
 with AWS CLI Config: 456
 */
