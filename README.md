@@ -1,4 +1,12 @@
-# :package: AthenaDriver  [![codecov](https://codecov.io/gh/uber/athenadriver/branch/uber/graph/badge.svg)](https://codecov.io/gh/uber/athenadriver) [![GoDoc][doc-img]][doc] [![Github release][release-img]][release] [![Build Status][ci-img]][ci] [![Go Report Card][report-card-img]][report-card] ![FOSSA](https://app.fossa.com/api/projects/custom%2B4458%2Fgit%40github.com%3Auber%2Fathenadriver.git.svg?type=shield)
+# :package: AthenaDriver
+
+[![CodeCov][cov-img]][cov]
+[![GoDoc][doc-img]][doc]
+[![Github release][release-img]][release]
+[![Build Status][ci-img]][ci]
+[![Go Report Card][report-card-img]][report-card]
+[![FOSSA][fossa-img]][fossa]
+
 
 
 <img align="right" height="100" src="resources/logo.png">
@@ -885,13 +893,22 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [doc-img]: http://img.shields.io/badge/GoDoc-Reference-blue.svg
 [doc]: https://godoc.org/uber/athenadriver
 
+[cov-img]: https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg
+[cov]: https://codecov.io/gh/uber/athenadriver
+
 [release-img]: https://img.shields.io/badge/athenadriver-v1.0.0-brightgreen
 [release]: https://github.com/uber/athenadriver/releases
 
-[ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?branch=master
+[ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?token=e2usf1UJEGmsFDHzV61y&branch=master
 [ci]: https://travis-ci.com/uber/athenadriver/branches
 
 [report-card-img]: https://goreportcard.com/badge/github.com/uber/athenadriver
 [report-card]: https://goreportcard.com/report/github.com/uber/athenadriver
+
+[license-img]: https://img.shields.io/badge/License-2020%20Uber%20Technologies%2C%20Inc-orange
+[license]: https://github.com/uber/athenadriver/blob/master/LICENSE
+
+[fossa-img]: https://app.fossa.com/api/projects/custom%2B4458%2Fgit%40github.com%3Auber%2Fathenadriver.git.svg?type=shield
+[fossa]: https://app.fossa.com/attribution/988b94c8-7015-4f6f-9a19-2ba6b240f992
 
 [release-policy]: https://golang.org/doc/devel/release.html#policy
