@@ -11,6 +11,8 @@ advanced features like Athena workgroup and tagging creation, driver read-only m
 
 The PDF version of AthenaDriver document is available at [ :scroll: ](resources/athenadriver.pdf)
 
+This project is stable and being incubated for long-term support.
+
 ## Features
 
 Except the basic features provided by Go `database/sql` like error handling, database pool and reconnection, `athenadriver` supports the following features out of box:
