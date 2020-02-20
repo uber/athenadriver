@@ -893,13 +893,13 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 
 
-[doc-img]: https://img.shields.io/badge/GoDoc-Reference-brightgreen.svg
+[doc-img]: https://img.shields.io/badge/GoDoc-Reference-red.svg
 [doc]: https://godoc.org/uber/athenadriver
 
 [cov-img]: https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
 
-[release-img]: https://img.shields.io/badge/release-v1.0.0-brightgreen
+[release-img]: https://img.shields.io/badge/release-v1.0.0-red
 [release]: https://github.com/uber/athenadriver/releases
 
 [ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?token=e2usf1UJEGmsFDHzV61y&branch=master
@@ -908,7 +908,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [report-card-img]: https://goreportcard.com/badge/github.com/uber/athenadriver
 [report-card]: https://goreportcard.com/report/github.com/uber/athenadriver
 
-[license-img]: https://img.shields.io/badge/License-Apache--2.0-brightgreen
+[license-img]: https://img.shields.io/badge/License-Apache--2.0-red
 [license]: https://github.com/uber/athenadriver/blob/master/LICENSE
 
 [fossa-img]: https://app.fossa.com/api/projects/custom%2B4458%2Fgit%40github.com%3Auber%2Fathenadriver.git.svg?type=shield
@@ -916,6 +916,6 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 [release-policy]: https://golang.org/doc/devel/release.html#policy
 
-[made-img]: https://img.shields.io/badge/By-Uber%20ATG-brightgreen
+[made-img]: https://img.shields.io/badge/By-Uber%20ATG-red
 [made]: https://www.uber.com/us/en/atg/
 
