@@ -14,7 +14,7 @@
 
 ## Overview
 
-(This project is stable and being incubated for long-term support.)
+(This project is a sandbox project and in active development.)
 
 `athenadriver` is a fully-featured AWS Athena database driver for Go developed at Uber ATG.
 It provides a hassle-free way of querying AWS Athena database with Go standard
