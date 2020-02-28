@@ -7,14 +7,13 @@
 [![Github release][release-img]][release]
 [![Build Status][ci-img]][ci]
 [![FOSSA][fossa-img]][fossa]
+[![Go Report Card][report-card-img]][report-card]
 [![lic][license-img]][license]
 [![made][made-img]][made]
 
-<!-- [![Go Report Card][report-card-img]][report-card] -->
-
 ## Overview
 
-(This project is a sandbox project and in active development.)
+(This project is a sandbox project and the development status is STABLE.)
 
 `athenadriver` is a fully-featured AWS Athena database driver for Go developed at Uber ATG.
 It provides a hassle-free way of querying AWS Athena database with Go standard
@@ -899,7 +898,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [cov-img]: https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
 
-[release-img]: https://img.shields.io/badge/release-v1.0.0-red
+[release-img]: https://img.shields.io/badge/release-v1.1.0-red
 [release]: https://github.com/uber/athenadriver/releases
 
 [ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?token=e2usf1UJEGmsFDHzV61y&branch=master
