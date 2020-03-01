@@ -1,6 +1,5 @@
 
-<p align="center"><img src="resources/logo.png" alt="athenadriver Logo" ></p>
-
+![](resources/logo.png)
 
 [![CodeCov][cov-img]][cov]
 [![GoDoc][doc-img]][doc]
@@ -883,17 +882,15 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 - [Common Pitfalls When Using database/sql in Go](https://www.vividcortex.com/blog/2015/09/22/common-pitfalls-go/)
 - [Implement Sql Database Driver in 100 Lines of Go](https://vyskocil.org/blog/implement-sql-database-driver-in-100-lines-of-go/)
 
-<img align="right" height="64" src="resources/atg-infra.png">
-
 ----
 
-`athenadriver` is brought to you by Uber ATG Infrastructure. Copyright (c) 2020 Uber Technologies, Inc.
+`athenadriver` is brought to you by Uber ATG Infrastructure. Copyright (c) 2020 Uber Technologies, Inc. ![](resources/atg-infra.png)
 
 
 
 
 [doc-img]: https://img.shields.io/badge/GoDoc-Reference-red.svg
-[doc]: https://godoc.org/uber/athenadriver
+[doc]: https://pkg.go.dev/mod/github.com/uber/athenadriver
 
 [cov-img]: https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
