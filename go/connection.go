@@ -157,7 +157,6 @@ func (c *Connection) CheckNamedValue(nv *driver.NamedValue) (err error) {
 }
 
 // ExecContext executes a query that doesn't return rows, such as an INSERT or UPDATE.
-// This is a dummy function in our use case.
 func (c *Connection) ExecContext(ctx context.Context, query string, namedArgs []driver.NamedValue) (driver.Result, error) {
 	var obs = c.connector.tracer
 	var err error
