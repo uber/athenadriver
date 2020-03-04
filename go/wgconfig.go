@@ -41,3 +41,18 @@ func GetDefaultWGConfig() *athena.WorkGroupConfiguration {
 		ResultConfiguration:             nil,
 	}
 }
+
+// NewWGConfig to create a WorkGroupConfiguration.
+func NewWGConfig(bytesScannedCutoffPerQuery int64,
+	enforceWorkGroupConfiguration bool,
+	publishCloudWatchMetricsEnabled bool,
+	requesterPaysEnabled bool,
+	resultConfiguration *athena.ResultConfiguration) *athena.WorkGroupConfiguration {
+	return &athena.WorkGroupConfiguration{
+		BytesScannedCutoffPerQuery:      &bytesScannedCutoffPerQuery,
+		EnforceWorkGroupConfiguration:   &enforceWorkGroupConfiguration,
+		PublishCloudWatchMetricsEnabled: &publishCloudWatchMetricsEnabled,
+		RequesterPaysEnabled:            &requesterPaysEnabled,
+		ResultConfiguration:             resultConfiguration,
+	}
+}

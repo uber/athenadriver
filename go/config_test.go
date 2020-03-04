@@ -249,3 +249,9 @@ func TestConfig_GetSessionToken(t *testing.T) {
 	}
 	assert.Equal(t, testConf.GetSessionToken(), GetFromEnvVal(credSessionEnvKey))
 }
+
+func TestConfig_WGConfig(t *testing.T) {
+	conf := NewWGConfig(10*DefaultBytesScannedCutoffPerQuery, true, true, false, nil)
+	wg := NewDefaultWG("workgroup1", conf, nil)
+	assert.Equal(t, *wg.Config.BytesScannedCutoffPerQuery, int64(DefaultBytesScannedCutoffPerQuery*10))
+}
