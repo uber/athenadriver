@@ -151,7 +151,7 @@ func main() {
 	conf, _ := drv.NewDefaultConfig("s3://henrywuqueryresults/",
 		"us-east-2", "DummyAccessID", "DummySecretAccessKey")
 	// Step 2. Open Connection.
-	db, _ := sql.Open(drv.DBDriverName, conf.Stringify())
+	db, _ := sql.Open(drv.DriverName, conf.Stringify())
 	// Step 3. Query and print results
 	var url string
 	_ = db.QueryRow("SELECT url from sampledb.elb_logs limit 1").Scan(&url)
@@ -274,7 +274,7 @@ func main() {
 	}
 	// 2. Open Connection.
 	dsn := conf.Stringify()
-	db, _ := sql.Open(drv.DBDriverName, dsn)
+	db, _ := sql.Open(drv.DriverName, dsn)
 	// 3. Query and print results
 	query := "SELECT JSON '\"Hello Athena\"', " +
 		"ST_POINT(-74.006801, 40.70522), " +
@@ -340,7 +340,7 @@ func main() {
 	conf.SetWGRemoteCreationAllowed(false)
 	// 2. Open Connection.
 	dsn := conf.Stringify()
-	db, _ := sql.Open(drv.DBDriverName, dsn)
+	db, _ := sql.Open(drv.DriverName, dsn)
 	// 3. Query and print results
 	rows, err := db.Query("select url from sampledb.elb_logs limit 3")
 	if err != nil {
@@ -398,7 +398,7 @@ func main() {
 	conf, _ := drv.NewDefaultConfig("s3://henrywuqueryresults/",
 		"us-east-2", "DummyAccessID", "DummySecretAccessKey")
 	// 2. Open Connection.
-	db, _ := sql.Open(drv.DBDriverName, conf.Stringify())
+	db, _ := sql.Open(drv.DriverName, conf.Stringify())
 	// 3. Prepared Statement
 	statement, err := db.Prepare("CREATE TABLE sampledb.urls AS " +
 		"SELECT url FROM sampledb.elb_logs where request_ip=? limit ?")
@@ -481,7 +481,7 @@ func main() {
 		panic(err)
 	}
 	// 2. Open Connection.
-	db, _ := sql.Open(drv.DBDriverName, conf.Stringify())
+	db, _ := sql.Open(drv.DriverName, conf.Stringify())
 	// 3. Execute and print results
 	if _, err = db.ExecContext(context.Background(),
 		"DROP TABLE IF EXISTS sampledb.urls"); err != nil {
@@ -546,7 +546,7 @@ func main() {
 	conf.SetMaskedColumnValue("url", "xxx")
 	// 2. Open Connection.
 	dsn := conf.Stringify()
-	db, _ := sql.Open(drv.DBDriverName, dsn)
+	db, _ := sql.Open(drv.DriverName, dsn)
 	// 3. Query and print results
 	rows, err := db.Query("select request_timestamp, url from " +
 		"sampledb.elb_logs limit 3")
@@ -599,7 +599,7 @@ func main() {
 
 	// 2. Open Connection.
 	dsn := conf.Stringify()
-	db, _ := sql.Open(drv.DBDriverName, dsn)
+	db, _ := sql.Open(drv.DriverName, dsn)
 	// 3. Query cancellation after 2 seconds
 	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
 	rows, err := db.QueryContext(ctx, "select count(*) from sampledb.elb_logs")
@@ -692,7 +692,7 @@ func main() {
 
 	// 2. Open Connection.
 	dsn := conf.Stringify()
-	db, _ := sql.Open(drv.DBDriverName, dsn)
+	db, _ := sql.Open(drv.DriverName, dsn)
 	// 3. Create Table with CTAS statement
 	rows, err := db.QueryContext(context.Background(), 
 	  "CREATE TABLE sampledb.elb_logs_new AS " +
