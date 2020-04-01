@@ -39,8 +39,9 @@ Except the basic features provided by Go `database/sql` like error handling, dat
 - Database missing value handling 
 - Read-Only mode 
 
-## How to set up/install/test `athenadriver`
+`athenadriver` can extremely simplify your code. Check [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader) out as an example and a convenient tool for your Athena query in command line. 
 
+## How to set up/install/test `athenadriver`
 
 ### Prerequisites - AWS Credentials & S3 Query Result Bucket 
 
@@ -629,7 +630,7 @@ Sample Output:
 ### Missing Value Handling 
 
 It is common to have missing values in S3 file, or Athena DB. When this happens, you can specify if you want to use
- `empty string` or `default data` as the missing value, whichever is better to facilitate your data processing. The default data for Athena column type are defined as below:
+ `empty string` or `default data` as the missing value, whichever is better to facilitate your data processing or ETL job. The default data for Athena column type are defined as below:
  
 ```scala
 func (r *Rows) getDefaultValueForColumnType(athenaType string) interface{} {
@@ -770,7 +771,7 @@ For more sample code, please check [ddl_ctas.go](https://github.com/uber/athenad
 ### Type Loss for map, struct, array etc
 
 One of Athena Go SDK's limitations is the type information could be lost after 
-querying. I think there are two reasons for this type infromation loss.
+querying. I think there are two reasons for this type information loss.
 
 The first reason is Athena SDK doesn't provide the full type information for complex type data.
 It assumes the application developers know the data schema and should take the responsibility of data serialization.

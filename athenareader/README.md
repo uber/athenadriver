@@ -16,6 +16,7 @@ go get github.com/uber/athenadriver/athenareader
 
 ```
 athenareader --help
+
 NAME
 	athenareader - read athena data from command line
 
