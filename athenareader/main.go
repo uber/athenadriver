@@ -57,7 +57,7 @@ func main() {
 			"REPORTING BUGS\n\thttps://github.com/uber/athenadriver\n"
 		fmt.Fprintf(CommandLine.Output(), pre_body)
 		fmt.Fprintf(CommandLine.Output(),
-			"SYNOPSIS\n\t%s [-b output_bucket] [-d database_name] [-q query_string_or_query_file] [-r]\n\nDESCRIPTION\n", os.Args[0])
+			"SYNOPSIS\n\t%s [-b output_bucket] [-d database_name] [-q query_string_or_file] [-r]\n\nDESCRIPTION\n", os.Args[0])
 		flag.PrintDefaults()
 		fmt.Fprintf(CommandLine.Output(), desc)
 	}

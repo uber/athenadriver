@@ -6,10 +6,16 @@
 
 To avoid exposing access keys(Access Key ID and Secret Access Key) in command line, `athenareader` use [AWS CLI Config For Authentication](https://github.com/uber/athenadriver#use-aws-cli-config-for-authentication) method. Please make sure your environment variable **`AWS_SDK_LOAD_CONFIG`** is set.
 
+## How to get/build/install `athenareader`
+
+```
+go get github.com/uber/athenadriver/athenareader
+```
+
 ## How to use `athenareader`
 
 ```
-athenareader -h
+athenareader --help
 NAME
 	athenareader - read athena data from command line
 
