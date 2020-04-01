@@ -23,11 +23,11 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	secret "github.com/uber/athenadriver/examples/constants"
 	drv "github.com/uber/athenadriver/go"
 	"io/ioutil"
 	"log"
-	"fmt"
 	"os"
 )
 
@@ -41,9 +41,9 @@ func main() {
 	var rowOnly = flag.Bool("r", false, "Display rows only, don't show the first row as columninfo")
 
 	flag.Usage = func() {
-		pre_body:="NAME\n\tathenareader - read athena data from command line\n\n"
+		pre_body := "NAME\n\tathenareader - read athena data from command line\n\n"
 		desc := "\nEXAMPLES\n\n" +
-			"\t$ athenareader -d sampledb -q \"select request_timestamp,elb_name from elb_logs limit 2\"\n"+
+			"\t$ athenareader -d sampledb -q \"select request_timestamp,elb_name from elb_logs limit 2\"\n" +
 			"\trequest_timestamp,elb_name\n" +
 			"\t2015-01-03T00:00:00.516940Z,elb_demo_004\n" +
 			"\t2015-01-03T00:00:00.902953Z,elb_demo_004\n\n" +
