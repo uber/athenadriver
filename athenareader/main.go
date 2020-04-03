@@ -66,6 +66,7 @@ func main() {
 	// 1. Set AWS Credential in Driver Config.
 	conf, err := drv.NewDefaultConfig(*bucket, secret.Region, secret.AccessID, secret.SecretAccessKey)
 	conf.SetDB(*database)
+	conf.SetReadOnly(true)
 	if err != nil {
 		log.Fatal(err)
 		return
