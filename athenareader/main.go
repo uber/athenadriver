@@ -33,12 +33,17 @@ import (
 
 var CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
+func printVersion() {
+	println("Current build version: v1.1.2")
+}
+
 // main will query Athena and print all columns and rows information in csv format
 func main() {
 	var bucket = flag.String("b", secret.OutputBucket, "Athena resultset output bucket")
 	var database = flag.String("d", "default", "The database you want to query")
 	var query = flag.String("q", "select 1", "The SQL query string or a file containing SQL string")
 	var rowOnly = flag.Bool("r", false, "Display rows only, don't show the first row as columninfo")
+	var versionFlag = flag.Bool("v", false, "Print the current version and exit")
 
 	flag.Usage = func() {
 		pre_body := "NAME\n\tathenareader - read athena data from command line\n\n"
@@ -57,12 +62,17 @@ func main() {
 			"REPORTING BUGS\n\thttps://github.com/uber/athenadriver\n"
 		fmt.Fprintf(CommandLine.Output(), pre_body)
 		fmt.Fprintf(CommandLine.Output(),
-			"SYNOPSIS\n\t%s [-b output_bucket] [-d database_name] [-q query_string_or_file] [-r]\n\nDESCRIPTION\n", os.Args[0])
+			"SYNOPSIS\n\t%s [-v] [-b output_bucket] [-d database_name] [-q query_string_or_file] [-r]\n\nDESCRIPTION\n", os.Args[0])
 		flag.PrintDefaults()
 		fmt.Fprintf(CommandLine.Output(), desc)
 	}
 
 	flag.Parse()
+	switch {
+	case *versionFlag:
+		printVersion()
+		return
+	}
 	// 1. Set AWS Credential in Driver Config.
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "1")
 	conf, err := drv.NewDefaultConfig(*bucket, secret.Region, secret.AccessID, secret.SecretAccessKey)
