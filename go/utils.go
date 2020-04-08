@@ -21,8 +21,10 @@
 package athenadriver
 
 import (
+	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/csv"
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aws/aws-sdk-go/service/athena"
@@ -77,7 +79,9 @@ func RowsToCSV(rows *sql.Rows) string {
 		return ""
 	}
 	columns, _ := rows.Columns()
-	s := ""
+	var buf bytes.Buffer
+	csvWriter := csv.NewWriter(&buf)
+	records := make([][]string, 0)
 	for rows.Next() {
 		rawResult := make([][]byte, len(columns))
 		row := make([]interface{}, len(columns))
@@ -86,16 +90,14 @@ func RowsToCSV(rows *sql.Rows) string {
 		}
 		// We don't consider malformed rows
 		_ = rows.Scan(row...)
+		s := make([]string, len(columns))
 		for i, cell := range rawResult {
-			s += string(cell)
-			if i != len(columns)-1 {
-				s += ","
-			} else {
-				s += "\n"
-			}
+			s[i] = string(cell)
 		}
+		records = append(records, s)
 	}
-	return s
+	csvWriter.WriteAll(records)
+	return buf.String()
 }
 
 // ColsRowsToCSV is a convenient function to convert columns and rows of sql.Rows to CSV format.
