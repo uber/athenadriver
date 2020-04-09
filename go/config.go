@@ -147,10 +147,10 @@ func (c *Config) SetOutputBucket(o string) error {
 	}
 	o = o[5:]
 	ss := strings.SplitN(o, "/", 2)
-	if len(ss) == 2{
+	if len(ss) == 2 {
 		c.dsn.Host = ss[0]
 		c.dsn.Path = ss[1]
-	}else{
+	} else {
 		c.dsn.Host = ss[0]
 		c.dsn.Path = ""
 	}
