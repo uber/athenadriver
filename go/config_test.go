@@ -64,7 +64,7 @@ func TestAthenaConfigWrongS3Bucket(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestConfig_SetOutputBucket(t *testing.T){
+func TestConfig_SetOutputBucket(t *testing.T) {
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2"
 	testConf := NewNoOpsConfig()
 	err := testConf.SetOutputBucket(s3bucket)
