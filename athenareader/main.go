@@ -31,7 +31,7 @@ import (
 	"os"
 )
 
-var CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+var commandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 func printVersion() {
 	println("Current build version: v1.1.2")
@@ -46,7 +46,7 @@ func main() {
 	var versionFlag = flag.Bool("v", false, "Print the current version and exit")
 
 	flag.Usage = func() {
-		pre_body := "NAME\n\tathenareader - read athena data from command line\n\n"
+		preBody := "NAME\n\tathenareader - read athena data from command line\n\n"
 		desc := "\nEXAMPLES\n\n" +
 			"\t$ athenareader -d sampledb -q \"select request_timestamp,elb_name from elb_logs limit 2\"\n" +
 			"\trequest_timestamp,elb_name\n" +
@@ -60,11 +60,11 @@ func main() {
 			"\t2015-01-06T00:00:00.516940Z,elb_demo_009\n\n" +
 			"AUTHOR\n\tHenry Fuheng Wu (henry.wu@uber.com)\n\n" +
 			"REPORTING BUGS\n\thttps://github.com/uber/athenadriver\n"
-		fmt.Fprintf(CommandLine.Output(), pre_body)
-		fmt.Fprintf(CommandLine.Output(),
+		fmt.Fprintf(commandLine.Output(), preBody)
+		fmt.Fprintf(commandLine.Output(),
 			"SYNOPSIS\n\t%s [-v] [-b output_bucket] [-d database_name] [-q query_string_or_file] [-r]\n\nDESCRIPTION\n", os.Args[0])
 		flag.PrintDefaults()
-		fmt.Fprintf(CommandLine.Output(), desc)
+		fmt.Fprintf(commandLine.Output(), desc)
 	}
 
 	flag.Parse()
