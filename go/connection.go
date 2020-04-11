@@ -294,6 +294,9 @@ WAITING_FOR_RESULT:
 				zap.String("workgroup", wg.Name),
 				zap.String("queryID", queryID))
 			obs.Scope().Timer(DriverName + ".query.canceled").Record(timeCanceled)
+			if c.connector.config.IsMoneyWise() {
+				printCost(statusResp)
+			}
 			return nil, context.Canceled
 		case athena.QueryExecutionStateFailed:
 			reason := *statusResp.QueryExecution.Status.StateChangeReason
@@ -305,6 +308,9 @@ WAITING_FOR_RESULT:
 			obs.Scope().Timer(DriverName + ".query.queryexecutionstatefailed").Record(timeQueryExecutionStateFailed)
 			return nil, errors.New(reason)
 		case athena.QueryExecutionStateSucceeded:
+			if c.connector.config.IsMoneyWise() {
+				printCost(statusResp)
+			}
 			timeQueryExecutionStateSucceeded := time.Since(now)
 			obs.Scope().Timer(DriverName + ".query.queryexecutionstatesucceeded").Record(timeQueryExecutionStateSucceeded)
 			break WAITING_FOR_RESULT
@@ -315,8 +321,7 @@ WAITING_FOR_RESULT:
 		select {
 		case <-ctx.Done():
 			_, err := c.athenaAPI.
-				StopQueryExecutionWithContext(ctx, &athena.
-					StopQueryExecutionInput{
+				StopQueryExecutionWithContext(context.Background(), &athena.StopQueryExecutionInput{
 					QueryExecutionId: aws.String(queryID),
 				})
 			if err != nil {
@@ -326,6 +331,12 @@ WAITING_FOR_RESULT:
 					zap.String("query", query))
 				obs.Scope().Counter(DriverName + ".failure.querycontext.stopqueryexecution.failed").Inc(1)
 				return nil, err
+			}
+			if c.connector.config.IsMoneyWise() {
+				statusRespFinal, _ := c.athenaAPI.GetQueryExecutionWithContext(context.Background(), &athena.GetQueryExecutionInput{
+					QueryExecutionId: aws.String(queryID),
+				})
+				printCost(statusRespFinal)
 			}
 			obs.Scope().Counter(DriverName + ".failure.querycontext.stopqueryexecution.succeeded").Inc(1)
 			timeStopQueryExecution := time.Since(now)

@@ -34,7 +34,7 @@ import (
 var commandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 func printVersion() {
-	println("Current build version: v1.1.2")
+	println("Current build version: v1.1.3")
 }
 
 // main will query Athena and print all columns and rows information in csv format
@@ -43,7 +43,9 @@ func main() {
 	var database = flag.String("d", "default", "The database you want to query")
 	var query = flag.String("q", "select 1", "The SQL query string or a file containing SQL string")
 	var rowOnly = flag.Bool("r", false, "Display rows only, don't show the first row as columninfo")
+	var moneyWise = flag.Bool("m", false, "Display the query cost as the first line of the output")
 	var versionFlag = flag.Bool("v", false, "Print the current version and exit")
+	var admin = flag.Bool("a", false, "Enable admin mode, so database write is allowed at athenadriver level")
 
 	flag.Usage = func() {
 		preBody := "NAME\n\tathenareader - read athena data from command line\n\n"
@@ -80,8 +82,13 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	if *moneyWise {
+		conf.setMoneyWise(true)
+	}
 	conf.SetDB(*database)
-	conf.SetReadOnly(true)
+	if !*admin {
+		conf.SetReadOnly(true)
+	}
 	if err != nil {
 		log.Fatal(err)
 		return

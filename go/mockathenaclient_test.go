@@ -222,12 +222,16 @@ func (m *mockAthenaClient) GetQueryExecutionWithContext(c aws.Context,
 	if *input.QueryExecutionId == "SELECTExecContext_OK_QID" {
 		ping := "SELECTExecContext_OK_QID"
 		stat := athena.QueryExecutionStateSucceeded
+		var dataScanned = int64(123)
 		return &athena.GetQueryExecutionOutput{
 			QueryExecution: &athena.QueryExecution{
 				Query:            &ping,
 				QueryExecutionId: &ping,
 				Status: &athena.QueryExecutionStatus{
 					State: &stat,
+				},
+				Statistics: &athena.QueryExecutionStatistics{
+					DataScannedInBytes: &dataScanned,
 				},
 			},
 		}, nil
@@ -251,6 +255,7 @@ func (m *mockAthenaClient) GetQueryExecutionWithContext(c aws.Context,
 		ping := "SELECTQueryContext_CANCEL_OK_QID"
 		stat := athena.QueryExecutionStateQueued
 		stt := "DDL"
+		var dataScanned = int64(123)
 		return &athena.GetQueryExecutionOutput{
 			QueryExecution: &athena.QueryExecution{
 				Query:            &ping,
@@ -259,11 +264,15 @@ func (m *mockAthenaClient) GetQueryExecutionWithContext(c aws.Context,
 					State: &stat,
 				},
 				StatementType: &stt,
+				Statistics: &athena.QueryExecutionStatistics{
+					DataScannedInBytes: &dataScanned,
+				},
 			},
 		}, nil
 	}
 	if *input.QueryExecutionId == "SELECTQueryContext_AWS_CANCEL_QID" {
 		ping := "SELECTQueryContext_AWS_CANCEL_QID"
+		var dataScanned = int64(123)
 		stat := athena.QueryExecutionStateCancelled
 		return &athena.GetQueryExecutionOutput{
 			QueryExecution: &athena.QueryExecution{
@@ -271,6 +280,9 @@ func (m *mockAthenaClient) GetQueryExecutionWithContext(c aws.Context,
 				QueryExecutionId: &ping,
 				Status: &athena.QueryExecutionStatus{
 					State: &stat,
+				},
+				Statistics: &athena.QueryExecutionStatistics{
+					DataScannedInBytes: &dataScanned,
 				},
 			},
 		}, nil
@@ -319,7 +331,6 @@ func (m *mockAthenaClient) GetQueryExecutionWithContext(c aws.Context,
 		}, nil
 	}
 	return nil, ErrTestMockGeneric
-
 }
 
 func (m *mockAthenaClient) StopQueryExecutionWithContext(ctx aws.Context, input *athena.StopQueryExecutionInput,

@@ -262,3 +262,11 @@ func TestConfig_WGConfig(t *testing.T) {
 	wg := NewDefaultWG("workgroup1", conf, nil)
 	assert.Equal(t, *wg.Config.BytesScannedCutoffPerQuery, int64(DefaultBytesScannedCutoffPerQuery*10))
 }
+
+func TestConfig_SetMoneyWise(t *testing.T) {
+	testConf := NewNoOpsConfig()
+	testConf.SetMoneyWise(false)
+	assert.False(t, testConf.IsMoneyWise())
+	testConf.SetMoneyWise(true)
+	assert.True(t, testConf.IsMoneyWise())
+}

@@ -500,3 +500,21 @@ func GetFromEnvVal(keys []string) string {
 	}
 	return ""
 }
+
+// printCost is to print query cost
+// https://aws.amazon.com/athena/pricing/
+// Cost of 10MB: 5 / (1024. * 1024.) * 10 = 4.76837158203125e-05
+func printCost(o *athena.GetQueryExecutionOutput) {
+	if o == nil || o.QueryExecution == nil || o.QueryExecution.Statistics == nil {
+		println("query cost: 0.0 USD")
+		return
+	}
+	dataScannedBytes := o.QueryExecution.Statistics.DataScannedInBytes
+	if dataScannedBytes == nil {
+		println("query cost: 0.0 USD")
+	} else if *dataScannedBytes < 10*1024*1024 {
+		println("query cost: 0.0000476837158203125 USD")
+	} else {
+		fmt.Printf("query cost: %.20f USD\n", float64(*dataScannedBytes)/1024.0/1024.0*0.00000476837158203125)
+	}
+}
