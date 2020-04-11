@@ -218,3 +218,28 @@ func TestGetFromEnvVal(t *testing.T) {
 	os.Unsetenv("henrywu_test")
 	assert.Equal(t, GetFromEnvVal([]string{"henrywu_test"}), "")
 }
+
+func TestPrintCost(t *testing.T) {
+	ping := "SELECTExecContext_OK_QID"
+	stat := athena.QueryExecutionStateSucceeded
+	o := &athena.GetQueryExecutionOutput{
+		QueryExecution: &athena.QueryExecution{
+			Query:            &ping,
+			QueryExecutionId: &ping,
+			Status: &athena.QueryExecutionStatus{
+				State: &stat,
+			},
+			Statistics: &athena.QueryExecutionStatistics{
+				DataScannedInBytes: nil,
+			},
+		},
+	}
+	printCost(nil)
+	printCost(o)
+	cost := int64(123)
+	o.QueryExecution.Statistics.DataScannedInBytes = &cost
+	printCost(o)
+	cost = int64(12345678)
+	o.QueryExecution.Statistics.DataScannedInBytes = &cost
+	printCost(o)
+}

@@ -393,3 +393,17 @@ func (c *Config) SetReadOnly(b bool) {
 func (c *Config) IsReadOnly() bool {
 	return c.values.Get("ReadOnly") == "true"
 }
+
+// SetMoneyWise is to set if we are in the moneywise mode
+func (c *Config) SetMoneyWise(b bool) {
+	if b {
+		c.values.Set("MoneyWise", "true")
+	} else {
+		c.values.Set("MoneyWise", "false")
+	}
+}
+
+// IsMoneyWise is to check if we are in the moneywise mode
+func (c *Config) IsMoneyWise() bool {
+	return c.values.Get("MoneyWise") == "true"
+}

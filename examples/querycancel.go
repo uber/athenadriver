@@ -40,10 +40,11 @@ func main() {
 	}
 
 	// 2. Open Connection.
+	conf.SetMoneyWise(true)
 	dsn := conf.Stringify()
 	db, _ := sql.Open(drv.DriverName, dsn)
 	// 3. Query cancellation after 2 seconds
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	rows, err := db.QueryContext(ctx, "select count(*) from sampledb.elb_logs")
 	if err != nil {
@@ -52,13 +53,12 @@ func main() {
 	}
 	defer rows.Close()
 
-	var requestTimestamp string
-	var url string
+	var cnt int64
 	for rows.Next() {
-		if err := rows.Scan(&requestTimestamp, &url); err != nil {
+		if err := rows.Scan(&cnt); err != nil {
 			log.Fatal(err)
 		}
-		println(requestTimestamp + "," + url)
+		println(cnt)
 	}
 }
 
