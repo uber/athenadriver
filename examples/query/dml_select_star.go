@@ -34,7 +34,6 @@ func main() {
 	conf, err := drv.NewDefaultConfig(secret.OutputBucket, secret.Region,
 		secret.AccessID, secret.SecretAccessKey)
 	if err != nil {
-		log.Fatal(err)
 		return
 	}
 	// 2. Open Connection.
