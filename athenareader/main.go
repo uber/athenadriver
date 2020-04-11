@@ -34,7 +34,7 @@ import (
 var commandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 func printVersion() {
-	println("Current build version: v1.1.3")
+	println("Current build version: v1.1.4")
 }
 
 // main will query Athena and print all columns and rows information in csv format
@@ -43,9 +43,9 @@ func main() {
 	var database = flag.String("d", "default", "The database you want to query")
 	var query = flag.String("q", "select 1", "The SQL query string or a file containing SQL string")
 	var rowOnly = flag.Bool("r", false, "Display rows only, don't show the first row as columninfo")
-	var moneyWise = flag.Bool("m", false, "Display the query cost as the first line of the output")
+	var moneyWise = flag.Bool("m", false, "Enable moneywise mode to display the query cost as the first line of the output")
 	var versionFlag = flag.Bool("v", false, "Print the current version and exit")
-	var admin = flag.Bool("a", false, "Enable admin mode, so database write is allowed at athenadriver level")
+	var admin = flag.Bool("a", false, "Enable admin mode, so database write(create/drop) is allowed at athenadriver level")
 
 	flag.Usage = func() {
 		preBody := "NAME\n\tathenareader - read athena data from command line\n\n"
@@ -60,11 +60,19 @@ func main() {
 			"\t$ athenareader -d sampledb -b s3://my-athena-query-result -q tools/query.sql\n" +
 			"\trequest_timestamp,elb_name\n" +
 			"\t2015-01-06T00:00:00.516940Z,elb_demo_009\n\n" +
+			"\n\tAdd '-m' to enable moneywise mode. The first line will display query cost under moneywise mode.\n\n" +
+			"\t$ athenareader -b s3://athena-query-result -q 'select count(*) as cnt from sampledb.elb_logs' -m\n" +
+			"\tquery cost: 0.00184898369752772851 USD\n" +
+			"\tcnt\n" +
+			"\t1356206\n\n"+
+			"\n\tAdd '-a' to enable admin mode. Database write is enabled at driver level under admin mode.\n\n" +
+			"\t$ athenareader -b s3://athena-query-result -q 'DROP TABLE IF EXISTS depreacted_table' -a\n" +
+			"\t\n" +
 			"AUTHOR\n\tHenry Fuheng Wu (henry.wu@uber.com)\n\n" +
 			"REPORTING BUGS\n\thttps://github.com/uber/athenadriver\n"
 		fmt.Fprintf(commandLine.Output(), preBody)
 		fmt.Fprintf(commandLine.Output(),
-			"SYNOPSIS\n\t%s [-v] [-b output_bucket] [-d database_name] [-q query_string_or_file] [-r]\n\nDESCRIPTION\n", os.Args[0])
+			"SYNOPSIS\n\t%s [-v] [-b output_bucket] [-d database_name] [-q query_string_or_file] [-r] [-a] [-m]\n\nDESCRIPTION\n", os.Args[0])
 		flag.PrintDefaults()
 		fmt.Fprintf(commandLine.Output(), desc)
 	}
