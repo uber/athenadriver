@@ -12,7 +12,7 @@
 
 ----
 
-command line utililty: :shell: [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader)
+:shell: [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader) - command line utililty to query athena in command line
 
 ----
 
