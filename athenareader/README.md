@@ -9,7 +9,7 @@ To avoid exposing access keys(Access Key ID and Secret Access Key) in command li
 ## How to get/build/install `athenareader`
 
 ```
-go get github.com/uber/athenadriver/athenareader
+go get -u github.com/uber/athenadriver/athenareader
 ```
 
 ## How to use `athenareader`
