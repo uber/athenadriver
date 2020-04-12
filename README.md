@@ -43,7 +43,8 @@ Except the basic features provided by Go `database/sql` like error handling, dat
 - Query cancelling support 
 - Mask columns with specific values 
 - Database missing value handling 
-- Read-Only mode 
+- Read-Only mode - disable database write in driver level
+- Moneywise mode - print out query cost(USD) for each query
 
 `athenadriver` can extremely simplify your code. Check [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader) out as an example and a convenient tool for your Athena query in command line. 
 
