@@ -10,6 +10,12 @@
 [![lic][license-img]][license]
 [![made][made-img]][made]
 
+----
+
+command line utililty: :shell: [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader)
+
+----
+
 ## Overview
 
 (This project is a sandbox project and the development status is STABLE.)
@@ -70,7 +76,7 @@ For more details on `athenadriver`'s support on AWS credentials & S3 query resul
 ### Installation
 
 ```scala
-go get github.com/uber/athenadriver
+go get -u github.com/uber/athenadriver
 ```
 
 ### Tests
@@ -896,7 +902,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [cov-img]: https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
 
-[release-img]: https://img.shields.io/badge/release-v1.1.1-red
+[release-img]: https://img.shields.io/badge/release-v1.1.4-red
 [release]: https://github.com/uber/athenadriver/releases
 
 [ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?token=e2usf1UJEGmsFDHzV61y&branch=master
