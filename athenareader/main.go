@@ -64,7 +64,7 @@ func main() {
 			"\t$ athenareader -b s3://athena-query-result -q 'select count(*) as cnt from sampledb.elb_logs' -m\n" +
 			"\tquery cost: 0.00184898369752772851 USD\n" +
 			"\tcnt\n" +
-			"\t1356206\n\n"+
+			"\t1356206\n\n" +
 			"\n\tAdd '-a' to enable admin mode. Database write is enabled at driver level under admin mode.\n\n" +
 			"\t$ athenareader -b s3://athena-query-result -q 'DROP TABLE IF EXISTS depreacted_table' -a\n" +
 			"\t\n" +

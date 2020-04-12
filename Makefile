@@ -42,7 +42,6 @@ lint: $(GOLINT)
 	@gofmt -d -s $(GO_FILES) 2>&1 | tee lint.log
 	@echo "Checking vet..."
 	@go vet github.com/uber/athenadriver/go/... 2>&1 | tee -a lint.log
-	@go vet github.com/uber/athenadriver/athenareader/... 2>&1 | tee -a lint.log
 	@echo "Checking lint..."
 	@$(GOLINT) github.com/uber/athenadriver/go/... | tee -a lint.log
 	@$(GOLINT) github.com/uber/athenadriver/athenareader/... | tee -a lint.log
