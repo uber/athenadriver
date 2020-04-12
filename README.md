@@ -13,7 +13,6 @@
 ----
 
 :package: [athenadriver](https://github.com/uber/athenadriver/tree/master/go) - A fully-featured AWS Athena database driver for Go  
-
 :shell: [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader) - A moneywise command line utililty to query athena in command line. Pay less and Query More!
 
 ----
