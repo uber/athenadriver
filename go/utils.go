@@ -570,7 +570,8 @@ func GetTidySQL(query string) string {
 	stmt, err := sqlparser.Parse(query)
 	if err == nil {
 		q := sqlparser.String(stmt)
-		if q == "otherread" {
+		// OtherRead represents a DESCRIBE, or EXPLAIN statement.
+		if q == "otherread"  || q == "otheradmin"{
 			return query
 		}
 		var dual = regexp.MustCompile(`from dual`)

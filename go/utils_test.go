@@ -235,11 +235,27 @@ func TestPrintCost(t *testing.T) {
 		},
 	}
 	printCost(nil)
+	printCost(&athena.GetQueryExecutionOutput{
+		QueryExecution: nil,
+	})
+	printCost(&athena.GetQueryExecutionOutput{
+		QueryExecution: &athena.QueryExecution{
+			Query:            &ping,
+			QueryExecutionId: &ping,
+			Status: &athena.QueryExecutionStatus{
+				State: &stat,
+			},
+			Statistics: nil,
+		},
+	})
 	printCost(o)
 	cost := int64(123)
 	o.QueryExecution.Statistics.DataScannedInBytes = &cost
 	printCost(o)
-	cost = int64(12345678)
+	cost = int64(12345678123456)
+	o.QueryExecution.Statistics.DataScannedInBytes = &cost
+	printCost(o)
+	cost = int64(0)
 	o.QueryExecution.Statistics.DataScannedInBytes = &cost
 	printCost(o)
 }
@@ -306,6 +322,8 @@ func TestUilts_GetTableNamesInQuery(t *testing.T) {
 
 func TestUilts_GetTidySQL(t *testing.T) {
 	assert.Equal(t, GetTidySQL(""), "")
+	assert.Equal(t, GetTidySQL("DESC abc"), "DESC abc")
+	assert.Equal(t, GetTidySQL("TRUNCATE abc"), "truncate table abc")
 	assert.Equal(t, GetTidySQL("select"), "select")
 	assert.Equal(t, GetTidySQL("drop table abc "), "drop table abc")
 	assert.Equal(t, GetTidySQL("/**/ "), "")
@@ -316,4 +334,12 @@ func TestUilts_GetTidySQL(t *testing.T) {
 	assert.Equal(t, GetTidySQL("/**/ "), "")
 	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1;"), "select 1")
 	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1 from;"), "SELECT 1 from;")
+	assert.Equal(t, GetTidySQL(" SELECT * from catalog.sampledb.abc "), "SELECT * from catalog.sampledb.abc")
+	assert.Equal(t, GetTidySQL(" select  *  from catalog.sampledb.abc "), "select  *  from catalog.sampledb.abc")
+}
+
+func TestUilts_GetCost(t *testing.T) {
+	assert.Equal(t, getCost(0), 0.0)
+	assert.Equal(t, getCost(1), getPrice10MB())
+	assert.Equal(t, getCost(10*1024*1024*123), getPriceOneByte()*10*1024*1024*123)
 }
