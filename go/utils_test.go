@@ -244,7 +244,7 @@ func TestPrintCost(t *testing.T) {
 	printCost(o)
 }
 
-func TestUilts_GetTableNamesInQuery(t *testing.T){
+func TestUilts_GetTableNamesInQuery(t *testing.T) {
 	query := "SELECT * from abc"
 	tableNames := GetTableNamesInQuery(query)
 	assert.Len(t, tableNames, 1)
@@ -304,7 +304,7 @@ func TestUilts_GetTableNamesInQuery(t *testing.T){
 	assert.Len(t, tableNames, 1)
 }
 
-func TestUilts_GetTidySQL(t *testing.T){
+func TestUilts_GetTidySQL(t *testing.T) {
 	assert.Equal(t, GetTidySQL(""), "")
 	assert.Equal(t, GetTidySQL("select"), "select")
 	assert.Equal(t, GetTidySQL("drop table abc "), "drop table abc")
@@ -315,4 +315,5 @@ func TestUilts_GetTidySQL(t *testing.T){
 	assert.Equal(t, GetTidySQL("DROP TABLE ABC "), "drop table ABC")
 	assert.Equal(t, GetTidySQL("/**/ "), "")
 	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1;"), "select 1")
+	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1 from;"), "select 1 from")
 }

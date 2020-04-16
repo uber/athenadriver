@@ -537,21 +537,21 @@ func getCost(data int64) float64 {
 	} else if data < int64(10*1024*1024) {
 		return getPrice10MB()
 	} else {
-		return float64(data) *getPriceOneByte()
+		return float64(data) * getPriceOneByte()
 	}
 }
 
 // GetTableNamesInQuery is a pessimistic function to return tables involved in query in format of DB.TABLE
 // https://regoio.herokuapp.com/
 // https://golang.org/pkg/regexp/syntax/
-func GetTableNamesInQuery(query string) map[string]bool{
+func GetTableNamesInQuery(query string) map[string]bool {
 	r, _ := regexp.Compile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
 	matchedResults := r.FindAllStringSubmatch(query, -1)
 	tables := map[string]bool{}
-	for _, matchedTableName := range(matchedResults) {
-		if len(matchedTableName) == 2{
-			if strings.IndexByte(matchedTableName[1], '.') == -1{
-				tables[DefaultDBName + "." + matchedTableName[1]] = true
+	for _, matchedTableName := range matchedResults {
+		if len(matchedTableName) == 2 {
+			if strings.IndexByte(matchedTableName[1], '.') == -1 {
+				tables[DefaultDBName+"."+matchedTableName[1]] = true
 			} else {
 				tables[matchedTableName[1]] = true
 			}
@@ -560,7 +560,9 @@ func GetTableNamesInQuery(query string) map[string]bool{
 	return tables
 }
 
+// GetTidySQL is to return a tidy SQL string
 func GetTidySQL(query string) string {
+	// remove comments
 	var multiLineComment = regexp.MustCompile(`\/\*(.*)\*/\s*`)
 	query = multiLineComment.ReplaceAllString(query, "")
 	var oneLineComment = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
@@ -574,5 +576,5 @@ func GetTidySQL(query string) string {
 		var dual = regexp.MustCompile(`from dual`)
 		query = dual.ReplaceAllString(q, "")
 	}
-	return strings.Trim(query," ")
+	return strings.Trim(query, " ")
 }
