@@ -122,7 +122,7 @@ func (m *mockAthenaClient) CreateWorkGroup(*athena.CreateWorkGroupInput) (
 
 func (m *mockAthenaClient) StartQueryExecution(s *athena.
 	StartQueryExecutionInput) (*athena.StartQueryExecutionOutput, error) {
-	if *s.QueryString == "SELECT 1" { // Ping
+	if *s.QueryString == "select 1" { // Ping
 		qid := "PING_OK_QID"
 		return &athena.StartQueryExecutionOutput{
 			QueryExecutionId: &qid,

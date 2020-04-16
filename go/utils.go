@@ -28,9 +28,11 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/xwb1989/sqlparser"
 	"math"
 	"math/rand"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -503,18 +505,78 @@ func GetFromEnvVal(keys []string) string {
 
 // printCost is to print query cost
 // https://aws.amazon.com/athena/pricing/
-// Cost of 10MB: 5 / (1024. * 1024.) * 10 = 4.76837158203125e-05
+// getCost of 10MB: 5 / (1024. * 1024.) * 10 = 4.76837158203125e-05
 func printCost(o *athena.GetQueryExecutionOutput) {
 	if o == nil || o.QueryExecution == nil || o.QueryExecution.Statistics == nil {
-		println("query cost: 0.0 USD")
+		println("query cost: 0.0 USD, scanned data: 0 B, qid: NA")
 		return
 	}
 	dataScannedBytes := o.QueryExecution.Statistics.DataScannedInBytes
 	if dataScannedBytes == nil {
-		println("query cost: 0.0 USD")
+		println("query cost: 0.0 USD, scanned data: 0 B, qid: NA")
+	} else if *dataScannedBytes == 0 {
+		println("query cost: 0.0 USD, scanned data: 0 B, qid: " + *o.QueryExecution.QueryExecutionId)
 	} else if *dataScannedBytes < 10*1024*1024 {
-		println("query cost: 0.0000476837158203125 USD")
+		fmt.Printf("query cost: %.20f USD, scanned data: %d B, qid: %s\n",
+			getCost(*dataScannedBytes),
+			*dataScannedBytes,
+			*o.QueryExecution.QueryExecutionId)
 	} else {
-		fmt.Printf("query cost: %.20f USD\n", float64(*dataScannedBytes)/1024.0/1024.0*0.00000476837158203125)
+		fmt.Printf("query cost: %.20f USD, scanned data: %d B, qid: %s\n",
+			getCost(*dataScannedBytes),
+			*dataScannedBytes,
+			*o.QueryExecution.QueryExecutionId)
 	}
+}
+
+// getCost is return the USD cost upon data scanned in Bytes
+// https://aws.amazon.com/athena/pricing/
+func getCost(data int64) float64 {
+	if data == 0 {
+		return 0.0
+	} else if data < int64(10*1024*1024) {
+		return getPrice10MB()
+	} else {
+		return float64(data) * getPriceOneByte()
+	}
+}
+
+// GetTableNamesInQuery is a pessimistic function to return tables involved in query in format of DB.TABLE
+// https://regoio.herokuapp.com/
+// https://golang.org/pkg/regexp/syntax/
+func GetTableNamesInQuery(query string) map[string]bool {
+	r, _ := regexp.Compile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
+	matchedResults := r.FindAllStringSubmatch(query, -1)
+	tables := map[string]bool{}
+	for _, matchedTableName := range matchedResults {
+		if len(matchedTableName) == 2 {
+			if strings.IndexByte(matchedTableName[1], '.') == -1 {
+				tables[DefaultDBName+"."+matchedTableName[1]] = true
+			} else {
+				tables[matchedTableName[1]] = true
+			}
+		}
+	}
+	return tables
+}
+
+// GetTidySQL is to return a tidy SQL string
+func GetTidySQL(query string) string {
+	// remove comments
+	var multiLineComment = regexp.MustCompile(`\/\*(.*)\*/\s*`)
+	query = multiLineComment.ReplaceAllString(query, "")
+	var oneLineComment = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
+	query = oneLineComment.ReplaceAllString(query, "")
+	stmt, err := sqlparser.Parse(query)
+	if err == nil {
+		q := sqlparser.String(stmt)
+		// OtherRead represents a DESCRIBE, or EXPLAIN statement.
+		// OtherAdmin represents a misc statement that relies on ADMIN privileges.
+		if q == "otherread" || q == "otheradmin" {
+			return query
+		}
+		var dual = regexp.MustCompile(`from dual`)
+		query = dual.ReplaceAllString(q, "")
+	}
+	return strings.Trim(query, " ")
 }
