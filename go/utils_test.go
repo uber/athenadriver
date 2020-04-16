@@ -243,3 +243,76 @@ func TestPrintCost(t *testing.T) {
 	o.QueryExecution.Statistics.DataScannedInBytes = &cost
 	printCost(o)
 }
+
+func TestUilts_GetTableNamesInQuery(t *testing.T){
+	query := "SELECT * from abc"
+	tableNames := GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 1)
+
+	query = "SELECT 1"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 0)
+
+	query = "CREATE TABLE testme3 WITH (format = 'TEXTFILE', " +
+		"external_location = 's3://external-location-henrywu/testme3_2', " +
+		"partitioned_by = ARRAY['ssl_protocol']) AS SELECT * FROM sampledb.elb_logs"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 1)
+
+	query = "SELECT * from sampledb.abc"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 1)
+
+	query = "WITH employee AS (SELECT * FROM Employees)\nSELECT * FROM employee WHERE ID < 20\nUNION ALL\nSELECT * FROM employee WHERE Sex = 'M'"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 2)
+
+	query = "SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate\nFROM Orders\n" +
+		"INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID where a='from abc'"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 2)
+
+	// This is a case which can fail our function, but we are fine with it since we are pessimistic
+	query = "SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate\nFROM Orders\n" +
+		"INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID where a='select * from abc where d=1'"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 3)
+
+	query = "select\n  sum(cost) as cost,\n  account_id,\n  case\n    user_mmowner" +
+		"\n    when '' then 'Unknown'\n    else user_mmowner\n  end as user_mmowner," +
+		"\n  case\n    user_owner\n    when '' then 'Unknown'\n    else user_owner" +
+		"\n  end as user_owner,\n  case\n    user_team\n    when '' then 'Unknown'" +
+		"\n    else user_team\n  end as user_team,\n  case\n    user_organization" +
+		"\n    when '' then 'Unknown'\n    else user_organization\n  end as user_organization," +
+		"\n  usage_date,\n  date_format(usage_date, '%Y-%m') as month_year\nfrom\nmytable\nwhere" +
+		"\n  date_format(usage_date, '%Y-%m') >= \"2019-01\"\n  and product_name = 'AmazonAthena'\ngroup by" +
+		"\n  account_id,\n  user_mmowner,\n  user_owner,\n  user_team," +
+		"\n  user_organization,\n  usage_date"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 1)
+
+	query = "/* QuickSight 32786c73-cbd4-4da0-812c-4a02cbae96b8 */\nSELECT \"key\", \"access_count\"\n" +
+		"FROM (SELECT \n*,\ncount(*) as access_count\nFROM (\nSELECT \n key\n" +
+		"FROM awsdatacatalog.rlogs_access_db.rlogs_server_logs\nWHERE regexp_like(useragent, ',.*presto') = false \n" +
+		"        AND requesturi_operation = 'GET' \n        AND bucket = 'atg-rlogs' \n" +
+		"        AND key like 'manifests%' \n        AND httpstatus = '200' \n" +
+		"        AND CAST( date_format(date_parse(rpad(requestdatetime, 11, '-'), '%d/%b/%Y'), '%Y-%m-%d') AS DATE )" +
+		" >= (current_date - interval '7' day) \n        AND split_part(requester, '/', 2) not " +
+		"like 'data_curation_lambda_role'\n) subquery\nGROUP BY key ORDER BY access_count asc LIMIT 10) " +
+		"AS \"sal_DataCurationTop10LeastAccessedLogLast7Days\""
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 1)
+}
+
+func TestUilts_GetTidySQL(t *testing.T){
+	assert.Equal(t, GetTidySQL(""), "")
+	assert.Equal(t, GetTidySQL("select"), "select")
+	assert.Equal(t, GetTidySQL("drop table abc "), "drop table abc")
+	assert.Equal(t, GetTidySQL("/**/ "), "")
+	assert.Equal(t, GetTidySQL("/* select 1 */ select 1;"), "select 1")
+	assert.Equal(t, GetTidySQL("SHOW FUNCTIONS;"), "show FUNCTIONS")
+	assert.Equal(t, GetTidySQL("SELECT 1"), "select 1")
+	assert.Equal(t, GetTidySQL("DROP TABLE ABC "), "drop table ABC")
+	assert.Equal(t, GetTidySQL("/**/ "), "")
+	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1;"), "select 1")
+}
