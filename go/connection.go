@@ -199,6 +199,7 @@ func (c *Connection) ExecContext(ctx context.Context, query string, namedArgs []
 // With QueryContext implemented, we don't need Queryer.
 // QueryerContext must honor the context timeout and return when the context is canceled.
 func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs []driver.NamedValue) (driver.Rows, error) {
+	query = GetTidySQL(query)
 	var obs = c.connector.tracer
 	if c.connector.config.IsReadOnly() {
 		if !isReadOnlyStatement(query) {
