@@ -315,5 +315,5 @@ func TestUilts_GetTidySQL(t *testing.T) {
 	assert.Equal(t, GetTidySQL("DROP TABLE ABC "), "drop table ABC")
 	assert.Equal(t, GetTidySQL("/**/ "), "")
 	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1;"), "select 1")
-	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1 from;"), "select 1 from")
+	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1 from;"), "SELECT 1 from;")
 }
