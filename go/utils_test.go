@@ -291,15 +291,15 @@ func TestUilts_GetTableNamesInQuery(t *testing.T){
 	tableNames = GetTableNamesInQuery(query)
 	assert.Len(t, tableNames, 1)
 
-	query = "/* QuickSight 32786c73-cbd4-4da0-812c-4a02cbae96b8 */\nSELECT \"key\", \"access_count\"\n" +
-		"FROM (SELECT \n*,\ncount(*) as access_count\nFROM (\nSELECT \n key\n" +
-		"FROM awsdatacatalog.rlogs_access_db.rlogs_server_logs\nWHERE regexp_like(useragent, ',.*presto') = false \n" +
+	query = "/* QuickSight 12345678-1234-5678-812c-4a02cbae96b8 */\nSELECT \"key\", \"bbbb\"\n" +
+		"FROM (SELECT \n*,\ncount(*) as aaaa\nFROM (\nSELECT \n key\n" +
+		"FROM adfads.asdfsdf.adfasdfasd\nWHERE regexp_like(assda, ',.*presto') = false \n" +
 		"        AND requesturi_operation = 'GET' \n        AND bucket = 'atg-rlogs' \n" +
 		"        AND key like 'manifests%' \n        AND httpstatus = '200' \n" +
 		"        AND CAST( date_format(date_parse(rpad(requestdatetime, 11, '-'), '%d/%b/%Y'), '%Y-%m-%d') AS DATE )" +
-		" >= (current_date - interval '7' day) \n        AND split_part(requester, '/', 2) not " +
-		"like 'data_curation_lambda_role'\n) subquery\nGROUP BY key ORDER BY access_count asc LIMIT 10) " +
-		"AS \"sal_DataCurationTop10LeastAccessedLogLast7Days\""
+		" >= (current_date - interval '7' day) \n        AND split_part(aaaa, '/', 2) not " +
+		"like 'xxx'\n) subquery\nGROUP BY key ORDER BY ddddd asc LIMIT 10) " +
+		"AS \"asdadsfasdfa\""
 	tableNames = GetTableNamesInQuery(query)
 	assert.Len(t, tableNames, 1)
 }
