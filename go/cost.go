@@ -1,5 +1,8 @@
 package athenadriver
 
+// getPriceOneByte to get the USD price per 1 Byte
+// >>> 5.0/ (1024**4)
+// 4.547473508864641e-12
 // https://calculator.aws/pricing/2.0/meteredUnitMaps/athena/USD/current/athena.json
 /**
 {
@@ -138,15 +141,10 @@ package athenadriver
    }
 }
 */
-
-
-// getPriceOneByte to get the USD price per 1 Byte
-// >>> 5.0/ (1024**4)
-// 4.547473508864641e-12
 func getPriceOneByte() float64 {
 	return 4.547473508864641e-12
 }
 
 func getPrice10MB() float64 {
-	return 10*1024*1024*getPriceOneByte()
+	return 10 * 1024 * 1024 * getPriceOneByte()
 }
