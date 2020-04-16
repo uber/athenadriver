@@ -571,7 +571,8 @@ func GetTidySQL(query string) string {
 	if err == nil {
 		q := sqlparser.String(stmt)
 		// OtherRead represents a DESCRIBE, or EXPLAIN statement.
-		if q == "otherread"  || q == "otheradmin"{
+		// OtherAdmin represents a misc statement that relies on ADMIN privileges.
+		if q == "otherread"  || q == "otheradmin" {
 			return query
 		}
 		var dual = regexp.MustCompile(`from dual`)
