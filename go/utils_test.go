@@ -341,5 +341,5 @@ func TestUilts_GetTidySQL(t *testing.T) {
 func TestUilts_GetCost(t *testing.T) {
 	assert.Equal(t, getCost(0), 0.0)
 	assert.Equal(t, getCost(1), getPrice10MB())
-	assert.Equal(t, getCost(10*1024*1024*123), getPriceOneByte()*10*1024*1024*13)
+	assert.Equal(t, getCost(10*1024*1024*13), getPriceOneByte()*10*1024*1024*13)
 }
