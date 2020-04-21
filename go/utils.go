@@ -545,6 +545,10 @@ func getCost(data int64) float64 {
 // https://regoio.herokuapp.com/
 // https://golang.org/pkg/regexp/syntax/
 func GetTableNamesInQuery(query string) map[string]bool {
+	var multiLineComment = regexp.MustCompile(`\/\*(.*)\*/\s*`)
+	query = multiLineComment.ReplaceAllString(query, "")
+	var oneLineComment = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
+	query = oneLineComment.ReplaceAllString(query, "")
 	r, _ := regexp.Compile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
 	matchedResults := r.FindAllStringSubmatch(query, -1)
 	tables := map[string]bool{}
