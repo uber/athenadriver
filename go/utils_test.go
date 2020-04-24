@@ -318,6 +318,36 @@ func TestUilts_GetTableNamesInQuery(t *testing.T) {
 		"AS \"asdadsfasdfa\""
 	tableNames = GetTableNamesInQuery(query)
 	assert.Len(t, tableNames, 1)
+
+	query = "-- What percentage of each node does each non-daemon pod use, and who owns it, if anyone from henry?\n" +
+		"SELECT by_resource.cluster_id, node_object.name AS node_name, instance_type, pricing_model, region, zone, " +
+		"namespace, by_resource.name AS pod_name, avg(resource_percent) AS responsibility_pct, owner\nFROM (\n" +
+		"  SELECT pods.cluster_id, pods.uid, object.name, namespace, pods.node_uid, instance_type," +
+		" req.name AS resource_name, req.quantity,\n    100 * req.quantity / sum(req.quantity) OVER w AS resource_percent\n" +
+		"  FROM (\n    SELECT cluster_id, uid, node_uid\n    FROM pod_active\n    WHERE as_of <= '2019-12-02 10:00:00'\n" +
+		"    UNION ALL -- We know these sets are disjoint.\n    SELECT cluster_id, uid, node_uid\n" +
+		"    FROM pod_active_during\n    WHERE during @> '2019-12-02 10:00:00'::timestamp\n  ) pods\n" +
+		"  NATURAL JOIN object\n  NATURAL JOIN namespaced_object\n  JOIN pod_resource_request req USING (cluster_id, uid)\n" +
+		"  JOIN node_machine\n    ON node_machine.cluster_id = pods.cluster_id\n    AND node_machine.uid = pods.node_uid\n" +
+		"  WHERE NOT EXISTS\n    (SELECT 1\n     FROM (\n       SELECT owner_uid AS uid\n       FROM owning_controller\n" +
+		"       WHERE as_of <= '2019-12-02 10:00:00'\n         AND cluster_id = pods.cluster_id\n         AND uid = pods.uid\n" +
+		"       UNION ALL -- We know these sets are disjoint.\n       SELECT owner_uid AS uid\n" +
+		"       FROM owning_controller_during\n       WHERE during @> '2019-12-02 10:00:00'::timestamp\n" +
+		"         AND cluster_id = pods.cluster_id\n         AND uid = pods.uid\n       LIMIT 1\n     ) owner\n" +
+		"     JOIN object_type_meta\n       ON cluster_id = pods.cluster_id\n       AND object_type_meta.uid = owner.uid\n" +
+		"       WHERE api_group = 'apps'\n         AND version = 'v1'\n         AND kind = 'DaemonSet'\n  )\n" +
+		"  WINDOW w AS (PARTITION BY pods.cluster_id, node_uid, req.name)\n) by_resource\nJOIN object node_object\n" +
+		"  ON node_object.cluster_id = by_resource.cluster_id\n  AND node_object.uid = by_resource.node_uid\n" +
+		"LEFT OUTER JOIN node_pricing\n  ON node_pricing.cluster_id = by_resource.cluster_id\n" +
+		"  AND node_pricing.uid = by_resource.node_uid\nLEFT OUTER JOIN node_topology\n" +
+		"  ON node_topology.cluster_id = by_resource.cluster_id\n  AND node_topology.uid = by_resource.node_uid\n" +
+		"LEFT OUTER JOIN (\n  SELECT cluster_id, uid, owner\n  FROM object_owner\n  WHERE as_of <= '2019-12-02 10:00:00'\n" +
+		"  UNION ALL -- We know these sets are disjoint.\n  SELECT cluster_id, uid, owner\n  FROM object_owner_during\n" +
+		"  WHERE during @> '2019-12-02 10:00:00'::timestamp\n) pod_owners\n  ON pod_owners.cluster_id = by_resource.cluster_id\n" +
+		"  AND pod_owners.uid = by_resource.uid\nGROUP BY by_resource.cluster_id, node_name, instance_type, pricing_model, " +
+		"region, zone, namespace, pod_name, owner;"
+	tableNames = GetTableNamesInQuery(query)
+	assert.Len(t, tableNames, 13)
 }
 
 func TestUilts_GetTidySQL(t *testing.T) {

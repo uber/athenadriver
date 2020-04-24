@@ -541,16 +541,18 @@ func getCost(data int64) float64 {
 	}
 }
 
+var multiLineCommentRE = regexp.MustCompile(`\/\*(.*)\*/\s*`)
+var oneLineCommentRE = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
+var getTableNameRE = regexp.MustCompile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
+var dualRE = regexp.MustCompile(`from dual`)
+
 // GetTableNamesInQuery is a pessimistic function to return tables involved in query in format of DB.TABLE
 // https://regoio.herokuapp.com/
 // https://golang.org/pkg/regexp/syntax/
 func GetTableNamesInQuery(query string) map[string]bool {
-	var multiLineComment = regexp.MustCompile(`\/\*(.*)\*/\s*`)
-	query = multiLineComment.ReplaceAllString(query, "")
-	var oneLineComment = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
-	query = oneLineComment.ReplaceAllString(query, "")
-	r, _ := regexp.Compile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
-	matchedResults := r.FindAllStringSubmatch(query, -1)
+	query = multiLineCommentRE.ReplaceAllString(query, "")
+	query = oneLineCommentRE.ReplaceAllString(query, "")
+	matchedResults := getTableNameRE.FindAllStringSubmatch(query, -1)
 	tables := map[string]bool{}
 	for _, matchedTableName := range matchedResults {
 		if len(matchedTableName) == 2 {
@@ -566,11 +568,8 @@ func GetTableNamesInQuery(query string) map[string]bool {
 
 // GetTidySQL is to return a tidy SQL string
 func GetTidySQL(query string) string {
-	// remove comments
-	var multiLineComment = regexp.MustCompile(`\/\*(.*)\*/\s*`)
-	query = multiLineComment.ReplaceAllString(query, "")
-	var oneLineComment = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
-	query = oneLineComment.ReplaceAllString(query, "")
+	query = multiLineCommentRE.ReplaceAllString(query, "")
+	query = oneLineCommentRE.ReplaceAllString(query, "")
 	stmt, err := sqlparser.Parse(query)
 	if err == nil {
 		q := sqlparser.String(stmt)
@@ -579,8 +578,7 @@ func GetTidySQL(query string) string {
 		if q == "otherread" || q == "otheradmin" {
 			return query
 		}
-		var dual = regexp.MustCompile(`from dual`)
-		query = dual.ReplaceAllString(q, "")
+		query = dualRE.ReplaceAllString(q, "")
 	}
 	return strings.Trim(query, " ")
 }
