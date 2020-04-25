@@ -553,6 +553,11 @@ func TestConnection_QueryContext7(t *testing.T) {
 	driverRows, err = c.QueryContext(ctx, query, []driver.NamedValue{})
 	assert.NotNil(t, err)
 	assert.Nil(t, driverRows)
+
+	query = "00000000-0000-0000-0000-000000000000"
+	driverRows, err = c.QueryContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, err)
+	assert.NotNil(t, driverRows)
 }
 
 func BenchmarkConnection_QueryContext(b *testing.B) {
@@ -615,6 +620,11 @@ func TestMoneyWise(t *testing.T) {
 	assert.Nil(t, er)
 	assert.NotNil(t, dr)
 
+	query = "00000000-0000-0000-0000-000000000000"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
+
 	query = "SELECTQueryContext_CANCEL_OK"
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	defer cancel()
@@ -628,4 +638,26 @@ func TestMoneyWise(t *testing.T) {
 	dr2, err = c.QueryContext(ctx, query, []driver.NamedValue{})
 	assert.NotNil(t, err)
 	assert.Nil(t, dr2)
+}
+
+func TestConnection_CachedQuery(t *testing.T) {
+	t.Parallel()
+	c := &Connection{
+		athenaAPI: newMockAthenaClient(),
+		connector: NoopsSQLConnector(),
+	}
+	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
+	testConf := NewNoOpsConfig()
+	err := testConf.SetOutputBucket(s3bucket)
+	assert.Nil(t, err)
+	err = testConf.SetRegion("us-east-1")
+	assert.Nil(t, err)
+	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetDB("default") // default
+	testConf.SetMoneyWise(true)
+	c.connector.config = testConf
+	query := "00000000-0000-0000-0000-000000000000"
+	dr, er := c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
 }

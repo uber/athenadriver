@@ -541,18 +541,19 @@ func getCost(data int64) float64 {
 	}
 }
 
-var multiLineCommentRE = regexp.MustCompile(`\/\*(.*)\*/\s*`)
-var oneLineCommentRE = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
-var getTableNameRE = regexp.MustCompile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
-var dualRE = regexp.MustCompile(`from dual`)
+var multiLineCommentPattern = regexp.MustCompile(`\/\*(.*)\*/\s*`)
+var oneLineCommentPattern = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
+var getTableNamePattern = regexp.MustCompile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
+var dualPattern = regexp.MustCompile(`from dual`)
+var QIDPattern = regexp.MustCompile(`[0-9a-f-]{36}`)
 
 // GetTableNamesInQuery is a pessimistic function to return tables involved in query in format of DB.TABLE
 // https://regoio.herokuapp.com/
 // https://golang.org/pkg/regexp/syntax/
 func GetTableNamesInQuery(query string) map[string]bool {
-	query = multiLineCommentRE.ReplaceAllString(query, "")
-	query = oneLineCommentRE.ReplaceAllString(query, "")
-	matchedResults := getTableNameRE.FindAllStringSubmatch(query, -1)
+	query = multiLineCommentPattern.ReplaceAllString(query, "")
+	query = oneLineCommentPattern.ReplaceAllString(query, "")
+	matchedResults := getTableNamePattern.FindAllStringSubmatch(query, -1)
 	tables := map[string]bool{}
 	for _, matchedTableName := range matchedResults {
 		if len(matchedTableName) == 2 {
@@ -568,8 +569,8 @@ func GetTableNamesInQuery(query string) map[string]bool {
 
 // GetTidySQL is to return a tidy SQL string
 func GetTidySQL(query string) string {
-	query = multiLineCommentRE.ReplaceAllString(query, "")
-	query = oneLineCommentRE.ReplaceAllString(query, "")
+	query = multiLineCommentPattern.ReplaceAllString(query, "")
+	query = oneLineCommentPattern.ReplaceAllString(query, "")
 	stmt, err := sqlparser.Parse(query)
 	if err == nil {
 		q := sqlparser.String(stmt)
@@ -578,7 +579,14 @@ func GetTidySQL(query string) string {
 		if q == "otherread" || q == "otheradmin" {
 			return query
 		}
-		query = dualRE.ReplaceAllString(q, "")
+		query = dualPattern.ReplaceAllString(q, "")
 	}
 	return strings.Trim(query, " ")
+}
+
+// IsQueryID is to check if a query string is a Query ID
+// the hexadecimal Athena query ID like a44f8e61-4cbb-429a-b7ab-bea2c4a5caed
+// https://aws.amazon.com/premiumsupport/knowledge-center/access-download-athena-query-results/
+func IsQID(q string) bool {
+	return QIDPattern.MatchString(q)
 }

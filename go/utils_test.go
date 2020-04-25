@@ -403,3 +403,9 @@ func TestUilts_GetCost(t *testing.T) {
 	assert.Equal(t, getCost(1), getPrice10MB())
 	assert.Equal(t, getCost(10*1024*1024*13), getPriceOneByte()*10*1024*1024*13)
 }
+
+func TestUtils_IsQID(t *testing.T) {
+	assert.True(t, IsQID("a44f8e61-4cbb-429a-b7ab-bea2c4a5caed"))
+	assert.False(t, IsQID("a44f8e61-4cbb-429a-b7ab-bea2c4a5caeD"))
+	assert.False(t, IsQID("a44f8e61"))
+}

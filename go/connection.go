@@ -188,6 +188,25 @@ func (c *Connection) ExecContext(ctx context.Context, query string, namedArgs []
 	return result, nil
 }
 
+func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, error) {
+	if c.connector.config.IsMoneyWise() {
+		dataScanned := int64(0)
+		printCost(&athena.GetQueryExecutionOutput{
+			QueryExecution: &athena.QueryExecution{
+				QueryExecutionId: &QID,
+				Statistics: &athena.QueryExecutionStatistics{
+					DataScannedInBytes: &dataScanned,
+				},
+			},
+		})
+	}
+	wg := c.connector.config.GetWorkgroup()
+	if wg.Name == "" {
+		wg.Name = DefaultWGName
+	}
+	return NewRows(ctx, c.athenaAPI, QID, c.connector.config, c.connector.tracer)
+}
+
 // QueryContext is implemented to be called by `DB.Query` (QueryerContext interface).
 //
 // "QueryerContext is an optional interface that may be implemented by a Conn.
@@ -255,6 +274,12 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	startOfStartQueryExecution := time.Now()
 	obs.Scope().Timer(DriverName + ".query.workgroup").Record(timeWorkgroup)
 
+	// case 1 - query directly using QID
+	if IsQID(query) {
+		return c.cachedQuery(ctx, query)
+	}
+
+	//  case 2 - TODO
 	resp, err := c.athenaAPI.StartQueryExecution(&athena.StartQueryExecutionInput{
 		QueryString: aws.String(query),
 		QueryExecutionContext: &athena.QueryExecutionContext{
