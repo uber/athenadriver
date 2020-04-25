@@ -61,13 +61,34 @@ func useAWSCLIConfigForAuth() {
 	os.Unsetenv("AWS_SDK_LOAD_CONFIG")
 }
 
+// To use AWS CLI's Config for authentication with non-default profile
+func useAWSCLIConfigForAuthProfile(profile string) {
+	os.Setenv("AWS_SDK_LOAD_CONFIG", "1")
+	os.Setenv("AWS_PROFILE", profile)
+	// 1. Set AWS Credential in Driver Config.
+	conf, err := drv.NewDefaultConfig(secret.OutputBucketDev, drv.DummyRegion,
+		drv.DummyAccessID, drv.DummySecretAccessKey)
+	if err != nil {
+		return
+	}
+	// 2. Open Connection.
+	db, _ := sql.Open(drv.DriverName, conf.Stringify())
+	// 3. Query and print results
+	var i int
+	_ = db.QueryRow("SELECT 789").Scan(&i)
+	println("with AWS CLI Config With Profile:", i)
+	os.Unsetenv("AWS_SDK_LOAD_CONFIG")
+}
+
 func main() {
 	useAthenaDriverConfigForAuth()
 	useAWSCLIConfigForAuth()
+	useAWSCLIConfigForAuthProfile("henry")
 }
 
 /*
 Sample Output:
 with AthenaDriver Config: 123
 with AWS CLI Config: 456
+with AWS CLI Config With Profile: 789
 */
