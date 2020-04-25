@@ -545,7 +545,7 @@ var multiLineCommentPattern = regexp.MustCompile(`\/\*(.*)\*/\s*`)
 var oneLineCommentPattern = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
 var getTableNamePattern = regexp.MustCompile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
 var dualPattern = regexp.MustCompile(`from dual`)
-var QIDPattern = regexp.MustCompile(`[0-9a-f-]{36}`)
+var qIDPattern = regexp.MustCompile(`[0-9a-f-]{36}`)
 
 // GetTableNamesInQuery is a pessimistic function to return tables involved in query in format of DB.TABLE
 // https://regoio.herokuapp.com/
@@ -584,9 +584,9 @@ func GetTidySQL(query string) string {
 	return strings.Trim(query, " ")
 }
 
-// IsQueryID is to check if a query string is a Query ID
+// IsQID is to check if a query string is a Query ID
 // the hexadecimal Athena query ID like a44f8e61-4cbb-429a-b7ab-bea2c4a5caed
 // https://aws.amazon.com/premiumsupport/knowledge-center/access-download-athena-query-results/
 func IsQID(q string) bool {
-	return QIDPattern.MatchString(q)
+	return qIDPattern.MatchString(q)
 }
