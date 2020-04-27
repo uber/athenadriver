@@ -381,6 +381,9 @@ func TestUilts_GetTableNamesInQuery(t *testing.T) {
 }
 
 func TestUilts_GetTidySQL(t *testing.T) {
+	// TODO: syntax error for catalog.sampledb.abc from sqlparser
+	// Fix https://github.com/uber/athenadriver/issues/5 when getting a chance
+	assert.Equal(t, GetTidySQL(" SELECT * from catalog.sampledb.abc "), "SELECT * from catalog.sampledb.abc")
 	assert.Equal(t, GetTidySQL(""), "")
 	assert.Equal(t, GetTidySQL("DESC abc"), "DESC abc")
 	assert.Equal(t, GetTidySQL("TRUNCATE abc"), "truncate table abc")
@@ -394,7 +397,6 @@ func TestUilts_GetTidySQL(t *testing.T) {
 	assert.Equal(t, GetTidySQL("/**/ "), "")
 	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1;"), "select 1")
 	assert.Equal(t, GetTidySQL("/* SELECT 1 */ SELECT 1 from;"), "SELECT 1 from;")
-	assert.Equal(t, GetTidySQL(" SELECT * from catalog.sampledb.abc "), "SELECT * from catalog.sampledb.abc")
 	assert.Equal(t, GetTidySQL(" select  *  from catalog.sampledb.abc "), "select  *  from catalog.sampledb.abc")
 }
 
