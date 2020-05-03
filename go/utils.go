@@ -543,7 +543,7 @@ func isQueryTimeOut(startOfStartQueryExecution time.Time, queryType string) bool
 // isQueryValid is to check the validity of Query, now only string length check.
 // https://docs.aws.amazon.com/athena/latest/ug/service-limits.html
 func isQueryValid(query string) bool {
-	return len(query) < MAXQueryStringLength
+	return len(query) < MAXQueryStringLength && len(query) > 4
 }
 
 // GetFromEnvVal is to get environmental variable value by keys.

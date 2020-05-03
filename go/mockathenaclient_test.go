@@ -62,6 +62,7 @@ func newMockAthenaClient() *mockAthenaClient {
 			"SELECTExecContext_OK_QID":             PingResponse,
 			"SELECTQueryContext_OK_QID":            PingResponse,
 			"00000000-0000-0000-0000-000000000000": PingResponse,
+			"pc:getqid":                            PingResponse,
 		},
 	}
 	return &m

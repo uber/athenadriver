@@ -625,6 +625,16 @@ func TestMoneyWise(t *testing.T) {
 	assert.Nil(t, er)
 	assert.NotNil(t, dr)
 
+	query = "pc:getqid"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Equal(t, er, ErrInvalidQuery)
+	assert.Nil(t, dr)
+
+	query = "pc:getqid SELECTQueryContext_CANCEL_OK"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
+
 	query = "SELECTQueryContext_CANCEL_OK"
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	defer cancel()
