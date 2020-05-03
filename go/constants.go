@@ -85,3 +85,10 @@ const (
 
 const digits01 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
 const digits10 = "0000000000111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999"
+
+// AthenaColumnTypes is a fixed array of Athena Column Types. An array isn't immutable by nature; you can't make it constant.
+var AthenaColumnTypes = [...]string{"tinyint", "smallint", "integer", "bigint", "float", "real", "double",
+	"json", "char", "varchar", "varbinary", "row", "string", "binary",
+	"struct", "interval year to month", "interval day to second", "decimal",
+	"ipaddress", "array", "map", "unknown", "boolean", "date", "time", "time with time zone",
+	"timestamp with time zone", "timestamp", "weird_type"}

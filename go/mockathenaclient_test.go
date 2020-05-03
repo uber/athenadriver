@@ -350,18 +350,18 @@ func MultiplePagesQueryResponse(token string) (*athena.GetQueryResultsOutput, er
 	switch token {
 	case "":
 		var nextToken = "a1"
-		return newHeaderResultPage(columns, &nextToken, 6), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 6), nil
 	case "a1":
 		nextToken := "a2"
-		return newHeaderlessResultPage(columns, &nextToken, 10), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 10), nil
 	case "a2":
 		nextToken := "a3"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a3":
 		nextToken := "a4"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a4":
-		return newHeaderlessResultPage(columns, nil, 10), nil
+		return newRandomHeaderlessResultPage(columns, nil, 10), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}
@@ -374,18 +374,18 @@ func MultiplePagesQueryFailedResponse(token string) (*athena.GetQueryResultsOutp
 	switch token {
 	case "":
 		var nextToken = "a1"
-		return newHeaderResultPage(columns, &nextToken, 6), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 6), nil
 	case "a1":
 		nextToken := "a2"
-		return newHeaderlessResultPage(columns, &nextToken, 3), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 3), nil
 	case "a2":
 		nextToken := "a3"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a3":
 		nextToken := "GetQueryResultsWithContext_return_error"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a4":
-		return newHeaderlessResultPage(columns, nil, 10), nil
+		return newRandomHeaderlessResultPage(columns, nil, 10), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}
@@ -398,18 +398,18 @@ func MultiplePagesEmptyRowInPageResponse(token string) (*athena.GetQueryResultsO
 	switch token {
 	case "":
 		var nextToken = "a1"
-		return newHeaderResultPage(columns, &nextToken, 6), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 6), nil
 	case "a1":
 		nextToken := "a2"
-		return newHeaderlessResultPage(columns, &nextToken, 0), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 0), nil
 	case "a2":
 		nextToken := "a3"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a3":
 		nextToken := "GetQueryResultsWithContext_return_error"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a4":
-		return newHeaderlessResultPage(columns, nil, 10), nil
+		return newRandomHeaderlessResultPage(columns, nil, 10), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}
@@ -419,7 +419,7 @@ func ShowResponse(_ string) (*athena.GetQueryResultsOutput, error) {
 	columns := []*athena.ColumnInfo{
 		newColumnInfo("partition", "string"),
 	}
-	return newHeaderResultPage(columns, nil, 6), nil
+	return newRandomHeaderResultPage(columns, nil, 6), nil
 }
 
 func OneColumnZeroRowResponse(token string) (*athena.GetQueryResultsOutput,
@@ -606,7 +606,7 @@ func NextFailedResponse(token string) (*athena.GetQueryResultsOutput, error) {
 	switch token {
 	case "":
 		var nextToken = "p1"
-		return newHeaderResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 5), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}

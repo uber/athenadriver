@@ -26,6 +26,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
 	"strconv"
 	"strings"
@@ -207,6 +208,17 @@ func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, 
 	return NewRows(ctx, c.athenaAPI, QID, c.connector.config, c.connector.tracer)
 }
 
+func (c *Connection) getQIDResultPage(ctx context.Context, qid string) (driver.Rows, error) {
+	r, err := NewNonOpsRows(ctx, c.athenaAPI, qid, c.connector.config, c.connector.tracer)
+	colName := "_col0"
+	columnNames := []*string{&colName}
+	columnTypes := []string{"string"}
+	data := make([][]*string, 1)
+	data[0] = []*string{&qid}
+	r.ResultOutput = newHeaderlessResultPage(columnNames, columnTypes, data)
+	return r, err
+}
+
 // QueryContext is implemented to be called by `DB.Query` (QueryerContext interface).
 //
 // "QueryerContext is an optional interface that may be implemented by a Conn.
@@ -218,8 +230,16 @@ func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, 
 // With QueryContext implemented, we don't need Queryer.
 // QueryerContext must honor the context timeout and return when the context is canceled.
 func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs []driver.NamedValue) (driver.Rows, error) {
-	query = GetTidySQL(query)
 	var obs = c.connector.tracer
+	var isPseudoCommand = false
+	if strings.HasPrefix(query, "pc:") {
+		isPseudoCommand = true
+		query = strings.Trim(query[3:], " ")
+		if strings.HasPrefix(query, "getqid") {
+			query = strings.Trim(query[7:], " ")
+		}
+	}
+	query = GetTidySQL(query)
 	if c.connector.config.IsReadOnly() {
 		if !isReadOnlyStatement(query) {
 			obs.Scope().Counter(DriverName + ".failure.querycontext.writeviolation").Inc(1)
@@ -291,6 +311,11 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		WorkGroup: aws.String(wg.Name),
 	})
 	if err != nil {
+		if isPseudoCommand {
+			if reqerr, ok := err.(awserr.RequestFailure); ok {
+				return c.getQIDResultPage(ctx, reqerr.RequestID())
+			}
+		}
 		return nil, err
 	}
 
@@ -299,6 +324,9 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	obs.Scope().Timer(DriverName + ".query.startqueryexecution").Record(timeStartQueryExecution)
 
 	queryID := *resp.QueryExecutionId
+	if isPseudoCommand {
+		return c.getQIDResultPage(ctx, queryID)
+	}
 WAITING_FOR_RESULT:
 	for {
 		statusResp, err := c.athenaAPI.GetQueryExecutionWithContext(ctx, &athena.GetQueryExecutionInput{

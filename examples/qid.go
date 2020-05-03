@@ -45,7 +45,7 @@ func main() {
 
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
-	// 3. Query cancellation after 2 seconds
+	// 3. Query
 	ctx := context.WithValue(context.Background(), drv.LoggerKey, logger)
 	rows, err := db.QueryContext(ctx, `3e6d49a6-999c-46ef-8295-7a101c327f90`)
 	if err != nil {
