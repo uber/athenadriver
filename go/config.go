@@ -268,6 +268,9 @@ func (c *Config) GetUser() string {
 
 // GetOutputBucket is getter of OutputBucket.
 func (c *Config) GetOutputBucket() string {
+	if strings.HasPrefix(c.dsn.Path, "/") {
+		return c.dsn.Scheme + "://" + c.dsn.Host + c.dsn.Path
+	}
 	return c.dsn.Scheme + "://" + c.dsn.Host + "/" + c.dsn.Path
 }
 

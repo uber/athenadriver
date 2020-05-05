@@ -57,6 +57,16 @@ func TestAthenaConfig(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestGetOutputBucket(t *testing.T) {
+	var s3bucket string = "s3://query-results-henry-wu-us-east-2/local/"
+	testConf := NewNoOpsConfig()
+	err := testConf.SetOutputBucket(s3bucket)
+	conf, _ := NewConfig(testConf.Stringify())
+	assert.Nil(t, err)
+	assert.Equal(t, testConf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/local/")
+	assert.Equal(t, conf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/local/")
+}
+
 func TestAthenaConfigWrongS3Bucket(t *testing.T) {
 	var s3bucket string = "file:///query-results-henry-wu-us-east-2/"
 	testConf := NewNoOpsConfig()
