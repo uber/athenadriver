@@ -270,9 +270,8 @@ func (c *Config) GetUser() string {
 func (c *Config) GetOutputBucket() string {
 	if strings.HasPrefix(c.dsn.Path, "/") {
 		return c.dsn.Scheme + "://" + c.dsn.Host + c.dsn.Path
-	} else {
-		return c.dsn.Scheme + "://" + c.dsn.Host + "/" + c.dsn.Path
 	}
+	return c.dsn.Scheme + "://" + c.dsn.Host + "/" + c.dsn.Path
 }
 
 // GetWorkgroup is getter of Workgroup.
