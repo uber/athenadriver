@@ -49,6 +49,20 @@ type Rows struct {
 	pageCount       int64
 }
 
+// NewNonOpsRows is to create a new Rows.
+func NewNonOpsRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, queryID string, driverConfig *Config,
+	obs *DriverTracer) (*Rows, error) {
+	r := Rows{
+		athena:    athenaAPI,
+		ctx:       ctx,
+		queryID:   queryID,
+		config:    driverConfig,
+		tracer:    obs,
+		pageCount: -1,
+	}
+	return &r, nil
+}
+
 // NewRows is to create a new Rows.
 func NewRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, queryID string, driverConfig *Config,
 	obs *DriverTracer) (*Rows, error) {

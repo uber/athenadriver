@@ -22,7 +22,9 @@ package athenadriver
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/athena"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
@@ -62,6 +64,8 @@ func newMockAthenaClient() *mockAthenaClient {
 			"SELECTExecContext_OK_QID":             PingResponse,
 			"SELECTQueryContext_OK_QID":            PingResponse,
 			"00000000-0000-0000-0000-000000000000": PingResponse,
+			"pc:get_query_id":                      PingResponse,
+			"FAILED_AFTER_GETQID":                  MissingDataResponse,
 		},
 	}
 	return &m
@@ -192,6 +196,19 @@ func (m *mockAthenaClient) StartQueryExecution(s *athena.
 		return &athena.StartQueryExecutionOutput{
 			QueryExecutionId: &qid,
 		}, nil
+	}
+	if *s.QueryString == "FAILED_AFTER_GETQID" {
+		qid := "FAILED_AFTER_GETQID_123"
+		return &athena.StartQueryExecutionOutput{
+			QueryExecutionId: &qid,
+		}, fmt.Errorf("FAILED_AFTER_GETQID_FAILED")
+	}
+	if *s.QueryString == "FAILED_AFTER_GETQID2" {
+		qid := "FAILED_AFTER_GETQID_123"
+		return &athena.StartQueryExecutionOutput{
+				QueryExecutionId: &qid,
+			}, awserr.NewRequestFailure(awserr.New("a", "b", fmt.Errorf("FAILED_AFTER_GETQID_FAILED")),
+				100, qid)
 	}
 	return nil, nil
 }
@@ -331,6 +348,25 @@ func (m *mockAthenaClient) GetQueryExecutionWithContext(c aws.Context,
 			},
 		}, nil
 	}
+	if *input.QueryExecutionId == "c89088ab-595d-4ee6-a9ce-73b55aeb8900" {
+		ping := "SELECTQueryContext_CANCEL_OK_QID"
+		stat := athena.QueryExecutionStateQueued
+		stt := "DDL"
+		var dataScanned = int64(123)
+		return &athena.GetQueryExecutionOutput{
+			QueryExecution: &athena.QueryExecution{
+				Query:            &ping,
+				QueryExecutionId: &ping,
+				Status: &athena.QueryExecutionStatus{
+					State: &stat,
+				},
+				StatementType: &stt,
+				Statistics: &athena.QueryExecutionStatistics{
+					DataScannedInBytes: &dataScanned,
+				},
+			},
+		}, nil
+	}
 	return nil, ErrTestMockGeneric
 }
 
@@ -342,6 +378,12 @@ func (m *mockAthenaClient) StopQueryExecutionWithContext(ctx aws.Context, input 
 	if *input.QueryExecutionId == "SELECTQueryContext_CANCEL_FAIL_QID" {
 		return nil, ErrTestMockGeneric
 	}
+	if *input.QueryExecutionId == "c89088ab-595d-4ee6-a9ce-73b55aeb8954" {
+		return &athena.StopQueryExecutionOutput{}, nil
+	}
+	if *input.QueryExecutionId == "c89088ab-595d-4ee6-a9ce-73b55aeb8955" {
+		return nil, ErrTestMockGeneric
+	}
 	return nil, ErrTestMockGeneric
 }
 
@@ -350,18 +392,18 @@ func MultiplePagesQueryResponse(token string) (*athena.GetQueryResultsOutput, er
 	switch token {
 	case "":
 		var nextToken = "a1"
-		return newHeaderResultPage(columns, &nextToken, 6), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 6), nil
 	case "a1":
 		nextToken := "a2"
-		return newHeaderlessResultPage(columns, &nextToken, 10), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 10), nil
 	case "a2":
 		nextToken := "a3"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a3":
 		nextToken := "a4"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a4":
-		return newHeaderlessResultPage(columns, nil, 10), nil
+		return newRandomHeaderlessResultPage(columns, nil, 10), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}
@@ -374,18 +416,18 @@ func MultiplePagesQueryFailedResponse(token string) (*athena.GetQueryResultsOutp
 	switch token {
 	case "":
 		var nextToken = "a1"
-		return newHeaderResultPage(columns, &nextToken, 6), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 6), nil
 	case "a1":
 		nextToken := "a2"
-		return newHeaderlessResultPage(columns, &nextToken, 3), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 3), nil
 	case "a2":
 		nextToken := "a3"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a3":
 		nextToken := "GetQueryResultsWithContext_return_error"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a4":
-		return newHeaderlessResultPage(columns, nil, 10), nil
+		return newRandomHeaderlessResultPage(columns, nil, 10), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}
@@ -398,18 +440,18 @@ func MultiplePagesEmptyRowInPageResponse(token string) (*athena.GetQueryResultsO
 	switch token {
 	case "":
 		var nextToken = "a1"
-		return newHeaderResultPage(columns, &nextToken, 6), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 6), nil
 	case "a1":
 		nextToken := "a2"
-		return newHeaderlessResultPage(columns, &nextToken, 0), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 0), nil
 	case "a2":
 		nextToken := "a3"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a3":
 		nextToken := "GetQueryResultsWithContext_return_error"
-		return newHeaderlessResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderlessResultPage(columns, &nextToken, 5), nil
 	case "a4":
-		return newHeaderlessResultPage(columns, nil, 10), nil
+		return newRandomHeaderlessResultPage(columns, nil, 10), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}
@@ -419,7 +461,7 @@ func ShowResponse(_ string) (*athena.GetQueryResultsOutput, error) {
 	columns := []*athena.ColumnInfo{
 		newColumnInfo("partition", "string"),
 	}
-	return newHeaderResultPage(columns, nil, 6), nil
+	return newRandomHeaderResultPage(columns, nil, 6), nil
 }
 
 func OneColumnZeroRowResponse(token string) (*athena.GetQueryResultsOutput,
@@ -606,7 +648,7 @@ func NextFailedResponse(token string) (*athena.GetQueryResultsOutput, error) {
 	switch token {
 	case "":
 		var nextToken = "p1"
-		return newHeaderResultPage(columns, &nextToken, 5), nil
+		return newRandomHeaderResultPage(columns, &nextToken, 5), nil
 	default:
 		return nil, ErrTestMockGeneric
 	}

@@ -347,7 +347,61 @@ func missingDataRow(columns []*athena.ColumnInfo) *athena.Row {
 	return row
 }
 
-func newHeaderResultPage(columns []*athena.ColumnInfo, nextToken *string,
+func genRow(rowData []*string) *athena.Row {
+	row := &athena.Row{
+		Data: make([]*athena.Datum, len(rowData)),
+	}
+	for i := 0; i < len(rowData); i++ {
+		row.Data[i] = &athena.Datum{VarCharValue: rowData[i]}
+	}
+	return row
+}
+
+// columnTypes must be from one of AthenaColumnTypes
+func newHeaderResultPage(columnNames []*string, columnTypes []string, rowsData [][]*string) *athena.GetQueryResultsOutput {
+	columns := make([]*athena.ColumnInfo, len(columnNames))
+	for i := 0; i < len(columnNames); i++ {
+		columns[i] = newColumnInfo(*columnNames[i], columnTypes[i])
+	}
+	rowLen := len(rowsData)
+	rows := make([]*athena.Row, rowLen+1)
+	rows[0] = genHeaderRow(columns)
+	for i := 1; i < rowLen+1; i++ {
+		rows[i] = genRow(rowsData[i-1])
+	}
+	return &athena.GetQueryResultsOutput{
+		NextToken: nil,
+		ResultSet: &athena.ResultSet{
+			ResultSetMetadata: &athena.ResultSetMetadata{
+				ColumnInfo: columns,
+			},
+			Rows: rows,
+		},
+	}
+}
+
+func newHeaderlessResultPage(columnNames []*string, columnTypes []string, rowsData [][]*string) *athena.GetQueryResultsOutput {
+	columns := make([]*athena.ColumnInfo, len(columnNames))
+	for i := 0; i < len(columnNames); i++ {
+		columns[i] = newColumnInfo(*columnNames[i], columnTypes[i])
+	}
+	rowLen := len(rowsData)
+	rows := make([]*athena.Row, rowLen)
+	for i := 0; i < rowLen; i++ {
+		rows[i] = genRow(rowsData[i])
+	}
+	return &athena.GetQueryResultsOutput{
+		NextToken: nil,
+		ResultSet: &athena.ResultSet{
+			ResultSetMetadata: &athena.ResultSetMetadata{
+				ColumnInfo: columns,
+			},
+			Rows: rows,
+		},
+	}
+}
+
+func newRandomHeaderResultPage(columns []*athena.ColumnInfo, nextToken *string,
 	rowLen int) *athena.GetQueryResultsOutput {
 	rows := make([]*athena.Row, rowLen)
 	rows[0] = genHeaderRow(columns)
@@ -365,7 +419,7 @@ func newHeaderResultPage(columns []*athena.ColumnInfo, nextToken *string,
 	}
 }
 
-func newHeaderlessResultPage(columns []*athena.ColumnInfo, nextToken *string,
+func newRandomHeaderlessResultPage(columns []*athena.ColumnInfo, nextToken *string,
 	rowLen int) *athena.GetQueryResultsOutput {
 	rows := make([]*athena.Row, rowLen)
 	for i := 0; i < rowLen; i++ {
@@ -489,7 +543,7 @@ func isQueryTimeOut(startOfStartQueryExecution time.Time, queryType string) bool
 // isQueryValid is to check the validity of Query, now only string length check.
 // https://docs.aws.amazon.com/athena/latest/ug/service-limits.html
 func isQueryValid(query string) bool {
-	return len(query) < MAXQueryStringLength
+	return len(query) < MAXQueryStringLength && len(query) > 4
 }
 
 // GetFromEnvVal is to get environmental variable value by keys.
