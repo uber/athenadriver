@@ -94,6 +94,12 @@ var AthenaColumnTypes = [...]string{"tinyint", "smallint", "integer", "bigint", 
 	"timestamp with time zone", "timestamp", "weird_type"}
 
 // pseudo commands all start with `PC_`
-const PC_GetQID = "get_query_id"
-const PC_GetQIDStatus = "get_query_id_status"
-const PC_StopQID = "stop_query_id"
+
+// PCGetQID is the pseudo command of getting query execution id of an SQL
+const PCGetQID = "get_query_id"
+
+// PCGetQIDStatus is the pseudo command of getting status of a query execution id
+const PCGetQIDStatus = "get_query_id_status"
+
+// PCStopQID is the pseudo command to stop a query execution id
+const PCStopQID = "stop_query_id"

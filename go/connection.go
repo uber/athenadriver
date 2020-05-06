@@ -234,11 +234,11 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	var pseudoCommand = ""
 	if strings.HasPrefix(query, "pc:") {
 		query = strings.Trim(query[3:], " ")
-		if pseudoCommand = PC_GetQID; strings.HasPrefix(query, pseudoCommand+" ") {
+		if pseudoCommand = PCGetQID; strings.HasPrefix(query, pseudoCommand+" ") {
 			query = strings.Trim(query[len(pseudoCommand):], " ")
-		} else if pseudoCommand = PC_GetQIDStatus; strings.HasPrefix(query, pseudoCommand+" ") {
+		} else if pseudoCommand = PCGetQIDStatus; strings.HasPrefix(query, pseudoCommand+" ") {
 			query = strings.Trim(query[len(pseudoCommand):], " ")
-		} else if pseudoCommand = PC_StopQID; strings.HasPrefix(query, pseudoCommand+" ") {
+		} else if pseudoCommand = PCStopQID; strings.HasPrefix(query, pseudoCommand+" ") {
 			query = strings.Trim(query[len(pseudoCommand):], " ")
 		} else {
 			return nil, fmt.Errorf("pseudo command " + query + "doesn't exist")
@@ -301,7 +301,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 
 	// case 1 - query directly using QID
 	if IsQID(query) {
-		if pseudoCommand == PC_GetQIDStatus {
+		if pseudoCommand == PCGetQIDStatus {
 			statusResp, err := c.athenaAPI.GetQueryExecutionWithContext(ctx, &athena.GetQueryExecutionInput{
 				QueryExecutionId: aws.String(query),
 			})
@@ -315,7 +315,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 			}
 			return c.getHeaderlessSingleRowResultPage(ctx, *statusResp.QueryExecution.Status.State)
 		}
-		if pseudoCommand == PC_StopQID {
+		if pseudoCommand == PCStopQID {
 			_, err := c.athenaAPI.StopQueryExecutionWithContext(context.Background(), &athena.StopQueryExecutionInput{
 				QueryExecutionId: aws.String(query),
 			})
@@ -344,7 +344,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		WorkGroup: aws.String(wg.Name),
 	})
 	if err != nil {
-		if pseudoCommand == PC_GetQID {
+		if pseudoCommand == PCGetQID {
 			if reqerr, ok := err.(awserr.RequestFailure); ok {
 				return c.getHeaderlessSingleRowResultPage(ctx, reqerr.RequestID())
 			}
@@ -357,7 +357,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	obs.Scope().Timer(DriverName + ".query.startqueryexecution").Record(timeStartQueryExecution)
 
 	queryID := *resp.QueryExecutionId
-	if pseudoCommand == PC_GetQID {
+	if pseudoCommand == PCGetQID {
 		return c.getHeaderlessSingleRowResultPage(ctx, queryID)
 	}
 WAITING_FOR_RESULT:
