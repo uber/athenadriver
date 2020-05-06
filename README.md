@@ -761,14 +761,12 @@ func main() {
 ```
 
 In [pc_get_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_query_id.go#L27), we only want to get the `Query ID` of the SQL statement, so we
-just to add `pc:get_query_id` before the sql statement. So the final string we pass to `db.QueryRow` is `pc:get_query_id select url from sampledb.elb_logs limit 2`.
-
-The return value is an Athena Query ID. Sample Output:
+just to add `pc:get_query_id` before the sql statement. So the final string we pass to `db.QueryRow` is `pc:get_query_id select url from sampledb.elb_logs limit 2`. The return value is one row with an Athena Query ID inside. A sample Output is:
 ```
 Query ID: c89088ab-595d-4ee6-a9ce-73b55aeb8953
 ```
 
-Now we support three `pseudo commands`: `get_query_id`, `get_query_id_status`, `stop_query_id`.
+Now we support three pseudo commands: `get_query_id`, `get_query_id_status`, `stop_query_id`.
 
 The syntax is `pc:pseudo_command parameter`.
 
@@ -782,7 +780,7 @@ The syntax is `pc:pseudo_command parameter`.
 
 ### stop_query_id
 
-`pc:stop_query_id Query_ID` - To stop the Query corresponding the Query ID. Example: [pc_stop_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_stop_query_id.go).
+`pc:stop_query_id Query_ID` - To stop the Query corresponding the Query ID. If there is no error, a one row string with `OK` will be returned. Example: [pc_stop_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_stop_query_id.go).
 
 
 ## Limitations of Go/Athena SDK's and `athenadriver`'s Solution

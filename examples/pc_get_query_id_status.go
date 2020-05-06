@@ -42,7 +42,7 @@ func main() {
 	dsn := conf.Stringify()
 	db, _ := sql.Open(drv.DriverName, dsn)
 
-	// 3. Query with pseudo command `pc:get_query_id`
+	// 3. Query with pseudo command
 	var qidStatus string
 	_ = db.QueryRow("pc:get_query_id_status c89088ab-595d-4ee6-a9ce-73b55aeb8953").Scan(&qidStatus)
 	println("Query ID c89088ab-595d-4ee6-a9ce-73b55aeb8953's Status: ", qidStatus)
