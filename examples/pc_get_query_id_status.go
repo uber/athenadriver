@@ -22,13 +22,13 @@ func main() {
 	dsn := conf.Stringify()
 	db, _ := sql.Open(drv.DriverName, dsn)
 
-	// 3. Query with pseudo command `pc:getqid`
-	var qid string
-	_ = db.QueryRow("pc:getqid select url from sampledb.elb_logs limit 2").Scan(&qid)
-	println("Query ID: ", qid)
+	// 3. Query with pseudo command `pc:get_query_id`
+	var qidStatus string
+	_ = db.QueryRow("pc:get_query_id_status c89088ab-595d-4ee6-a9ce-73b55aeb8953").Scan(&qidStatus)
+	println("Query ID c89088ab-595d-4ee6-a9ce-73b55aeb8953's Status: ", qidStatus)
 }
 
 /*
 Sample Output:
-Query ID: c89088ab-595d-4ee6-a9ce-73b55aeb8953
+Query ID c89088ab-595d-4ee6-a9ce-73b55aeb8953's Status:  SUCCEEDED
 */

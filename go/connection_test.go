@@ -625,31 +625,6 @@ func TestMoneyWise(t *testing.T) {
 	assert.Nil(t, er)
 	assert.NotNil(t, dr)
 
-	query = "pc:getqid"
-	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
-	assert.Equal(t, er, ErrInvalidQuery)
-	assert.Nil(t, dr)
-
-	query = "pc:getqid FAILED_AFTER_GETQID"
-	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
-	assert.Equal(t, er.Error(), "FAILED_AFTER_GETQID_FAILED")
-	assert.Nil(t, dr)
-
-	query = "pc:getqid FAILED_AFTER_GETQID2"
-	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
-	assert.Nil(t, er)
-	assert.NotNil(t, dr)
-
-	query = "pc:badcommand"
-	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
-	assert.NotNil(t, er)
-	assert.Nil(t, dr)
-
-	query = "pc:getqid SELECTQueryContext_CANCEL_OK"
-	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
-	assert.Nil(t, er)
-	assert.NotNil(t, dr)
-
 	query = "SELECTQueryContext_CANCEL_OK"
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	defer cancel()
@@ -685,4 +660,94 @@ func TestConnection_CachedQuery(t *testing.T) {
 	dr, er := c.ExecContext(context.Background(), query, []driver.NamedValue{})
 	assert.Nil(t, er)
 	assert.NotNil(t, dr)
+}
+
+func Test_PseudoCommand(t *testing.T) {
+	t.Parallel()
+	c := &Connection{
+		athenaAPI: newMockAthenaClient(),
+		connector: NoopsSQLConnector(),
+	}
+	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
+
+	wgTags := NewWGTags()
+	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber Asset", "abc.efg")
+	wg := NewDefaultWG(DefaultWGName, nil, wgTags)
+	testConf := NewNoOpsConfig()
+	err := testConf.SetOutputBucket(s3bucket)
+	assert.Nil(t, err)
+	err = testConf.SetRegion("us-east-1")
+	assert.Nil(t, err)
+	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetDB("default") // default
+
+	_ = testConf.SetWorkGroup(wg)
+	testConf.SetMoneyWise(true)
+	c.connector.config = testConf
+
+	query := "pc:get_query_id"
+	dr, er := c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
+	query = "pc:get_query_id FAILED_AFTER_GETQID"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Equal(t, er.Error(), "FAILED_AFTER_GETQID_FAILED")
+	assert.Nil(t, dr)
+
+	query = "pc:get_query_id FAILED_AFTER_GETQID2"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
+
+	query = "pc:badcommand"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
+	query = "pc:get_query_id SELECTQueryContext_CANCEL_OK"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
+
+	query = "pc:stop_query_id c89088ab-595d-4ee6-a9ce-73b55aeb8954"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
+
+	query = "pc:stop_query_id c89088ab-595d-4ee6-a9ce-73b55aeb8955"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
+	query = "pc:stop_query_id"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
+	query = "pc:stop_query_id 123"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
+	query = "pc:get_query_id_status c89088ab-595d-4ee6-a9ce-73b55aeb8900"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
+
+	query = "pc:get_query_id_status c89088ab-595d-4ee6-a9ce-73b55aeb8111"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
+	query = "pc:get_query_id_status"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
+	query = "pc:get_query_id_status 123"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
 }

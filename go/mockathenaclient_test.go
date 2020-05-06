@@ -64,7 +64,7 @@ func newMockAthenaClient() *mockAthenaClient {
 			"SELECTExecContext_OK_QID":             PingResponse,
 			"SELECTQueryContext_OK_QID":            PingResponse,
 			"00000000-0000-0000-0000-000000000000": PingResponse,
-			"pc:getqid":                            PingResponse,
+			"pc:get_query_id":                      PingResponse,
 			"FAILED_AFTER_GETQID":                  MissingDataResponse,
 		},
 	}
@@ -348,6 +348,25 @@ func (m *mockAthenaClient) GetQueryExecutionWithContext(c aws.Context,
 			},
 		}, nil
 	}
+	if *input.QueryExecutionId == "c89088ab-595d-4ee6-a9ce-73b55aeb8900" {
+		ping := "SELECTQueryContext_CANCEL_OK_QID"
+		stat := athena.QueryExecutionStateQueued
+		stt := "DDL"
+		var dataScanned = int64(123)
+		return &athena.GetQueryExecutionOutput{
+			QueryExecution: &athena.QueryExecution{
+				Query:            &ping,
+				QueryExecutionId: &ping,
+				Status: &athena.QueryExecutionStatus{
+					State: &stat,
+				},
+				StatementType: &stt,
+				Statistics: &athena.QueryExecutionStatistics{
+					DataScannedInBytes: &dataScanned,
+				},
+			},
+		}, nil
+	}
 	return nil, ErrTestMockGeneric
 }
 
@@ -357,6 +376,12 @@ func (m *mockAthenaClient) StopQueryExecutionWithContext(ctx aws.Context, input 
 		return &athena.StopQueryExecutionOutput{}, nil
 	}
 	if *input.QueryExecutionId == "SELECTQueryContext_CANCEL_FAIL_QID" {
+		return nil, ErrTestMockGeneric
+	}
+	if *input.QueryExecutionId == "c89088ab-595d-4ee6-a9ce-73b55aeb8954" {
+		return &athena.StopQueryExecutionOutput{}, nil
+	}
+	if *input.QueryExecutionId == "c89088ab-595d-4ee6-a9ce-73b55aeb8955" {
 		return nil, ErrTestMockGeneric
 	}
 	return nil, ErrTestMockGeneric

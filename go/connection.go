@@ -208,7 +208,7 @@ func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, 
 	return NewRows(ctx, c.athenaAPI, QID, c.connector.config, c.connector.tracer)
 }
 
-func (c *Connection) getQIDResultPage(ctx context.Context, qid string) (driver.Rows, error) {
+func (c *Connection) getHeaderlessSingleRowResultPage(ctx context.Context, qid string) (driver.Rows, error) {
 	r, err := NewNonOpsRows(ctx, c.athenaAPI, qid, c.connector.config, c.connector.tracer)
 	colName := "_col0"
 	columnNames := []*string{&colName}
@@ -231,12 +231,15 @@ func (c *Connection) getQIDResultPage(ctx context.Context, qid string) (driver.R
 // QueryerContext must honor the context timeout and return when the context is canceled.
 func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs []driver.NamedValue) (driver.Rows, error) {
 	var obs = c.connector.tracer
-	var isPseudoCommand = false
+	var pseudoCommand = ""
 	if strings.HasPrefix(query, "pc:") {
-		isPseudoCommand = true
 		query = strings.Trim(query[3:], " ")
-		if strings.HasPrefix(query, "getqid") {
-			query = strings.Trim(query[6:], " ")
+		if pseudoCommand = PC_GetQID; strings.HasPrefix(query, pseudoCommand+" ") {
+			query = strings.Trim(query[len(pseudoCommand):], " ")
+		} else if pseudoCommand = PC_GetQIDStatus; strings.HasPrefix(query, pseudoCommand+" ") {
+			query = strings.Trim(query[len(pseudoCommand):], " ")
+		} else if pseudoCommand = PC_StopQID; strings.HasPrefix(query, pseudoCommand+" ") {
+			query = strings.Trim(query[len(pseudoCommand):], " ")
 		} else {
 			return nil, fmt.Errorf("pseudo command " + query + "doesn't exist")
 		}
@@ -298,6 +301,34 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 
 	// case 1 - query directly using QID
 	if IsQID(query) {
+		if pseudoCommand == PC_GetQIDStatus {
+			statusResp, err := c.athenaAPI.GetQueryExecutionWithContext(ctx, &athena.GetQueryExecutionInput{
+				QueryExecutionId: aws.String(query),
+			})
+			if err != nil {
+				obs.Log(ErrorLevel, "GetQueryExecutionWithContext failed",
+					zap.String("workgroup", wg.Name),
+					zap.String("queryID", query),
+					zap.String("error", err.Error()))
+				obs.Scope().Counter(DriverName + ".failure.querycontext.getqueryexecutionwithcontext").Inc(1)
+				return nil, err
+			}
+			return c.getHeaderlessSingleRowResultPage(ctx, *statusResp.QueryExecution.Status.State)
+		}
+		if pseudoCommand == PC_StopQID {
+			_, err := c.athenaAPI.StopQueryExecutionWithContext(context.Background(), &athena.StopQueryExecutionInput{
+				QueryExecutionId: aws.String(query),
+			})
+			if err != nil {
+				obs.Log(ErrorLevel, "StopQueryExecution failed",
+					zap.String("workgroup", wg.Name),
+					zap.String("queryID", query),
+					zap.String("query", query))
+				obs.Scope().Counter(DriverName + ".failure.querycontext.stopqueryexecution.failed").Inc(1)
+				return nil, err
+			}
+			return c.getHeaderlessSingleRowResultPage(ctx, "OK")
+		}
 		return c.cachedQuery(ctx, query)
 	}
 
@@ -313,9 +344,9 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		WorkGroup: aws.String(wg.Name),
 	})
 	if err != nil {
-		if isPseudoCommand {
+		if pseudoCommand == PC_GetQID {
 			if reqerr, ok := err.(awserr.RequestFailure); ok {
-				return c.getQIDResultPage(ctx, reqerr.RequestID())
+				return c.getHeaderlessSingleRowResultPage(ctx, reqerr.RequestID())
 			}
 		}
 		return nil, err
@@ -326,8 +357,8 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	obs.Scope().Timer(DriverName + ".query.startqueryexecution").Record(timeStartQueryExecution)
 
 	queryID := *resp.QueryExecutionId
-	if isPseudoCommand {
-		return c.getQIDResultPage(ctx, queryID)
+	if pseudoCommand == PC_GetQID {
+		return c.getHeaderlessSingleRowResultPage(ctx, queryID)
 	}
 WAITING_FOR_RESULT:
 	for {
