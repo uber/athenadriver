@@ -47,7 +47,7 @@ Except the basic features provided by Go `database/sql` like error handling, dat
 - Read-Only mode - disable database write in driver level
 - Moneywise mode :moneybag: - print out query cost(USD) for each query
 - Query with Athena Query ID(QID)
-- Pseudo commands from database/sql interface: `getworkgroup`, `listworkgroups`, `updateworkgroup`, `getqueryids`, `getcost`, `getexecutionreport`, `get_queryid` etc
+- Pseudo commands from database/sql interface: `get_query_id`, `get_query_id_status`, `stop_query_id`, `get_workgroup`, `list_workgroups`, `update_workgroup`, `get_cost`, `get_execution_report` etc
 
 `athenadriver` can extremely simplify your code. Check [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader) out as an example and a convenient tool for your Athena query in command line. 
 
@@ -720,6 +720,68 @@ Sample Output:
 ```bash
 2020/01/26 01:10:28 writing to Athena database is disallowed in read-only mode
 ```
+
+### Pseudo Commands
+
+`athenadriver` provides `pseudo command` to support some special use cases beyond Go's standard database/sql framework.
+`pseudo command` is a special prefix string you can put in `db.QueryContext`, `db.QueryRow`. It is easier to explain with some example like  [pc_get_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_query_id.go).
+
+```scala
+package main
+
+import (
+	"database/sql"
+	"os"
+	secret "github.com/uber/athenadriver/examples/constants"
+	drv "github.com/uber/athenadriver/go"
+)
+
+func main() {
+	// 1. Set AWS Credential in Driver Config.
+	os.Setenv("AWS_SDK_LOAD_CONFIG", "1")
+	conf, err := drv.NewDefaultConfig(secret.OutputBucket, secret.Region, secret.AccessID, secret.SecretAccessKey)
+	conf.SetLogging(true)
+	if err != nil {
+		panic(err)
+		return
+	}
+
+	// 2. Open Connection.
+	dsn := conf.Stringify()
+	db, _ := sql.Open(drv.DriverName, dsn)
+
+	// 3. Query with pseudo command `pc:get_query_id`
+	var qid string
+	_ = db.QueryRow("pc:get_query_id select url from sampledb.elb_logs limit 2").Scan(&qid)
+	println("Query ID: ", qid)
+}
+```
+
+In [pc_get_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_query_id.go#L27), we only want to get the `Query ID` of the SQL statement, so we
+just to add `pc:get_query_id` before the sql statement. So the final string we pass to `db.QueryRow` is `pc:get_query_id select url from sampledb.elb_logs limit 2`.
+
+The return value is an Athena Query ID. Sample Output:
+```
+Query ID: c89088ab-595d-4ee6-a9ce-73b55aeb8953
+```
+
+Now we support three `pseudo commands`: `get_query_id`, `get_query_id_status`, `stop_query_id`.
+
+The syntax is `pc:pseudo_command parameter`.
+
+### get_query_id
+
+`pc:get_query_id SQL_STATEMENT` - Will return Query ID of the `SQL_STATEMENT`, no matter request fails or succeeds. Example: [pc_get_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_query_id.go).
+
+### get_query_id_status
+
+`pc:get_query_id_status Query_ID` - Return status of the Query ID. Example: [pc_get_query_id_status.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_query_id_status.go).
+
+### stop_query_id
+
+`pc:stop_query_id Query_ID` - To stop the Query corresponding the Query ID. Example: [pc_stop_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_stop_query_id.go).
+
+
 ## Limitations of Go/Athena SDK's and `athenadriver`'s Solution
 
 ### Column number mismatch in `GetQueryResults` of Athena Go SDK
