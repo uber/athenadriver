@@ -724,7 +724,10 @@ Sample Output:
 ### Pseudo Commands
 
 `athenadriver` provides `pseudo command` to support some special use cases beyond Go's standard database/sql framework.
-`pseudo command` is a special prefix string you can put in `db.QueryContext`, `db.QueryRow`. It is easier to explain with some example like  [pc_get_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_query_id.go).
+One sample use case is [Asynchronous Query Support](https://github.com/uber/athenadriver/issues/6#issuecomment-624132881).
+`pseudo command` is a special prefix string you can put in `db.QueryContext` or `db.QueryRow` or `db.ExecuteContext` etc.
+
+It is easier to explain with an example like  [pc_get_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_query_id.go).
 
 ```scala
 package main
