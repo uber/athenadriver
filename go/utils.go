@@ -367,7 +367,7 @@ func newHeaderResultPage(columnNames []*string, columnTypes []string, rowsData [
 	rows := make([]*athena.Row, rowLen+1)
 	rows[0] = genHeaderRow(columns)
 	for i := 1; i < rowLen+1; i++ {
-		rows[i] = genRow(rowsData[i])
+		rows[i] = genRow(rowsData[i-1])
 	}
 	return &athena.GetQueryResultsOutput{
 		NextToken: nil,

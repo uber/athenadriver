@@ -630,6 +630,21 @@ func TestMoneyWise(t *testing.T) {
 	assert.Equal(t, er, ErrInvalidQuery)
 	assert.Nil(t, dr)
 
+	query = "pc:getqid FAILED_AFTER_GETQID"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Equal(t, er.Error(), "FAILED_AFTER_GETQID_FAILED")
+	assert.Nil(t, dr)
+
+	query = "pc:getqid FAILED_AFTER_GETQID2"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
+
+	query = "pc:badcommand"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.NotNil(t, er)
+	assert.Nil(t, dr)
+
 	query = "pc:getqid SELECTQueryContext_CANCEL_OK"
 	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
 	assert.Nil(t, er)

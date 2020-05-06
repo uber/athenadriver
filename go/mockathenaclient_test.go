@@ -22,7 +22,9 @@ package athenadriver
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/athena"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
@@ -63,6 +65,7 @@ func newMockAthenaClient() *mockAthenaClient {
 			"SELECTQueryContext_OK_QID":            PingResponse,
 			"00000000-0000-0000-0000-000000000000": PingResponse,
 			"pc:getqid":                            PingResponse,
+			"FAILED_AFTER_GETQID":                  MissingDataResponse,
 		},
 	}
 	return &m
@@ -193,6 +196,19 @@ func (m *mockAthenaClient) StartQueryExecution(s *athena.
 		return &athena.StartQueryExecutionOutput{
 			QueryExecutionId: &qid,
 		}, nil
+	}
+	if *s.QueryString == "FAILED_AFTER_GETQID" {
+		qid := "FAILED_AFTER_GETQID_123"
+		return &athena.StartQueryExecutionOutput{
+			QueryExecutionId: &qid,
+		}, fmt.Errorf("FAILED_AFTER_GETQID_FAILED")
+	}
+	if *s.QueryString == "FAILED_AFTER_GETQID2" {
+		qid := "FAILED_AFTER_GETQID_123"
+		return &athena.StartQueryExecutionOutput{
+				QueryExecutionId: &qid,
+			}, awserr.NewRequestFailure(awserr.New("a", "b", fmt.Errorf("FAILED_AFTER_GETQID_FAILED")),
+				100, qid)
 	}
 	return nil, nil
 }

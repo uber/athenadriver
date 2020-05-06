@@ -406,3 +406,14 @@ func TestUtils_IsQID(t *testing.T) {
 	assert.False(t, IsQID("a44f8e61-4cbb-429a-b7ab-bea2c4a5caeD"))
 	assert.False(t, IsQID("a44f8e61"))
 }
+
+func Test_newHeaderResultPage(t *testing.T) {
+	colName := "_col0"
+	qid := "123"
+	columnNames := []*string{&colName}
+	columnTypes := []string{"string"}
+	data := make([][]*string, 1)
+	data[0] = []*string{&qid}
+	page := newHeaderResultPage(columnNames, columnTypes, data)
+	assert.NotNil(t, page)
+}

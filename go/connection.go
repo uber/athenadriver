@@ -237,6 +237,8 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		query = strings.Trim(query[3:], " ")
 		if strings.HasPrefix(query, "getqid") {
 			query = strings.Trim(query[6:], " ")
+		} else {
+			return nil, fmt.Errorf("pseudo command " + query + "doesn't exist")
 		}
 	}
 	query = GetTidySQL(query)
