@@ -410,3 +410,14 @@ func (c *Config) SetMoneyWise(b bool) {
 func (c *Config) IsMoneyWise() bool {
 	return c.values.Get("MoneyWise") == "true"
 }
+
+// SetAWSProfile is to manually set the credential provider
+// https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html
+func (c *Config) SetAWSProfile(profile string) {
+	c.values.Set("AWSProfile", profile)
+}
+
+// GetAWSProfile is to get the credential provider name manually set by user
+func (c *Config) GetAWSProfile() string {
+	return c.values.Get("AWSProfile")
+}

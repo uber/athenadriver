@@ -280,3 +280,9 @@ func TestConfig_SetMoneyWise(t *testing.T) {
 	testConf.SetMoneyWise(true)
 	assert.True(t, testConf.IsMoneyWise())
 }
+
+func TestConfig_SetAWSProfile(t *testing.T) {
+	testConf := NewNoOpsConfig()
+	testConf.SetAWSProfile("development")
+	assert.Equal(t, testConf.GetAWSProfile(), "development")
+}

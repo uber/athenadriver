@@ -57,6 +57,11 @@ func (c *SQLConnector) Driver() driver.Driver {
 }
 
 // Connect is to create an AWS session.
+// The order to find auth information to create session is:
+// 1. Manually set  AWS profile in Config by calling config.SetAWSProfile(profileName)
+// 2. AWS_SDK_LOAD_CONFIG
+// 3. Static Credentials
+// Ref: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html
 func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 	now := time.Now()
 	c.tracer = newDefaultObservability(c.config)
@@ -66,11 +71,18 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 	if logger, ok := ctx.Value(LoggerKey).(*zap.Logger); ok {
 		c.tracer.SetLogger(logger)
 	}
+
 	var awsAthenaSession *session.Session
 	var err error
 	// respect AWS_SDK_LOAD_CONFIG and local ~/.aws/credentials, ~/.aws/config
 	if ok, _ := strconv.ParseBool(os.Getenv("AWS_SDK_LOAD_CONFIG")); ok {
-		awsAthenaSession, err = session.NewSession(&aws.Config{})
+		if profile := c.config.GetAWSProfile(); profile != "" {
+			awsAthenaSession, err = session.NewSession(&aws.Config{
+				Credentials: credentials.NewSharedCredentials("", profile),
+			})
+		} else {
+			awsAthenaSession, err = session.NewSession(&aws.Config{})
+		}
 	} else {
 		staticCredentials := credentials.NewStaticCredentials(c.config.GetAccessID(),
 			c.config.GetSecretAccessKey(),
@@ -85,6 +97,7 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 		c.tracer.Scope().Counter(DriverName + ".failure.sqlconnector.newsession").Inc(1)
 		return nil, err
 	}
+
 	athenaAPI := athena.New(awsAthenaSession)
 	timeConnect := time.Since(now)
 	conn := &Connection{

@@ -104,6 +104,24 @@ func TestSQLConnector_Connect_NewSession_AWS_SDK_LOAD_CONFIG_true(t *testing.T) 
 	assert.Nil(t, err)
 	assert.NotNil(t, conn)
 }
+
+func TestSQLConnector_Connect_NewSession_AWS_SDK_LOAD_CONFIG_true_AWSProfile_Set(t *testing.T) {
+	testConf := NewNoOpsConfig()
+	_ = testConf.SetRegion("ap-southeast-1")
+	testConf.SetAWSProfile("hello-profile")
+	os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
+	connector := &SQLConnector{
+		config: testConf,
+		tracer: newDefaultObservability(testConf),
+	}
+	conn, err := connector.Connect(context.Background())
+
+	os.Unsetenv("AWS_SDK_LOAD_CONFIG")
+	os.Unsetenv("AWS_STS_REGIONAL_ENDPOINTS")
+	assert.Nil(t, err)
+	assert.NotNil(t, conn)
+}
+
 func TestSQLConnector_Connect_NewSession_AWS_SDK_LOAD_CONFIG_false(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	_ = testConf.SetRegion("ap-southeast-1")
