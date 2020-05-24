@@ -24,6 +24,9 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 )
 
 // Config is for AWS Athena Driver Config.
@@ -76,6 +79,36 @@ func NewDefaultConfig(outputBucket string, region string, accessID string,
 		return nil, err
 	}
 	err = conf.SetSecretAccessKey(secretAccessKey)
+	return conf, err
+}
+
+// NewAWSSessionConfig is to new a Config using session credentials (For running in AWS Lambda).
+func NewAWSSessionConfig(outputBucket string, region string) (*Config, error) {
+
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String(region),
+	})
+	if err != nil {
+		return nil, err
+	}
+	c, err := sess.Config.Credentials.Get()
+	if err != nil {
+		return nil, err
+	}
+	conf := NewNoOpsConfig()
+	err = conf.SetOutputBucket(outputBucket)
+	if err != nil {
+		return nil, err
+	}
+	err = conf.SetRegion(region)
+	if err != nil {
+		return nil, err
+	}
+	err = conf.SetAccessID(c.AccessKeyID)
+	if err != nil {
+		return nil, err
+	}
+	err = conf.SetSecretAccessKey(c.SecretAccessKey)
 	return conf, err
 }
 
