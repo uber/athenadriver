@@ -196,7 +196,7 @@ from `~/.aws/credentials`, `region` from `~/.aws/config`. For details about `~/.
 
 But you still need to specify correct `OutputBucket` in `athenadriver.Config` because it is not in the AWS client config.
 
-`OutputBucket` is critical in Athena. Even if you have a default value set in Athean web console, you must pass one programmatically or you will get error:
+`OutputBucket` is critical in Athena. Even if you have a default value set in Athena web console, you must pass one programmatically or you will get error:
 `No output location provided. An output location is required either through the Workgroup result configuration setting or as an API input.`
 
 
@@ -229,6 +229,9 @@ If your AWS CLI setting is valid like mine, this function should output:
 ```scala
 with AWS CLI Config: 456
 ```
+
+The above authentication method also works for querying Athena in [AWS Lambda](https://aws.amazon.com/lambda/). In lambda, you don't have to provide access ID, key and region, and you don't need AWS CLI config files either. You just need to specify the correct output bucket.
+Please check the AWS Lambda Go same code [here](https://github.com/uber/athenadriver/tree/master/examples/lambda/Go).
 
 #### Use `athenadriver` Config For Authentication
 
