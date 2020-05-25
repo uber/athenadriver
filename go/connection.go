@@ -240,6 +240,8 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 			query = strings.Trim(query[len(pseudoCommand):], " ")
 		} else if pseudoCommand = PCStopQID; strings.HasPrefix(query, pseudoCommand+" ") {
 			query = strings.Trim(query[len(pseudoCommand):], " ")
+		} else if pseudoCommand = PCGetDriverVersion; strings.HasPrefix(query, pseudoCommand) {
+			return c.getHeaderlessSingleRowResultPage(ctx, driverVersion)
 		} else {
 			return nil, fmt.Errorf("pseudo command " + query + "doesn't exist")
 		}
