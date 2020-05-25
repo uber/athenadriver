@@ -34,7 +34,7 @@ import (
 var commandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 func printVersion() {
-	println("Current build version: v1.1.4")
+	println("Current build version: v1.1.6")
 }
 
 // main will query Athena and print all columns and rows information in csv format

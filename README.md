@@ -47,7 +47,7 @@ Except the basic features provided by Go `database/sql` like error handling, dat
 - Read-Only mode - disable database write in driver level
 - Moneywise mode :moneybag: - print out query cost(USD) for each query
 - Query with Athena Query ID(QID)
-- Pseudo commands from database/sql interface: `get_query_id`, `get_query_id_status`, `stop_query_id`, `get_workgroup`, `list_workgroups`, `update_workgroup`, `get_cost`, `get_execution_report` etc
+- Pseudo commands from database/sql interface: `get_query_id`, `get_query_id_status`, `stop_query_id`, `get_workgroup`, `list_workgroups`, `update_workgroup`, `get_cost`, `get_execution_report` etc [:link:](#pseudo-commands)
 
 `athenadriver` can extremely simplify your code. Check [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader) out as an example and a convenient tool for your Athena query in command line. 
 
@@ -785,6 +785,10 @@ The syntax is `pc:pseudo_command parameter`.
 
 `pc:stop_query_id Query_ID` - To stop the Query corresponding the Query ID. If there is no error, a one row string with `OK` will be returned. Example: [pc_stop_query_id.go](https://github.com/uber/athenadriver/blob/master/examples/pc_stop_query_id.go).
 
+### get_driver_version
+
+`pc:get_driver_version` - To return the version of athenadriver. Example: [pc_get_driver_version.go](https://github.com/uber/athenadriver/blob/master/examples/pc_get_driver_version.go).
+
 
 ## Limitations of Go/Athena SDK's and `athenadriver`'s Solution
 
@@ -972,7 +976,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [cov-img]: https://codecov.io/gh/henrywu2019/athenasql/branch/uber/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
 
-[release-img]: https://img.shields.io/badge/release-v1.1.4-red
+[release-img]: https://img.shields.io/badge/release-v1.1.6-red
 [release]: https://github.com/uber/athenadriver/releases
 
 [ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?token=e2usf1UJEGmsFDHzV61y&branch=master

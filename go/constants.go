@@ -107,4 +107,4 @@ const PCStopQID = "stop_query_id"
 // PCGetDriverVersion is the pseudo command to get the version of athenadriver
 const PCGetDriverVersion = "get_driver_version"
 
-const driverVersion = "1.1.5"
+const driverVersion = "1.1.6"

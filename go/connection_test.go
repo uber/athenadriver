@@ -750,4 +750,9 @@ func Test_PseudoCommand(t *testing.T) {
 	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
 	assert.NotNil(t, er)
 	assert.Nil(t, dr)
+
+	query = "pc:get_driver_version"
+	dr, er = c.ExecContext(context.Background(), query, []driver.NamedValue{})
+	assert.Nil(t, er)
+	assert.NotNil(t, dr)
 }

@@ -2,7 +2,13 @@
 
 ## Example
 
-build and package locally:
+First, install `aws-lambda-go`:
+
+```go
+go get github.com/aws/aws-lambda-go/lambda
+```
+
+Build and package locally:
 ```go
 go mod init lambda-test
 go build main.go && zip function.zip main

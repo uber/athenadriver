@@ -1,0 +1,7 @@
+
+v1.1.6 - Pseudo commands, bug fix and more document and sample code (May 25, 2020)
+
+    - Introduce pseudo commands: get_query_id, get_query_id_status, stop_query_id, get_driver_version (doc: https://github.com/uber/athenadriver#pseudo-commands, Sample code: https://github.com/uber/athenadriver/tree/master/examples)
+    - Enable AWS profile manual setup for authentication (Sample code: https://github.com/uber/athenadriver/blob/master/examples/auth.go)
+    - Query Athena with athenadriver in AWS Lambda (https://github.com/uber/athenadriver/tree/master/examples/lambda/Go)
+    - One bug fix (https://github.com/uber/athenadriver/commit/8618706818a8db7abc8f1bd344ac0eca50d38959)
