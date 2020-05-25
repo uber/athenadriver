@@ -43,7 +43,8 @@ func useAthenaDriverConfigForAuth() {
 	println("with AthenaDriver Config:", i)
 }
 
-// To use AWS CLI's Config for authentication
+// To use AWS CLI's Config for authentication or use in AWS Lambda where access ID and key are not required.
+// Ref: https://github.com/uber/athenadriver/pull/10
 func useAWSCLIConfigForAuth() {
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "1")
 	// 1. Set AWS Credential in Driver Config.
