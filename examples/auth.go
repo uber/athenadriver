@@ -43,7 +43,9 @@ func useAthenaDriverConfigForAuth() {
 	println("with AthenaDriver Config:", i)
 }
 
-// To use AWS CLI's Config for authentication or use in AWS Lambda where access ID and key are not required.
+// - use AWS CLI's Config for authentication
+// - use in AWS Lambda where access ID and key are not required
+// - assume role where access ID and key are not required
 // Ref: https://github.com/uber/athenadriver/pull/10
 func useAWSCLIConfigForAuth() {
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "1")
@@ -51,13 +53,21 @@ func useAWSCLIConfigForAuth() {
 	conf, err := drv.NewDefaultConfig(secret.OutputBucketProd, drv.DummyRegion,
 		drv.DummyAccessID, drv.DummySecretAccessKey)
 	if err != nil {
+		println(err.Error())
 		return
 	}
 	// 2. Open Connection.
-	db, _ := sql.Open(drv.DriverName, conf.Stringify())
+	db, err := sql.Open(drv.DriverName, conf.Stringify())
+	if err != nil {
+		println(err.Error())
+		return
+	}
 	// 3. Query and print results
 	var i int
-	_ = db.QueryRow("SELECT 456").Scan(&i)
+	err = db.QueryRow("SELECT 456").Scan(&i)
+	if err != nil {
+		println(err.Error())
+	}
 	println("with AWS CLI Config:", i)
 	os.Unsetenv("AWS_SDK_LOAD_CONFIG")
 }
