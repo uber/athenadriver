@@ -50,7 +50,7 @@ func useAthenaDriverConfigForAuth() {
 func useAWSCLIConfigForAuth() {
 	os.Setenv("AWS_SDK_LOAD_CONFIG", "1")
 	// 1. Set AWS Credential in Driver Config.
-	conf, err := drv.NewDefaultConfig(secret.OutputBucketProd, drv.DummyRegion,
+	conf, err := drv.NewDefaultConfig(secret.OutputBucketProd, drv.DefaultRegion,
 		drv.DummyAccessID, drv.DummySecretAccessKey)
 	if err != nil {
 		println(err.Error())
