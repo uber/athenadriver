@@ -43,6 +43,7 @@ func useAthenaDriverConfigForAuth() {
 	println("with AthenaDriver Config:", i)
 }
 
+// AWS_SDK_LOAD_CONFIG is used here for multiple use cases
 // - use AWS CLI's Config for authentication
 // - use in AWS Lambda where access ID and key are not required
 // - assume role where access ID and key are not required
