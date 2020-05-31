@@ -146,7 +146,8 @@ func isReadOnlyStatement(query string) bool {
 		strings.Index(nQuery, "using") == 0 ||
 		strings.Index(nQuery, "with") == 0 ||
 		strings.Index(nQuery, "desc") == 0 ||
-		strings.Index(nQuery, "show") == 0
+		strings.Index(nQuery, "show") == 0 ||
+		IsQID(query)
 }
 
 func isInsertStatement(query string) bool {
