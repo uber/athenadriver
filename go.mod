@@ -12,7 +12,7 @@ require (
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/uber-go/tally v3.3.16+incompatible
-	github.com/uber/athenadriver/athenareader v0.0.0-20200601071720-4f4514022f39 // indirect
+	github.com/uber/athenadriver/athenareader v0.0.0-20200601071720-4f4514022f39
 	github.com/xwb1989/sqlparser v0.0.0-20180606152119-120387863bf2
 	go.mongodb.org/mongo-driver v1.3.3 // indirect
 	go.uber.org/config v1.4.0

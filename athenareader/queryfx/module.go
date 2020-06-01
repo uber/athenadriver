@@ -27,35 +27,36 @@ import (
 	"go.uber.org/fx"
 )
 
+// Module is to provide dependency of query to main app
 var Module = fx.Provide(new)
 
 // Params defines the dependencies or inputs
 type Params struct {
 	fx.In
 
-	MC configfx.MyConfig
+	MC configfx.AthenaDriverConfig
 }
 
 // Result defines output
 type Result struct {
 	fx.Out
 
-	QAD QueryAndDB
+	QAD QueryAndDBConnection
 }
 
-type QueryAndDB struct {
+// QueryAndDBConnection is the result of queryfx module
+type QueryAndDBConnection struct {
 	DB    *sql.DB
 	Query string
 }
 
 func new(p Params) (Result, error) {
-	// 2. Open Connection.
+	// Open Connection.
 	dsn := p.MC.DrvConfig.Stringify()
 	db, _ := sql.Open(drv.DriverName, dsn)
-	// 3. Query and print results
-	qad := QueryAndDB{
+	qad := QueryAndDBConnection{
 		DB:    db,
-		Query: p.MC.Qy,
+		Query: p.MC.QueryString,
 	}
 	return Result{
 		QAD: qad,

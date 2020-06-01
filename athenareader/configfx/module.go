@@ -33,6 +33,7 @@ import (
 	"os"
 )
 
+// Module is to provide dependency of Configuration to main app
 var Module = fx.Provide(new)
 
 // Params defines the dependencies or inputs
@@ -41,6 +42,7 @@ type Params struct {
 	Shutdowner fx.Shutdowner
 }
 
+// ReaderInputConfig is to represent the output section of configuration file
 type ReaderOutputConfig struct {
 	Render    string `yaml:"render"`
 	Page      int    `yaml:"pagesize"`
@@ -49,6 +51,7 @@ type ReaderOutputConfig struct {
 	Moneywise bool   `yaml:"moneywise"`
 }
 
+// ReaderInputConfig is to represent the input section of configuration file
 type ReaderInputConfig struct {
 	Bucket   string `yaml:"bucket"`
 	Region   string `yaml:"region"`
@@ -56,18 +59,19 @@ type ReaderInputConfig struct {
 	Admin    bool   `yaml:"admin"`
 }
 
-type MyConfig struct {
-	OC        ReaderOutputConfig
-	IC        ReaderInputConfig
-	Qy        string
-	DrvConfig *drv.Config
+// AthenaDriverConfig is Athena Driver Configuration
+type AthenaDriverConfig struct {
+	OutputConfig ReaderOutputConfig
+	InputConfig  ReaderInputConfig
+	QueryString  string
+	DrvConfig    *drv.Config
 }
 
 // Result defines output
 type Result struct {
 	fx.Out
 
-	MC MyConfig
+	MC AthenaDriverConfig
 }
 
 func init() {
@@ -134,20 +138,20 @@ func new(p Params) (Result, error) {
 		return Result{}, fmt.Errorf("no")
 	}
 
-	var mc = MyConfig{}
+	var mc = AthenaDriverConfig{}
 	var (
 		provider *config.YAML
 		err      error
 	)
 
-	if _, err = os.Stat(HomeDir() + "/athenareader.config"); err == nil {
-		provider, err = config.NewYAML(config.File(HomeDir() + "/athenareader.config"))
+	if _, err = os.Stat(homeDir() + "/athenareader.config"); err == nil {
+		provider, err = config.NewYAML(config.File(homeDir() + "/athenareader.config"))
 	} else if _, err = os.Stat("athenareader.config"); err == nil {
 		provider, err = config.NewYAML(config.File("athenareader.config"))
 	} else {
 		goPath := os.Getenv("GOPATH")
 		if goPath == "" {
-			goPath = HomeDir() + "/go"
+			goPath = homeDir() + "/go"
 			if _, err = os.Stat(goPath); err != nil {
 				d, _ := os.Getwd()
 				println("could not find athenareader.config in home directory or current directory " + d)
@@ -157,17 +161,18 @@ func new(p Params) (Result, error) {
 		}
 		path := goPath + "/src/github.com/uber/athenadriver/athenareader/athenareader.config"
 		if _, err = os.Stat(path); err == nil {
-			Copy(path, HomeDir()+"/athenareader.config")
+			copyFile(path, homeDir()+"/athenareader.config")
 			provider, err = config.NewYAML(config.File(path))
 		} else {
-			err = downloadFile(HomeDir()+"/athenareader.config", "https://raw.githubusercontent.com/uber/athenadriver/master/athenareader/athenareader.config")
+			err = downloadFile(homeDir()+"/athenareader.config",
+				"https://raw.githubusercontent.com/uber/athenadriver/master/athenareader/athenareader.config")
 			if err != nil {
 				d, _ := os.Getwd()
 				println("could not find athenareader.config in home directory or current directory " + d)
 				p.Shutdowner.Shutdown()
 				os.Exit(2)
 			} else {
-				provider, err = config.NewYAML(config.File(HomeDir() + "/athenareader.config"))
+				provider, err = config.NewYAML(config.File(homeDir() + "/athenareader.config"))
 			}
 		}
 	}
@@ -176,48 +181,48 @@ func new(p Params) (Result, error) {
 		return Result{}, err
 	}
 
-	provider.Get("athenareader.output").Populate(&mc.OC)
-	provider.Get("athenareader.input").Populate(&mc.IC)
+	provider.Get("athenareader.output").Populate(&mc.OutputConfig)
+	provider.Get("athenareader.input").Populate(&mc.InputConfig)
 
-	mc.Qy = *query
+	mc.QueryString = *query
 	if _, err := os.Stat(*query); err == nil {
 		b, err := ioutil.ReadFile(*query)
 		if err == nil {
-			mc.Qy = string(b) // convert content to a 'string'
+			mc.QueryString = string(b) // convert content to a 'string'
 		}
 	}
 
-	mc.DrvConfig, err = drv.NewDefaultConfig(mc.IC.Bucket, mc.IC.Region, secret.AccessID, secret.SecretAccessKey)
+	mc.DrvConfig, err = drv.NewDefaultConfig(mc.InputConfig.Bucket, mc.InputConfig.Region, secret.AccessID, secret.SecretAccessKey)
 	if err != nil {
 		return Result{}, err
 	}
 	if isFlagPassed("b") {
-		mc.IC.Bucket = *bucket
-		mc.DrvConfig.SetOutputBucket(mc.IC.Bucket)
+		mc.InputConfig.Bucket = *bucket
+		mc.DrvConfig.SetOutputBucket(mc.InputConfig.Bucket)
 	}
 	if isFlagPassed("d") {
-		mc.IC.Database = *database
+		mc.InputConfig.Database = *database
 	}
 	if isFlagPassed("r") {
-		mc.OC.Rowonly = *rowOnly
+		mc.OutputConfig.Rowonly = *rowOnly
 	}
 	if isFlagPassed("m") {
-		mc.OC.Moneywise = *moneyWise
+		mc.OutputConfig.Moneywise = *moneyWise
 	}
 	if isFlagPassed("a") {
-		mc.IC.Admin = *admin
+		mc.InputConfig.Admin = *admin
 	}
 	if isFlagPassed("y") {
-		mc.OC.Style = *style
+		mc.OutputConfig.Style = *style
 	}
 	if isFlagPassed("o") {
-		mc.OC.Render = *format
+		mc.OutputConfig.Render = *format
 	}
-	if mc.OC.Moneywise {
+	if mc.OutputConfig.Moneywise {
 		mc.DrvConfig.SetMoneyWise(true)
 	}
-	mc.DrvConfig.SetDB(mc.IC.Database)
-	if !mc.IC.Admin {
+	mc.DrvConfig.SetDB(mc.InputConfig.Database)
+	if !mc.InputConfig.Admin {
 		mc.DrvConfig.SetReadOnly(true)
 	}
 	if err != nil {
@@ -228,7 +233,7 @@ func new(p Params) (Result, error) {
 	}, nil
 }
 
-func Copy(src, dst string) error {
+func copyFile(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
 		return err
@@ -248,7 +253,7 @@ func Copy(src, dst string) error {
 	return out.Close()
 }
 
-func HomeDir() string {
+func homeDir() string {
 	if h := os.Getenv("HOME"); h != "" {
 		return h
 	}
