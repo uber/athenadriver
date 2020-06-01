@@ -43,16 +43,16 @@ func opts() fx.Option {
 	)
 }
 
-func queryAthena(qad queryfx.QueryAndDB, mc configfx.MyConfig) {
+func queryAthena(qad queryfx.QueryAndDBConnection, mc configfx.AthenaDriverConfig) {
 	rows, err := qad.DB.Query(qad.Query)
 	if err != nil {
 		println(err.Error())
 		return
 	}
 	defer rows.Close()
-	if mc.OC.Rowonly {
-		drv.PrettyPrintSQLRows(rows, mc.OC.Style, mc.OC.Render, mc.OC.Page)
+	if mc.OutputConfig.Rowonly {
+		drv.PrettyPrintSQLRows(rows, mc.OutputConfig.Style, mc.OutputConfig.Render, mc.OutputConfig.Page)
 	} else {
-		drv.PrettyPrintSQLColsRows(rows, mc.OC.Style, mc.OC.Render, mc.OC.Page)
+		drv.PrettyPrintSQLColsRows(rows, mc.OutputConfig.Style, mc.OutputConfig.Render, mc.OutputConfig.Page)
 	}
 }
