@@ -18,41 +18,46 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package queryfx
 
 import (
-	"context"
+	"database/sql"
 	"github.com/uber/athenadriver/athenareader/configfx"
-	"github.com/uber/athenadriver/athenareader/queryfx"
 	drv "github.com/uber/athenadriver/go"
 	"go.uber.org/fx"
 )
 
-func main() {
-	app := fx.New(opts(), fx.Options(fx.NopLogger))
-	ctx := context.Background()
-	app.Start(ctx)
-	defer app.Stop(ctx)
+var Module = fx.Provide(new)
+
+// Params defines the dependencies or inputs
+type Params struct {
+	fx.In
+
+	MC configfx.MyConfig
 }
 
-func opts() fx.Option {
-	return fx.Options(
-		configfx.Module,
-		queryfx.Module,
-		fx.Invoke(queryAthena),
-	)
+// Result defines output
+type Result struct {
+	fx.Out
+
+	QAD QueryAndDB
 }
 
-func queryAthena(qad queryfx.QueryAndDB, mc configfx.MyConfig) {
-	rows, err := qad.DB.Query(qad.Query)
-	if err != nil {
-		println(err.Error())
-		return
+type QueryAndDB struct {
+	DB    *sql.DB
+	Query string
+}
+
+func new(p Params) (Result, error) {
+	// 2. Open Connection.
+	dsn := p.MC.DrvConfig.Stringify()
+	db, _ := sql.Open(drv.DriverName, dsn)
+	// 3. Query and print results
+	qad := QueryAndDB{
+		DB:    db,
+		Query: p.MC.Qy,
 	}
-	defer rows.Close()
-	if mc.OC.Rowonly {
-		drv.PrettyPrintSQLRows(rows, mc.OC.Style, mc.OC.Render, mc.OC.Page)
-	} else {
-		drv.PrettyPrintSQLColsRows(rows, mc.OC.Style, mc.OC.Render, mc.OC.Page)
-	}
+	return Result{
+		QAD: qad,
+	}, nil
 }

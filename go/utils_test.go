@@ -74,6 +74,39 @@ func TestColsRowsToCSV(t *testing.T) {
 	assert.Equal(t, expected, "one,two,three\n1,2,3\n")
 }
 
+func TestPrettyPrintSQLRows(t *testing.T) {
+	sqlRows := sqlmock.NewRows([]string{"one", "two", "three"})
+	sqlRows.AddRow("1", "2", "3")
+	sqlRows.AddRow("a", "b", "c")
+	sqlRows.AddRow("hello", "world", "athenadriver")
+	rows := mockRowsToSQLRows(sqlRows)
+	for _, s := range OutputStyles {
+		for _, r := range OutputFormats {
+			PrettyPrintSQLRows(rows, s, r, 2)
+		}
+	}
+}
+
+func TestPrettyPrintSQLColsRows(t *testing.T) {
+	sqlRows := sqlmock.NewRows([]string{"one", "two", "three"})
+	sqlRows.AddRow("1", "2", "3")
+	sqlRows.AddRow("a", "b", "c")
+	sqlRows.AddRow("hello", "world", "athenadriver")
+	rows := mockRowsToSQLRows(sqlRows)
+	PrettyPrintSQLColsRows(rows, "StyleColoredBlackOnBlueWhite", "default", 2)
+	PrettyPrintSQLRows(nil, "StyleColoredBlackOnBlueWhite", "default", 2)
+}
+
+func TestPrettyPrintSQLColsRows2(t *testing.T) {
+	sqlRows := sqlmock.NewRows([]string{"one", "two", "three"})
+	sqlRows.AddRow("1", "2", "3")
+	sqlRows.AddRow("a", "b", "c")
+	sqlRows.AddRow("hello", "world", "athenadriver")
+	rows := mockRowsToSQLRows(sqlRows)
+	PrettyPrintSQLColsRows(rows, "StyleColoredBlackOnCyanWhite", "default", 0)
+	PrettyPrintSQLColsRows(nil, "StyleColoredBlackOnCyanWhite", "default", 0)
+}
+
 func TestIsSelectStatement(t *testing.T) {
 	assert.True(t, colInFirstPage("SELECT"))
 	assert.True(t, colInFirstPage(" SELECT"))
