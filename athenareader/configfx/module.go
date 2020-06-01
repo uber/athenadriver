@@ -44,34 +44,48 @@ type Params struct {
 
 // ReaderInputConfig is to represent the output section of configuration file
 type ReaderOutputConfig struct {
-	Render    string `yaml:"render"`
-	Page      int    `yaml:"pagesize"`
-	Style     string `yaml:"style"`
-	Rowonly   bool   `yaml:"rowonly"`
-	Moneywise bool   `yaml:"moneywise"`
+	// Render is for the output format
+	Render string `yaml:"render"`
+	// Page is for the pagination
+	Page int `yaml:"pagesize"`
+	// Style is output style
+	Style string `yaml:"style"`
+	// Rowonly is for displaying header or not
+	Rowonly bool `yaml:"rowonly"`
+	// Moneywise is for displaying spending or not
+	Moneywise bool `yaml:"moneywise"`
 }
 
 // ReaderInputConfig is to represent the input section of configuration file
 type ReaderInputConfig struct {
-	Bucket   string `yaml:"bucket"`
-	Region   string `yaml:"region"`
+	// Bucket is the output bucket
+	Bucket string `yaml:"bucket"`
+	// Region is AWS region
+	Region string `yaml:"region"`
+	// Database is the name of the DB
 	Database string `yaml:"database"`
-	Admin    bool   `yaml:"admin"`
+	// Admin is for write mode
+	Admin bool `yaml:"admin"`
 }
 
 // AthenaDriverConfig is Athena Driver Configuration
 type AthenaDriverConfig struct {
+	// OutputConfig is for the output section of the config
 	OutputConfig ReaderOutputConfig
-	InputConfig  ReaderInputConfig
-	QueryString  string
-	DrvConfig    *drv.Config
+	// InputConfig is for the input section of the config
+	InputConfig ReaderInputConfig
+	// QueryString is the query string
+	QueryString string
+	// DrvConfig is the datastructure of Driver Config
+	DrvConfig *drv.Config
 }
 
 // Result defines output
 type Result struct {
 	fx.Out
 
-	MC AthenaDriverConfig
+	// MyConfig is the current AthenaDriver Config
+	MyConfig AthenaDriverConfig
 }
 
 func init() {
@@ -229,7 +243,7 @@ func new(p Params) (Result, error) {
 		return Result{}, err
 	}
 	return Result{
-		MC: mc,
+		MyConfig: mc,
 	}, nil
 }
 

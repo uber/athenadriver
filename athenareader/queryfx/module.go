@@ -34,29 +34,33 @@ var Module = fx.Provide(new)
 type Params struct {
 	fx.In
 
-	MC configfx.AthenaDriverConfig
+	// MyConfig is the current Athenadriver Config
+	MyConfig configfx.AthenaDriverConfig
 }
 
 // Result defines output
 type Result struct {
 	fx.Out
 
+	// QAD is the Query and DB Connection
 	QAD QueryAndDBConnection
 }
 
 // QueryAndDBConnection is the result of queryfx module
 type QueryAndDBConnection struct {
-	DB    *sql.DB
+	// DB is the pointer to sql/database DB
+	DB *sql.DB
+	// Query is the query string
 	Query string
 }
 
 func new(p Params) (Result, error) {
 	// Open Connection.
-	dsn := p.MC.DrvConfig.Stringify()
+	dsn := p.MyConfig.DrvConfig.Stringify()
 	db, _ := sql.Open(drv.DriverName, dsn)
 	qad := QueryAndDBConnection{
 		DB:    db,
-		Query: p.MC.QueryString,
+		Query: p.MyConfig.QueryString,
 	}
 	return Result{
 		QAD: qad,
