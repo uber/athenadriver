@@ -39,6 +39,16 @@ import (
 	"time"
 )
 
+var OutputStyle = [...]string{"StyleDefault", "StyleBold", "StyleColoredBright", "StyleColoredDark",
+	"StyleColoredBlackOnBlueWhite", "StyleColoredBlackOnCyanWhite", "StyleColoredBlackOnGreenWhite",
+	"StyleColoredBlackOnMagentaWhite", "StyleColoredBlackOnYellowWhite", "StyleColoredBlackOnRedWhite",
+	"StyleColoredBlueWhiteOnBlack", "StyleColoredCyanWhiteOnBlack", "StyleColoredGreenWhiteOnBlack",
+	"StyleColoredMagentaWhiteOnBlack", "StyleColoredRedWhiteOnBlack", "StyleColoredYellowWhiteOnBlack",
+	"StyleDouble", "StyleLight", "StyleRounded",
+}
+
+var OutputFormat = [...]string{"csv", "html", "markdown", "table"}
+
 func scanNullString(v interface{}) (sql.NullString, error) {
 	if v == nil {
 		return sql.NullString{}, nil
@@ -164,6 +174,7 @@ func renderTable(renderType string, w table.Writer) string {
 	return w.RenderCSV()
 }
 
+// PrettyPrintSQLRows is to print rows beautifully
 func PrettyPrintSQLRows(rows *sql.Rows, style string, render string, page int) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
@@ -190,6 +201,7 @@ func PrettyPrintSQLRows(rows *sql.Rows, style string, render string, page int) {
 	renderTable(render, t)
 }
 
+// PrettyPrintSQLColsRows is to print rows beautifully with header
 func PrettyPrintSQLColsRows(rows *sql.Rows, style string, render string, page int) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)

@@ -80,7 +80,11 @@ func TestPrettyPrintSQLRows(t *testing.T) {
 	sqlRows.AddRow("a", "b", "c")
 	sqlRows.AddRow("hello", "world", "athenadriver")
 	rows := mockRowsToSQLRows(sqlRows)
-	PrettyPrintSQLRows(rows, "Styledefault", "default", 2)
+	for _, s := range OutputStyle {
+		for _, r := range OutputFormat {
+			PrettyPrintSQLRows(rows, s, r, 2)
+		}
+	}
 }
 
 func TestPrettyPrintSQLColsRows(t *testing.T) {
@@ -90,6 +94,7 @@ func TestPrettyPrintSQLColsRows(t *testing.T) {
 	sqlRows.AddRow("hello", "world", "athenadriver")
 	rows := mockRowsToSQLRows(sqlRows)
 	PrettyPrintSQLColsRows(rows, "StyleColoredBlackOnBlueWhite", "default", 2)
+	PrettyPrintSQLRows(nil, "StyleColoredBlackOnBlueWhite", "default", 2)
 }
 
 func TestPrettyPrintSQLColsRows2(t *testing.T) {
@@ -99,6 +104,7 @@ func TestPrettyPrintSQLColsRows2(t *testing.T) {
 	sqlRows.AddRow("hello", "world", "athenadriver")
 	rows := mockRowsToSQLRows(sqlRows)
 	PrettyPrintSQLColsRows(rows, "StyleColoredBlackOnCyanWhite", "default", 0)
+	PrettyPrintSQLColsRows(nil, "StyleColoredBlackOnCyanWhite", "default", 0)
 }
 
 func TestIsSelectStatement(t *testing.T) {
