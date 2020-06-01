@@ -29,7 +29,7 @@ import (
 )
 
 func main() {
-	app := fx.New(opts(),fx.Options(fx.NopLogger))
+	app := fx.New(opts(), fx.Options(fx.NopLogger))
 	ctx := context.Background()
 	app.Start(ctx)
 	defer app.Stop(ctx)
