@@ -27,7 +27,9 @@ import (
 	drv "github.com/uber/athenadriver/go"
 	"go.uber.org/config"
 	"go.uber.org/fx"
+	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 )
 
@@ -138,15 +140,36 @@ func new(p Params) (Result, error) {
 		err      error
 	)
 
-	if _, err = os.Stat("~/athenareader.config"); err == nil {
-		provider, err = config.NewYAML(config.File("~/athenareader.config"))
+	if _, err = os.Stat(HomeDir() + "/athenareader.config"); err == nil {
+		provider, err = config.NewYAML(config.File(HomeDir() + "/athenareader.config"))
 	} else if _, err = os.Stat("athenareader.config"); err == nil {
 		provider, err = config.NewYAML(config.File("athenareader.config"))
 	} else {
-		d, _ := os.Getwd()
-		println("could not find athenareader.config in home directory or current directory " + d)
-		p.Shutdowner.Shutdown()
-		os.Exit(2)
+		goPath := os.Getenv("GOPATH")
+		if goPath == "" {
+			goPath = HomeDir() + "/go"
+			if _, err = os.Stat(goPath); err != nil {
+				d, _ := os.Getwd()
+				println("could not find athenareader.config in home directory or current directory " + d)
+				p.Shutdowner.Shutdown()
+				os.Exit(2)
+			}
+		}
+		path := goPath + "/src/github.com/uber/athenadriver/athenareader/athenareader.config"
+		if _, err = os.Stat(path); err == nil {
+			Copy(path, HomeDir()+"/athenareader.config")
+			provider, err = config.NewYAML(config.File(path))
+		} else {
+			err = downloadFile(HomeDir()+"/athenareader.config", "https://raw.githubusercontent.com/uber/athenadriver/master/athenareader/athenareader.config")
+			if err != nil {
+				d, _ := os.Getwd()
+				println("could not find athenareader.config in home directory or current directory " + d)
+				p.Shutdowner.Shutdown()
+				os.Exit(2)
+			} else {
+				provider, err = config.NewYAML(config.File(HomeDir() + "/athenareader.config"))
+			}
+		}
 	}
 
 	if err != nil {
@@ -170,6 +193,7 @@ func new(p Params) (Result, error) {
 	}
 	if isFlagPassed("b") {
 		mc.IC.Bucket = *bucket
+		mc.DrvConfig.SetOutputBucket(mc.IC.Bucket)
 	}
 	if isFlagPassed("d") {
 		mc.IC.Database = *database
@@ -202,4 +226,56 @@ func new(p Params) (Result, error) {
 	return Result{
 		MC: mc,
 	}, nil
+}
+
+func Copy(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
+}
+
+func HomeDir() string {
+	if h := os.Getenv("HOME"); h != "" {
+		return h
+	}
+	return os.Getenv("USERPROFILE") // windows
+}
+
+func downloadFile(filepath string, url string) (err error) {
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	// Check server response
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+	// Writer the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+	return nil
 }

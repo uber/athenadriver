@@ -1,4 +1,4 @@
-v1.1.7 - Athenareader output style and format added (May 31, 2020)
+v1.1.8 - Athenareader output style and format added (May 31, 2020)
 
     - prettify athenareader output
     - One bug fix (https://github.com/uber/athenadriver/issues/12)
