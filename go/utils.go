@@ -39,7 +39,8 @@ import (
 	"time"
 )
 
-var OutputStyle = [...]string{"StyleDefault", "StyleBold", "StyleColoredBright", "StyleColoredDark",
+// OutputStyles are all the styles we can choose to print query result
+var OutputStyles = [...]string{"StyleDefault", "StyleBold", "StyleColoredBright", "StyleColoredDark",
 	"StyleColoredBlackOnBlueWhite", "StyleColoredBlackOnCyanWhite", "StyleColoredBlackOnGreenWhite",
 	"StyleColoredBlackOnMagentaWhite", "StyleColoredBlackOnYellowWhite", "StyleColoredBlackOnRedWhite",
 	"StyleColoredBlueWhiteOnBlack", "StyleColoredCyanWhiteOnBlack", "StyleColoredGreenWhiteOnBlack",
@@ -47,7 +48,8 @@ var OutputStyle = [...]string{"StyleDefault", "StyleBold", "StyleColoredBright",
 	"StyleDouble", "StyleLight", "StyleRounded",
 }
 
-var OutputFormat = [...]string{"csv", "html", "markdown", "table"}
+// OutputFormats are all the formats we can choose to print query result
+var OutputFormats = [...]string{"csv", "html", "markdown", "table"}
 
 func scanNullString(v interface{}) (sql.NullString, error) {
 	if v == nil {

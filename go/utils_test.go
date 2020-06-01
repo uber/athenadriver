@@ -80,8 +80,8 @@ func TestPrettyPrintSQLRows(t *testing.T) {
 	sqlRows.AddRow("a", "b", "c")
 	sqlRows.AddRow("hello", "world", "athenadriver")
 	rows := mockRowsToSQLRows(sqlRows)
-	for _, s := range OutputStyle {
-		for _, r := range OutputFormat {
+	for _, s := range OutputStyles {
+		for _, r := range OutputFormats {
 			PrettyPrintSQLRows(rows, s, r, 2)
 		}
 	}
