@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/jedib0t/go-pretty/table"
 	"github.com/xwb1989/sqlparser"
 	"math"
 	"math/rand"
@@ -107,6 +108,119 @@ func ColsRowsToCSV(rows *sql.Rows) string {
 	s := ColsToCSV(rows)
 	r := RowsToCSV(rows)
 	return s + r
+}
+
+func getTableStyle(style string) table.Style {
+	switch style {
+	case "StyleColoredBright":
+		return table.StyleColoredBright
+	case "StyleBold":
+		return table.StyleBold
+	case "StyleColoredDark":
+		return table.StyleColoredDark
+	case "StyleColoredBlackOnBlueWhite":
+		return table.StyleColoredBlackOnBlueWhite
+	case "StyleColoredBlackOnCyanWhite":
+		return table.StyleColoredBlackOnCyanWhite
+	case "StyleColoredBlackOnGreenWhite":
+		return table.StyleColoredBlackOnGreenWhite
+	case "StyleColoredBlackOnMagentaWhite":
+		return table.StyleColoredBlackOnMagentaWhite
+	case "StyleColoredBlackOnYellowWhite":
+		return table.StyleColoredBlackOnYellowWhite
+	case "StyleColoredBlackOnRedWhite":
+		return table.StyleColoredBlackOnRedWhite
+	case "StyleColoredBlueWhiteOnBlack":
+		return table.StyleColoredBlueWhiteOnBlack
+	case "StyleColoredCyanWhiteOnBlack":
+		return table.StyleColoredCyanWhiteOnBlack
+	case "StyleColoredGreenWhiteOnBlack":
+		return table.StyleColoredGreenWhiteOnBlack
+	case "StyleColoredMagentaWhiteOnBlack":
+		return table.StyleColoredMagentaWhiteOnBlack
+	case "StyleColoredRedWhiteOnBlack":
+		return table.StyleColoredRedWhiteOnBlack
+	case "StyleColoredYellowWhiteOnBlack":
+		return table.StyleColoredYellowWhiteOnBlack
+	case "StyleDouble":
+		return table.StyleDouble
+	case "StyleLight":
+		return table.StyleLight
+	case "StyleRounded":
+		return table.StyleRounded
+	}
+	return table.StyleDefault
+}
+
+func renderTable(renderType string, w table.Writer) string {
+	switch renderType {
+	case "markdown":
+		return w.RenderMarkdown()
+	case "table":
+		return w.Render()
+	case "html":
+		return w.RenderHTML()
+	}
+	return w.RenderCSV()
+}
+
+func PrettyPrintSQLRows(rows *sql.Rows, style string, render string, page int) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	if rows == nil {
+		return
+	}
+	columns, _ := rows.Columns()
+	for rows.Next() {
+		rawResult := make([][]byte, len(columns))
+		row := make([]interface{}, len(columns))
+		for i := range rawResult {
+			row[i] = &rawResult[i] // pointers to each string in the interface slice
+		}
+		// We don't consider malformed rows
+		_ = rows.Scan(row...)
+		s := make(table.Row, len(columns))
+		for i, cell := range rawResult {
+			s[i] = string(cell)
+		}
+		t.AppendRow(s)
+	}
+	t.SetPageSize(page)
+	t.SetStyle(getTableStyle(style))
+	renderTable(render, t)
+}
+
+func PrettyPrintSQLColsRows(rows *sql.Rows, style string, render string, page int) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	if rows == nil {
+		return
+	}
+	columns, _ := rows.Columns()
+	if columns != nil && len(columns) > 0 {
+		myrow := make(table.Row, len(columns))
+		for i, c := range columns {
+			myrow[i] = c
+		}
+		t.AppendHeader(myrow)
+	}
+	for rows.Next() {
+		rawResult := make([][]byte, len(columns))
+		row := make([]interface{}, len(columns))
+		for i := range rawResult {
+			row[i] = &rawResult[i] // pointers to each string in the interface slice
+		}
+		// We don't consider malformed rows
+		_ = rows.Scan(row...)
+		s := make(table.Row, len(columns))
+		for i, cell := range rawResult {
+			s[i] = string(cell)
+		}
+		t.AppendRow(s)
+	}
+	t.SetPageSize(page)
+	t.SetStyle(getTableStyle(style))
+	renderTable(render, t)
 }
 
 // colInFirstPage is to check if this is a SELECT or VALUES statement.

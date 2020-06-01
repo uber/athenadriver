@@ -29,8 +29,8 @@ import (
 // Config is for AWS Athena Driver Config.
 // Be noted this is different from aws.Config.
 type Config struct {
-	dsn    url.URL
-	values url.Values
+	dsn    url.URL    `yaml:"dns"`
+	values url.Values `yaml:"values"`
 }
 
 var reSecretAccessKey = regexp.MustCompile(`secretAccessKey=[^&]+`)
