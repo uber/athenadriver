@@ -47,7 +47,7 @@ Except the basic features provided by Go `database/sql` like error handling, dat
 - Read-Only mode - disable database write in driver level
 - Moneywise mode :moneybag: - print out query cost(USD) for each query
 - Query with Athena Query ID(QID)
-- Pseudo commands from database/sql interface: `get_query_id`, `get_query_id_status`, `stop_query_id`, `get_workgroup`, `list_workgroups`, `update_workgroup`, `get_cost`, `get_execution_report` etc [:link:](#pseudo-commands)
+- Pseudo commands from database/sql interface: `get_driver_version`, `get_query_id`, `get_query_id_status`, `stop_query_id`, `get_workgroup`, `list_workgroups`, `update_workgroup`, `get_cost`, `get_execution_report` etc [:link:](#pseudo-commands)
 
 `athenadriver` can extremely simplify your code. Check [athenareader](https://github.com/uber/athenadriver/tree/master/athenareader) out as an example and a convenient tool for your Athena query in command line. 
 
