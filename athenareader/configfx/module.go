@@ -42,7 +42,7 @@ type Params struct {
 	LC fx.Lifecycle
 }
 
-// ReaderInputConfig is to represent the output section of configuration file
+// ReaderOutputConfig is to represent the output section of configuration file
 type ReaderOutputConfig struct {
 	// Render is for the output format
 	Render string `yaml:"render"`

@@ -3,7 +3,7 @@ export GOBIN ?= $(shell pwd)/bin
 GOLINT = $(GOBIN)/golint
 
 GO_FILES := $(shell \
-	find . '(' -path './go/.*' -o -path './vendor' ')' -prune \
+	find . '(' -path './go/.*' -o -path './athenareader'  ')' -prune \
 	-o -name '*.go' -print | cut -b3-)
 
 .PHONY: build
