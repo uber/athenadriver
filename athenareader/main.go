@@ -22,9 +22,9 @@ package main
 
 import (
 	"context"
-	"github.com/uber/athenadriver/athenareader/configfx"
-	"github.com/uber/athenadriver/athenareader/queryfx"
 	drv "github.com/uber/athenadriver/go"
+	"github.com/uber/athenadriver/lib/configfx"
+	"github.com/uber/athenadriver/lib/queryfx"
 	"go.uber.org/fx"
 )
 

@@ -9,7 +9,7 @@ require (
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/stretchr/testify v1.5.1
 	github.com/uber-go/tally v3.3.16+incompatible
-	github.com/uber/athenadriver/athenareader v0.0.0-20200605150104-b94bd9cfedeb
+	github.com/uber/athenadriver/athenareader v0.0.0-20200605151833-17e12bb8e7b7 // indirect
 	github.com/xwb1989/sqlparser v0.0.0-20180606152119-120387863bf2
 	go.uber.org/config v1.4.0
 	go.uber.org/fx v1.12.0

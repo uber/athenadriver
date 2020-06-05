@@ -3,7 +3,6 @@ module github.com/uber/athenadriver/athenareader
 go 1.13
 
 require (
-	github.com/uber/athenadriver v1.1.8
-	go.uber.org/config v1.4.0
+	github.com/uber/athenadriver v1.1.9
 	go.uber.org/fx v1.12.0
 )
