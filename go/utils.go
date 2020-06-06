@@ -237,6 +237,21 @@ func PrettyPrintSQLColsRows(rows *sql.Rows, style string, render string, page in
 	renderTable(render, t)
 }
 
+// PrettyPrintCSV is to print rows in CSV format with default style
+func PrettyPrintCSV(rows *sql.Rows) {
+	PrettyPrintSQLColsRows(rows, "StyleDefault", "csv", 1024)
+}
+
+// PrettyPrintMD is to print rows in markdown format with default style
+func PrettyPrintMD(rows *sql.Rows) {
+	PrettyPrintSQLColsRows(rows, "StyleDefault", "markdown", 1024)
+}
+
+// PrettyPrintFancy is to print rows in table format with fancy style
+func PrettyPrintFancy(rows *sql.Rows) {
+	PrettyPrintSQLColsRows(rows, "StyleColoredGreenWhiteOnBlack", "table", 1024)
+}
+
 // colInFirstPage is to check if this is a SELECT or VALUES statement.
 // Some Sample Queries are like:
 //

@@ -85,6 +85,9 @@ func TestPrettyPrintSQLRows(t *testing.T) {
 			PrettyPrintSQLRows(rows, s, r, 2)
 		}
 	}
+	PrettyPrintMD(rows)
+	PrettyPrintCSV(rows)
+	PrettyPrintFancy(rows)
 }
 
 func TestPrettyPrintSQLColsRows(t *testing.T) {
