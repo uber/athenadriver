@@ -144,7 +144,7 @@ Now re-plugin your cable and wait for network coming back, you can see the progr
 import athenadriver "github.com/uber/athenadriver/go"
 ```
 
-The following are coding examples to demonstrate `athenadriver`'s features and how you should use `athenadriver` in youe Go application.
+The following are coding examples to demonstrate `athenadriver`'s features and how you should use `athenadriver` in your Go application.
 Please be noted the code is for demonstration purpose only, so please follow your own coding style or best practice if necessary.
 
 ### Get Started - A Simple Query
