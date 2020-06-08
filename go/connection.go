@@ -188,6 +188,30 @@ func (c *Connection) ExecContext(ctx context.Context, query string, namedArgs []
 	return result, nil
 }
 
+func isQueryID(q string) bool {
+	return len(q) == 36 && strings.Count(q, "-") == 4
+}
+
+func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, error) {
+	if c.connector.config.IsMoneyWise() {
+		dataScanned := int64(0)
+		printCost(&athena.GetQueryExecutionOutput{
+			QueryExecution: &athena.QueryExecution{
+				QueryExecutionId: &QID,
+				Statistics: &athena.QueryExecutionStatistics{
+					DataScannedInBytes: &dataScanned,
+				},
+			},
+		})
+	}
+	wg := c.connector.config.GetWorkgroup()
+	if wg.Name == "" {
+		wg.Name = DefaultWGName
+	}
+	gRedis.SetSaving(wg.Name, QID)
+	return NewRows(ctx, c.athenaAPI, QID, c.connector.config, c.connector.tracer)
+}
+
 // QueryContext is implemented to be called by `DB.Query` (QueryerContext interface).
 //
 // "QueryerContext is an optional interface that may be implemented by a Conn.
@@ -199,6 +223,8 @@ func (c *Connection) ExecContext(ctx context.Context, query string, namedArgs []
 // With QueryContext implemented, we don't need Queryer.
 // QueryerContext must honor the context timeout and return when the context is canceled.
 func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs []driver.NamedValue) (driver.Rows, error) {
+	query = GetTidySQL(query)
+	println("Tidy SQL: " + query)
 	var obs = c.connector.tracer
 	if c.connector.config.IsReadOnly() {
 		if !isReadOnlyStatement(query) {
@@ -254,6 +280,22 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	startOfStartQueryExecution := time.Now()
 	obs.Scope().Timer(DriverName + ".query.workgroup").Record(timeWorkgroup)
 
+	// case 1
+	if isQueryID(query) {
+		return c.cachedQuery(ctx, query)
+	}
+	//  case 2
+	// This query cannot be cache-queried
+	tableNames := GetTableNamesInQuery(query)
+	// Don't optimize joint query
+	if len(tableNames) == 1 {
+		for tableName, _ := range tableNames {
+			if cacheQID := gRedis.GetValidCachedQID(query, tableName); cacheQID != "" {
+				return c.cachedQuery(ctx, cacheQID)
+			}
+		}
+	}
+
 	resp, err := c.athenaAPI.StartQueryExecution(&athena.StartQueryExecutionInput{
 		QueryString: aws.String(query),
 		QueryExecutionContext: &athena.QueryExecutionContext{
@@ -308,6 +350,10 @@ WAITING_FOR_RESULT:
 			obs.Scope().Timer(DriverName + ".query.queryexecutionstatefailed").Record(timeQueryExecutionStateFailed)
 			return nil, errors.New(reason)
 		case athena.QueryExecutionStateSucceeded:
+			data := *statusResp.QueryExecution.Statistics.DataScannedInBytes
+			t := statusResp.QueryExecution.Status.CompletionDateTime.Unix()
+			gRedis.SetQID(query, data, queryID, t)
+			gRedis.SetCost(wg.Name, data, queryID)
 			if c.connector.config.IsMoneyWise() {
 				printCost(statusResp)
 			}

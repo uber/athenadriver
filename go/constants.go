@@ -64,6 +64,18 @@ const (
 
 	// DummySecretAccessKey is used when AWS CLI Config is used, ie AWS_SDK_LOAD_CONFIG is set
 	DummySecretAccessKey = "dummy"
+
+	//RedisServerHost = "redis-celery-queue-1.17j826.ng.0001.use1.cache.amazonaws.com"
+	RedisServerHost = "redis-celery-queue-1.pit-irn-1.uberatc.net"
+
+	// Redis server port
+	RedisServerPort = 13480
+
+	// Redis server default DB
+	RedisServerDefaultDB = 1
+
+	// Redis Server Password, default to empty string
+	RedisServerPassword = ""
 )
 
 // https://docs.aws.amazon.com/athena/latest/ug/service-limits.html
