@@ -108,4 +108,4 @@ const PCStopQID = "stop_query_id"
 const PCGetDriverVersion = "get_driver_version"
 
 // DriverVersion is athenadriver's version
-const DriverVersion = "1.1.10"
+const DriverVersion = "1.1.11"
