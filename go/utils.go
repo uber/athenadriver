@@ -774,8 +774,8 @@ func GetTidySQL(query string) string {
 		q := sqlparser.String(stmt)
 		// OtherRead represents a DESCRIBE, or EXPLAIN statement.
 		// OtherAdmin represents a misc statement that relies on ADMIN privileges.
-		if q == "otherread" || q == "otheradmin" {
-			return query
+		if q == "otherread" || q == "otheradmin" || strings.Contains(q, " '$path' ") {
+			return strings.Trim(query, " ")
 		}
 		query = dualPattern.ReplaceAllString(q, "")
 	}
