@@ -1,5 +1,6 @@
 v1.1.11 - Minor bug fix and more documentation (June 16, 2020)
     - Uber Engdoc documentation
+    - Support $path in Athena query
     - Remove SQL Tidy function and working on replacing it with a Presto SQL parser in the future
 
 v1.1.10 - Minor bug fix and more documentation (June 5, 2020)

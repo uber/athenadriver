@@ -246,7 +246,6 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 			return nil, fmt.Errorf("pseudo command " + query + "doesn't exist")
 		}
 	}
-	query = GetTidySQL(query)
 	if c.connector.config.IsReadOnly() {
 		if !isReadOnlyStatement(query) {
 			obs.Scope().Counter(DriverName + ".failure.querycontext.writeviolation").Inc(1)

@@ -127,6 +127,7 @@ func new(p Params) (Result, error) {
 		return Result{}, fmt.Errorf("no")
 	}
 
+	// How to install a config file from a library
 	if _, err = os.Stat(homeDir() + "/athenareader.config"); err == nil {
 		provider, err = config.NewYAML(config.File(homeDir() + "/athenareader.config"))
 	} else if _, err = os.Stat("athenareader.config"); err == nil {
