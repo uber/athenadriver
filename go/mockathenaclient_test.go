@@ -28,6 +28,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/athena"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
+	"strings"
 )
 
 // genQueryResultsOutputByToken is a function type with string as parameter.
@@ -127,7 +128,7 @@ func (m *mockAthenaClient) CreateWorkGroup(*athena.CreateWorkGroupInput) (
 
 func (m *mockAthenaClient) StartQueryExecution(s *athena.
 	StartQueryExecutionInput) (*athena.StartQueryExecutionOutput, error) {
-	if *s.QueryString == "select 1" { // Ping
+	if strings.ToLower(*s.QueryString) == "select 1" { // Ping
 		qid := "PING_OK_QID"
 		return &athena.StartQueryExecutionOutput{
 			QueryExecutionId: &qid,
