@@ -1110,10 +1110,10 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [doc-img]: https://img.shields.io/badge/GoDoc-Reference-red.svg
 [doc]: https://pkg.go.dev/mod/github.com/uber/athenadriver
 
-[cov-img]: https://codecov.io/gh/uber/athenasql/branch/uber/graph/badge.svg
+[cov-img]: https://codecov.io/gh/uber/athenadriver/branch/master/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
 
-[release-img]: https://img.shields.io/badge/release-v1.1.6-red
+[release-img]: https://img.shields.io/badge/release-v1.1.11-red
 [release]: https://github.com/uber/athenadriver/releases
 
 [ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?token=e2usf1UJEGmsFDHzV61y&branch=master
