@@ -51,7 +51,7 @@ type QueryAndDBConnection struct {
 	// DB is the pointer to sql/database DB
 	DB *sql.DB
 	// Query is the query string
-	Query string
+	Query []string
 }
 
 func new(p Params) (Result, error) {

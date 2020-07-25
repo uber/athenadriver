@@ -26,6 +26,7 @@ import (
 	"github.com/uber/athenadriver/lib/configfx"
 	"github.com/uber/athenadriver/lib/queryfx"
 	"go.uber.org/fx"
+	"strings"
 )
 
 func main() {
@@ -44,15 +45,24 @@ func opts() fx.Option {
 }
 
 func queryAthena(qad queryfx.QueryAndDBConnection, mc configfx.AthenaDriverConfig) {
-	rows, err := qad.DB.Query(qad.Query)
-	if err != nil {
-		println(err.Error())
-		return
-	}
-	defer rows.Close()
-	if mc.OutputConfig.Rowonly {
-		drv.PrettyPrintSQLRows(rows, mc.OutputConfig.Style, mc.OutputConfig.Render, mc.OutputConfig.Page)
-	} else {
-		drv.PrettyPrintSQLColsRows(rows, mc.OutputConfig.Style, mc.OutputConfig.Render, mc.OutputConfig.Page)
+	for _, query := range qad.Query {
+		query = strings.Trim(query, " \n\t")
+		if query == "" {
+			continue
+		}
+		rows, err := qad.DB.Query(query)
+		if err != nil {
+			println("ERROR: " + err.Error())
+			if mc.OutputConfig.Fastfail {
+				return
+			}
+			continue
+		}
+		defer rows.Close()
+		if mc.OutputConfig.Rowonly {
+			drv.PrettyPrintSQLRows(rows, mc.OutputConfig.Style, mc.OutputConfig.Render, mc.OutputConfig.Page)
+		} else {
+			drv.PrettyPrintSQLColsRows(rows, mc.OutputConfig.Style, mc.OutputConfig.Render, mc.OutputConfig.Page)
+		}
 	}
 }
