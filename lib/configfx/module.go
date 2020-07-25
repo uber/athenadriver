@@ -30,6 +30,9 @@ import (
 	"go.uber.org/fx"
 	"io/ioutil"
 	"os"
+	"os/user"
+	"path/filepath"
+	"strings"
 )
 
 // Module is to provide dependency of Configuration to main app
@@ -54,6 +57,8 @@ type ReaderOutputConfig struct {
 	Rowonly bool `yaml:"rowonly"`
 	// Moneywise is for displaying spending or not
 	Moneywise bool `yaml:"moneywise"`
+	// Fastfail is for multiple queries
+	Fastfail bool `yaml:"fastfail"`
 }
 
 // ReaderInputConfig is to represent the input section of configuration file
@@ -75,7 +80,7 @@ type AthenaDriverConfig struct {
 	// InputConfig is for the input section of the config
 	InputConfig ReaderInputConfig
 	// QueryString is the query string
-	QueryString string
+	QueryString []string
 	// DrvConfig is the datastructure of Driver Config
 	DrvConfig *drv.Config
 }
@@ -93,7 +98,9 @@ func init() {
 }
 
 func new(p Params) (Result, error) {
-	var mc = AthenaDriverConfig{}
+	var mc = AthenaDriverConfig{
+		QueryString: make([]string, 0),
+	}
 	var (
 		provider *config.YAML
 		err      error
@@ -118,6 +125,7 @@ func new(p Params) (Result, error) {
 	var admin = flag.Bool("a", false, "Enable admin mode, so database write(create/drop) is allowed at athenadriver level")
 	var style = flag.String("y", "default", "Output rendering style")
 	var format = flag.String("o", "csv", "Output format(options: table, markdown, csv, html)")
+	var fastFail = flag.Bool("f", true, "fast fail when where are multiple queries")
 
 	flag.Parse()
 	switch {
@@ -166,12 +174,14 @@ func new(p Params) (Result, error) {
 	provider.Get("athenareader.output").Populate(&mc.OutputConfig)
 	provider.Get("athenareader.input").Populate(&mc.InputConfig)
 
-	mc.QueryString = *query
-	if _, err := os.Stat(*query); err == nil {
-		b, err := ioutil.ReadFile(*query)
+	filePath := expand(*query)
+	if _, err := os.Stat(filePath); err == nil {
+		b, err := ioutil.ReadFile(filePath)
 		if err == nil {
-			mc.QueryString = string(b) // convert content to a 'string'
+			mc.QueryString = strings.Split(string(b), "\n\n") // convert content to a '[]string'
 		}
+	} else {
+		mc.QueryString = append(mc.QueryString, *query)
 	}
 
 	mc.DrvConfig, err = drv.NewDefaultConfig(mc.InputConfig.Bucket, mc.InputConfig.Region, secret.AccessID, secret.SecretAccessKey)
@@ -190,6 +200,11 @@ func new(p Params) (Result, error) {
 	}
 	if isFlagPassed("m") {
 		mc.OutputConfig.Moneywise = *moneyWise
+	}
+	if isFlagPassed("f") {
+		mc.OutputConfig.Fastfail = *fastFail
+	} else {
+		mc.OutputConfig.Fastfail = true
 	}
 	if isFlagPassed("a") {
 		mc.InputConfig.Admin = *admin
@@ -213,4 +228,16 @@ func new(p Params) (Result, error) {
 	return Result{
 		MyConfig: mc,
 	}, nil
+}
+
+func expand(path string) string {
+	if len(path) == 0 || path[0] != '~' {
+		return path
+	}
+
+	usr, err := user.Current()
+	if err != nil {
+		return "/tmp/"
+	}
+	return filepath.Join(usr.HomeDir, path[1:])
 }
