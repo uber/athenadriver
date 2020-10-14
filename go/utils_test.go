@@ -439,6 +439,7 @@ func TestUilts_GetCost(t *testing.T) {
 }
 
 func TestUtils_IsQID(t *testing.T) {
+	assert.False(t, IsQID(`select "a44f8e61-4cbb-429a-b7ab-bea2c4a5caed"`))
 	assert.True(t, IsQID("a44f8e61-4cbb-429a-b7ab-bea2c4a5caed"))
 	assert.False(t, IsQID("a44f8e61-4cbb-429a-b7ab-bea2c4a5caeD"))
 	assert.False(t, IsQID("a44f8e61"))

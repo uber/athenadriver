@@ -743,7 +743,7 @@ var multiLineCommentPattern = regexp.MustCompile(`\/\*(.*)\*/\s*`)
 var oneLineCommentPattern = regexp.MustCompile(`(^\-\-[^\n]+|\s--[^\n]+)`)
 var getTableNamePattern = regexp.MustCompile(`(?i)\s+(?:from|join)\s+([\w.]+)`)
 var dualPattern = regexp.MustCompile(`from dual`)
-var qIDPattern = regexp.MustCompile(`[0-9a-f-]{36}`)
+var qIDPattern = regexp.MustCompile(`^[0-9a-f-]{36}$`)
 
 // GetTableNamesInQuery is a pessimistic function to return tables involved in query in format of DB.TABLE
 // https://regoio.herokuapp.com/
