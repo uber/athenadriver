@@ -432,7 +432,7 @@ WAITING_FOR_RESULT:
 			obs.Log(ErrorLevel, "query canceled", zap.String("queryID", queryID))
 			return nil, ctx.Err()
 		case <-time.After(PoolInterval * time.Second):
-			if isQueryTimeOut(startOfStartQueryExecution, *statusResp.QueryExecution.StatementType) {
+			if isQueryTimeOut(startOfStartQueryExecution, *statusResp.QueryExecution.StatementType, c.connector.config.GetServiceLimitOverride()) {
 				obs.Log(ErrorLevel, "Query timeout failure",
 					zap.String("workgroup", wg.Name),
 					zap.String("queryID", queryID),

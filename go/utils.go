@@ -665,22 +665,32 @@ func valueToNamedValue(args []driver.Value) []driver.NamedValue {
 	return nameValues
 }
 
-func isQueryTimeOut(startOfStartQueryExecution time.Time, queryType string) bool {
+func isQueryTimeOut(startOfStartQueryExecution time.Time, queryType string, serviceLimitOverride *ServiceLimitOverride) bool {
+	ddlQueryTimeout := DDLQueryTimeout
+	dmlQueryTimeout := DMLQueryTimeout
+	if serviceLimitOverride != nil {
+		if serviceLimitOverride.GetDDLQueryTimeout() > 0 {
+			ddlQueryTimeout = serviceLimitOverride.GetDDLQueryTimeout()
+		}
+		if serviceLimitOverride.GetDMLQueryTimeout() > 0 {
+			dmlQueryTimeout = serviceLimitOverride.GetDMLQueryTimeout()
+		}
+	}
 	switch queryType {
 	case "DDL":
 		return time.Since(startOfStartQueryExecution) >
-			DDLQueryTimeout*time.Second
+			time.Duration(ddlQueryTimeout)*time.Second
 	case "DML":
 		return time.Since(startOfStartQueryExecution) >
-			DMLQueryTimeout*time.Second
+			time.Duration(dmlQueryTimeout)*time.Second
 	case "UTILITY":
 		return time.Since(startOfStartQueryExecution) >
-			DMLQueryTimeout*time.Second
+			time.Duration(dmlQueryTimeout)*time.Second
 	case "TIMEOUT_NOW":
 		return true
 	default:
 		return time.Since(startOfStartQueryExecution) >
-			DDLQueryTimeout*time.Second
+			time.Duration(ddlQueryTimeout)*time.Second
 	}
 }
 
