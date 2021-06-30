@@ -1116,9 +1116,6 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [release-img]: https://img.shields.io/badge/release-v1.1.12-red
 [release]: https://github.com/uber/athenadriver/releases
 
-[ci-img]: https://api.travis-ci.com/uber/athenadriver.svg?token=e2usf1UJEGmsFDHzV61y&branch=master
-[ci]: https://travis-ci.com/uber/athenadriver/branches
-
 [report-card-img]: https://goreportcard.com/badge/github.com/uber/athenadriver
 [report-card]: https://goreportcard.com/report/github.com/uber/athenadriver
 
