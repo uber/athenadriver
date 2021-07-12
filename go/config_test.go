@@ -286,29 +286,3 @@ func TestConfig_SetAWSProfile(t *testing.T) {
 	testConf.SetAWSProfile("development")
 	assert.Equal(t, testConf.GetAWSProfile(), "development")
 }
-
-func TestConfig_SetServiceLimitOverride(t *testing.T) {
-	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
-
-	testConf := NewNoOpsConfig()
-	_ = testConf.SetOutputBucket(s3bucket)
-	serviceLimitOverride := NewServiceLimitOverride()
-	ddlQueryTimeout := 1000 * 60 // 1000 minutes
-	_ = serviceLimitOverride.SetDDLQueryTimeout(ddlQueryTimeout)
-	testConf.SetServiceLimitOverride(*serviceLimitOverride)
-	testServiceLimitOverride := testConf.GetServiceLimitOverride()
-	assert.Equal(t, ddlQueryTimeout, testServiceLimitOverride.GetDDLQueryTimeout())
-
-	expected := "s3://query-results-henry-wu-us-east-2?DDLQueryTimeout=60000&DMLQueryTimeout=0&WGRemoteCreation=true&db=default&missingAsEmptyString=true&region=us-east-1"
-	assert.Equal(t, expected, testConf.Stringify())
-
-	dmlQueryTimeout := 60 * 60 // 60 minutes
-	_ = serviceLimitOverride.SetDMLQueryTimeout(dmlQueryTimeout)
-	testConf.SetServiceLimitOverride(*serviceLimitOverride)
-	testServiceLimitOverride = testConf.GetServiceLimitOverride()
-	assert.Equal(t, ddlQueryTimeout, testServiceLimitOverride.GetDDLQueryTimeout())
-	assert.Equal(t, dmlQueryTimeout, testServiceLimitOverride.GetDMLQueryTimeout())
-
-	expected = "s3://query-results-henry-wu-us-east-2?DDLQueryTimeout=60000&DMLQueryTimeout=3600&WGRemoteCreation=true&db=default&missingAsEmptyString=true&region=us-east-1"
-	assert.Equal(t, expected, testConf.Stringify())
-}

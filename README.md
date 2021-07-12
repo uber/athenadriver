@@ -642,58 +642,6 @@ Sample Output:
 2020/01/20 15:28:35 context deadline exceeded
 ```
 
-### Overriding Athena Service Limits for Query Timeout
-This library assumes default [Athena service limits](https://docs.aws.amazon.com/athena/latest/ug/service-limits.html) for DDL and DML query timeouts, as can be found in `athenadriver/go/constants.go`.
-If you've increased your service limits, for example via the [Athena Service Quotas](https://console.aws.amazon.com/servicequotas/home/services/athena/quotas) console,
-you can override them on your `Config`.
-
-Here's the same example found at [Query Cancellation](#query-cancellation), but with an *increased* query timeout.
-
-```go
-package main
-
-import (
-	"context"
-	"database/sql"
-	"log"
-	"time"
-	drv "github.com/uber/athenadriver/go"
-)
-
-func main() {
-	// 1. Set AWS Credential in Driver Config.
-	conf, _ := drv.NewDefaultConfig("s3://myqueryresults/",
-		"us-east-2", "DummyAccessID", "DummySecretAccessKey")
-	
-	// 2. Override the DML query timeout to 60 minutes (3600 seconds). 
-	serviceLimitOverride := drv.NewServiceLimitOverride()
-	serviceLimitOverride.SetDMLQueryTimeout(3600)
-	conf.SetServiceLimitOverride(*serviceLimitOverride)
-
-	// 3. Open Connection.
-	dsn := conf.Stringify()
-	db, _ := sql.Open(drv.DriverName, dsn)
-	
-	// 4. Run the query.
-	rows, err := db.QueryContext(context.Background(), "select count(*) from sampledb.elb_logs")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	defer rows.Close()
-
-	var requestTimestamp string
-	var url string
-	for rows.Next() {
-		if err := rows.Scan(&requestTimestamp, &url); err != nil {
-			log.Fatal(err)
-		}
-		println(requestTimestamp + "," + url)
-	}
-}
-```
-
-
 ### Missing Value Handling 
 
 It is common to have missing values in S3 file, or Athena DB. When this happens, you can specify if you want to use

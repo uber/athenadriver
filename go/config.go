@@ -421,17 +421,3 @@ func (c *Config) SetAWSProfile(profile string) {
 func (c *Config) GetAWSProfile() string {
 	return c.values.Get("AWSProfile")
 }
-
-// SetServiceLimitOverride is to set values from a ServiceLimitOverride
-func (c *Config) SetServiceLimitOverride(serviceLimitOverride ServiceLimitOverride) {
-	for k, v := range serviceLimitOverride.GetAsStringMap() {
-		c.values.Set(k, v)
-	}
-}
-
-// GetServiceLimitOverride is to get the ServiceLimitOverride manually set by a user
-func (c *Config) GetServiceLimitOverride() *ServiceLimitOverride {
-	serviceLimitOverride := NewServiceLimitOverride()
-	serviceLimitOverride.SetFromValues(c.values)
-	return serviceLimitOverride
-}
