@@ -4,8 +4,6 @@
 [![CodeCov][cov-img]][cov]
 [![GoDoc][doc-img]][doc]
 [![Github release][release-img]][release]
-[![Build Status][ci-img]][ci]
-[![FOSSA][fossa-img]][fossa]
 [![Go Report Card][report-card-img]][report-card]
 [![lic][license-img]][license]
 [![made][made-img]][made]
@@ -1154,7 +1152,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 ----
 
-`athenadriver` is brought to you by Uber ATG Infrastructure. Copyright (c) 2020 Uber Technologies, Inc. ![](resources/atg-infra.png)
+`athenadriver` is brought to you by Uber. Copyright (c) 2020 Uber Technologies, Inc.
 
 
 
@@ -1165,7 +1163,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [cov-img]: https://codecov.io/gh/uber/athenadriver/branch/master/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
 
-[release-img]: https://img.shields.io/badge/release-v1.1.12-red
+[release-img]: https://img.shields.io/badge/release-v1.1.13-red
 [release]: https://github.com/uber/athenadriver/releases
 
 [report-card-img]: https://goreportcard.com/badge/github.com/uber/athenadriver
@@ -1179,6 +1177,6 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 [release-policy]: https://golang.org/doc/devel/release.html#policy
 
-[made-img]: https://img.shields.io/badge/By-Uber%20ATG-red
-[made]: https://www.uber.com/us/en/atg/
+[made-img]: https://img.shields.io/badge/By-Uber%20Tech-red
+[made]: https://www.uber.com
 
