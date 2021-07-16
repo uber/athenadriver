@@ -42,5 +42,5 @@ var (
 	ErrAthenaNilAPI                 = errors.New("athenaAPI must not be nil")
 	ErrTestMockGeneric              = errors.New("some_mock_error_for_test")
 	ErrTestMockFailedByAthena       = errors.New("the reason why Athena failed the query")
-	ErrServiceLimitOverride         = errors.New(fmt.Sprintf("service limit override must be greater than %d", PoolInterval))
+	ErrServiceLimitOverride         = fmt.Errorf("service limit override must be greater than %d", PoolInterval)
 )
