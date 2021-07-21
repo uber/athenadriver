@@ -40,6 +40,7 @@ Except the basic features provided by Go `database/sql` like error handling, dat
 - Go sql's prepared statement support [:link:](#prepared-statement-support-for-athena-db)
 - Go sql's `DB.Exec()` and `db.ExecContext()` support [:link:](#dbexec-and-dbexeccontext)
 - Query cancelling support [:link:](#query-cancellation)
+- Override default query timeout limits [:link:](#overriding-athena-service-limits-for-query-timeout)  
 - Mask columns with specific values [:link:](#mask-columns-with-specific-values)
 - Database missing value handling [:link:](#missing-value-handling)
 - Read-Only mode - disable database write in driver level [:link:](#read-only-mode)
