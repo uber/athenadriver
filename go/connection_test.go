@@ -24,14 +24,15 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
+	"math/rand"
+	"testing"
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/athena"
 	"github.com/stretchr/testify/assert"
-	"math/rand"
-	"testing"
-	"time"
 )
 
 var regions = []string{"ap-east-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3",
@@ -111,7 +112,7 @@ func TestConnection_Prepare(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, err := connector.Connect(context.Background())
@@ -131,7 +132,7 @@ func TestConnection_Begin(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, err := connector.Connect(context.Background())
@@ -146,7 +147,7 @@ func TestConnection_Close(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, err := connector.Connect(context.Background())
@@ -160,7 +161,7 @@ func TestConnection_QueryContext(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, err := connector.Connect(context.Background())

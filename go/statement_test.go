@@ -23,15 +23,16 @@ package athenadriver
 import (
 	"context"
 	"database/sql/driver"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStatement_NumInput(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
@@ -53,7 +54,7 @@ func TestStatement_Exec(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
@@ -73,7 +74,7 @@ func TestStatement_Exec_After_Close(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
@@ -94,7 +95,7 @@ func TestStatement_Query(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
@@ -114,7 +115,7 @@ func TestStatement_Query_After_Close(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
@@ -135,7 +136,7 @@ func TestStatement_ColumnConverter(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
@@ -150,7 +151,7 @@ func TestStatement_Close(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
@@ -167,7 +168,7 @@ func TestStatement_Close_AfterConnectionClose(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{
 		config: testConf,
-		tracer: newDefaultObservability(testConf),
+		tracer: NewDefaultObservability(testConf),
 	}
 
 	conn, _ := connector.Connect(context.Background())
