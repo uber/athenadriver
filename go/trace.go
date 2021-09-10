@@ -49,8 +49,8 @@ type DriverTracer struct {
 	config *Config
 }
 
-// newDefaultObservability is to create an observability object.
-func newObservability(config *Config, logger *zap.Logger,
+// NewObservability is to create an observability object.
+func NewObservability(config *Config, logger *zap.Logger,
 	scope tally.Scope) *DriverTracer {
 	o := DriverTracer{
 		logger: logger,
@@ -60,9 +60,9 @@ func newObservability(config *Config, logger *zap.Logger,
 	return &o
 }
 
-// newDefaultObservability is to create an observability object with logger
+// NewDefaultObservability is to create an observability object with logger
 // and scope as default(noops object).
-func newDefaultObservability(config *Config) *DriverTracer {
+func NewDefaultObservability(config *Config) *DriverTracer {
 	o := DriverTracer{
 		logger: zap.NewNop(),
 		scope:  tally.NoopScope,
@@ -71,8 +71,8 @@ func newDefaultObservability(config *Config) *DriverTracer {
 	return &o
 }
 
-// newNoOpsObservability is for testing purpose.
-func newNoOpsObservability() *DriverTracer {
+// NewNoOpsObservability is for testing purpose.
+func NewNoOpsObservability() *DriverTracer {
 	o := DriverTracer{
 		logger: zap.NewNop(),
 		scope:  tally.NoopScope,

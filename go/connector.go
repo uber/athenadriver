@@ -23,7 +23,7 @@ package athenadriver
 import (
 	"context"
 	"database/sql/driver"
-	"github.com/aws/aws-sdk-go/aws/credentials"
+
 	"os"
 	"strconv"
 	"time"
@@ -32,6 +32,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/athena"
 )
@@ -47,7 +48,7 @@ func NoopsSQLConnector() *SQLConnector {
 	noopsConfig := NewNoOpsConfig()
 	return &SQLConnector{
 		config: noopsConfig,
-		tracer: newDefaultObservability(noopsConfig),
+		tracer: NewDefaultObservability(noopsConfig),
 	}
 }
 
@@ -64,7 +65,7 @@ func (c *SQLConnector) Driver() driver.Driver {
 // Ref: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html
 func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 	now := time.Now()
-	c.tracer = newDefaultObservability(c.config)
+	c.tracer = NewDefaultObservability(c.config)
 	if metrics, ok := ctx.Value(MetricsKey).(tally.Scope); ok {
 		c.tracer.SetScope(metrics)
 	}
