@@ -26,10 +26,6 @@ import (
 	"database/sql/driver"
 	"encoding/csv"
 	"fmt"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aws/aws-sdk-go/service/athena"
-	"github.com/jedib0t/go-pretty/table"
-	"github.com/xwb1989/sqlparser"
 	"math"
 	"math/rand"
 	"os"
@@ -37,6 +33,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/xwb1989/sqlparser"
 )
 
 // OutputStyles are all the styles we can choose to print query result
