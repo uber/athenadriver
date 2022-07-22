@@ -84,7 +84,7 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 		} else {
 			awsAthenaSession, err = session.NewSession(&aws.Config{})
 		}
-	} else if c.config.GetSecretAccessKey() != "" {
+	} else if c.config.GetAccessID() != "" {
 		staticCredentials := credentials.NewStaticCredentials(c.config.GetAccessID(),
 			c.config.GetSecretAccessKey(),
 			c.config.GetSessionToken())
