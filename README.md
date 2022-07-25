@@ -271,7 +271,7 @@ If environment variable `AWS_SDK_LOAD_CONFIG` is NOT set and credentials are not
 
 `Region` and `OutputBucket` bucket still need to be explictly defined.
 
-The sample code below ensure `AWS_SDK_LOAD_CONFIG` is not set, then creates a athenadriver config with OutputBucket and Region values set.
+The sample code below ensures `AWS_SDK_LOAD_CONFIG` is not set, then creates a athenadriver config with OutputBucket and Region values set.
 
 ```go
 // To use AWS SDK Default Credentials
