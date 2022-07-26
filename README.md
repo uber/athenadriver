@@ -267,11 +267,11 @@ with AthenaDriver Config: 123
 The full code is here at [examples/auth.go](https://github.com/uber/athenadriver/tree/master/examples/auth.go).
 
 #### Use AWS SDK Default Credentials Resolution for Authentication
-If environment variable `AWS_SDK_LOAD_CONFIG` is NOT set and credentials are not supplied in the athenadriver configuration, the AWS SDK will lookup credentials using its default methodology described here: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials.
+If environment variable `AWS_SDK_LOAD_CONFIG` is NOT set and credentials are not supplied in the `athenadriver` configuration, the AWS SDK will look up credentials using its default methodology described here: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials.
 
 `Region` and `OutputBucket` bucket still need to be explictly defined.
 
-The sample code below ensure `AWS_SDK_LOAD_CONFIG` is not set, then creates a athenadriver config with OutputBucket and Region values set.
+The sample code below ensures `AWS_SDK_LOAD_CONFIG` is not set, then creates a athenadriver config with OutputBucket and Region values set.
 
 ```go
 // To use AWS SDK Default Credentials
