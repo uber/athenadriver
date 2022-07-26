@@ -236,7 +236,7 @@ Please check the AWS Lambda Go same code [here](https://github.com/uber/athenadr
 
 #### Use `athenadriver` Config For Authentication
 
-When environment variable `AWS_SDK_LOAD_CONFIG` is NOT set, you can pass valid (NOT dummy) `region`, `accessID`, `secretAccessKey` into `athenadriver.NewDefaultConfig()`, in addition to `outputBucket`.
+When environment variable `AWS_SDK_LOAD_CONFIG` is NOT set, you may explicitly define crednetials by passing valid valid (NOT dummy) `accessID`, `secretAccessKey`, `region`, and `outputBucket` into `athenadriver.NewDefaultConfig()`.
 
 The sample code below ensure `AWS_SDK_LOAD_CONFIG` is not set, then pass four valid parameters into `NewDefaultConfig()`:
 
