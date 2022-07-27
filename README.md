@@ -236,7 +236,7 @@ Please check the AWS Lambda Go same code [here](https://github.com/uber/athenadr
 
 #### Use `athenadriver` Config For Authentication
 
-When environment variable `AWS_SDK_LOAD_CONFIG` is NOT set, you need to pass valid(NOT dummy) `region`, `accessID`, `secretAccessKey` into `athenadriver.NewDefaultConfig()`, in addition to `outputBucket`.
+When environment variable `AWS_SDK_LOAD_CONFIG` is NOT set, you may explicitly define credentials by passing valid (NOT dummy) `accessID`, `secretAccessKey`, `region`, and `outputBucket` into `athenadriver.NewDefaultConfig()`.
 
 The sample code below ensure `AWS_SDK_LOAD_CONFIG` is not set, then pass four valid parameters into `NewDefaultConfig()`:
 
@@ -265,6 +265,36 @@ with AthenaDriver Config: 123
 ```
 
 The full code is here at [examples/auth.go](https://github.com/uber/athenadriver/tree/master/examples/auth.go).
+
+#### Use AWS SDK Default Credentials Resolution for Authentication
+If environment variable `AWS_SDK_LOAD_CONFIG` is NOT set and credentials are not supplied in the `athenadriver` configuration, the AWS SDK will look up credentials using its default methodology described here: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials.
+
+`Region` and `OutputBucket` bucket still need to be explictly defined.
+
+The sample code below ensures `AWS_SDK_LOAD_CONFIG` is not set, then creates a athenadriver config with OutputBucket and Region values set.
+
+```go
+// To use AWS SDK Default Credentials
+func useAthenaDriverConfigForAuth() {
+	os.Unsetenv("AWS_SDK_LOAD_CONFIG")
+	// 1. Set OutputBucket and Region in Driver Config.
+	conf := drv.NewNoOpsConfig()
+	conf.SetOutputBucket(secret.OutputBucketDev)
+	conf.SetRegion(secret.Region)
+
+	// 2. Open Connection.
+	db, _ := sql.Open(drv.DriverName, conf.Stringify())
+	// 3. Query and print results
+	var i int
+	_ = db.QueryRow("SELECT 123").Scan(&i)
+	println("with AthenaDriver Config:", i)
+}
+```
+The sample output:
+
+```go
+with AthenaDriver Config: 123
+```
 
 ### Full Support of All Data Types 
 

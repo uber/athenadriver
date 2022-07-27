@@ -139,6 +139,22 @@ func TestSQLConnector_Connect_NewSession_AWS_SDK_LOAD_CONFIG_false(t *testing.T)
 	assert.NotNil(t, conn)
 }
 
+func TestSQLConnector_Connect_NewSession_Credentials(t *testing.T) {
+	testConf := NewNoOpsConfig()
+	_ = testConf.SetRegion("ap-southeast-1")
+	_ = testConf.SetAccessID("testid")
+	_ = testConf.SetSecretAccessKey("testkey")
+	connector := &SQLConnector{
+		config: testConf,
+		tracer: NewDefaultObservability(testConf),
+	}
+
+	conn, err := connector.Connect(context.Background())
+
+	assert.Nil(t, err)
+	assert.NotNil(t, conn)
+}
+
 func TestSQLConnector_Driver(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	connector := &SQLConnector{

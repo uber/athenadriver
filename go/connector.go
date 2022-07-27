@@ -84,7 +84,7 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 		} else {
 			awsAthenaSession, err = session.NewSession(&aws.Config{})
 		}
-	} else {
+	} else if c.config.GetAccessID() != "" {
 		staticCredentials := credentials.NewStaticCredentials(c.config.GetAccessID(),
 			c.config.GetSecretAccessKey(),
 			c.config.GetSessionToken())
@@ -93,6 +93,10 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 			Credentials: staticCredentials,
 		}
 		awsAthenaSession, err = session.NewSession(awsConfig)
+	} else {
+		awsAthenaSession, err = session.NewSession(&aws.Config{
+			Region: aws.String(c.config.GetRegion()),
+		})
 	}
 	if err != nil {
 		c.tracer.Scope().Counter(DriverName + ".failure.sqlconnector.newsession").Inc(1)
