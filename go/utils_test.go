@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,15 @@ package athenadriver
 import (
 	"database/sql"
 	"database/sql/driver"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aws/aws-sdk-go/service/athena"
-	"github.com/stretchr/testify/assert"
 	"math"
 	"os"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestScanNullString(t *testing.T) {

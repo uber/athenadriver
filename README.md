@@ -19,7 +19,7 @@
 
 (This project is a sandbox project and the development status is STABLE.)
 
-`athenadriver` is a fully-featured AWS Athena database driver for Go developed at Uber ATG.
+`athenadriver` is a fully-featured AWS Athena database driver for Go developed at Uber Technologies Inc.
 It provides a hassle-free way of querying AWS Athena database with Go standard
 library. It not only provides basic features of Athena Go SDK, but 
 addresses some SDK's limitation, improves and extends it. Moreover, it also includes
@@ -383,7 +383,7 @@ func main() {
 	conf, _ := drv.NewDefaultConfig("s3://myqueryresults/",
 		"us-east-2", "DummyAccessID", "DummySecretAccessKey")
 	wgTags := drv.NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber ID", "123456")
 	wgTags.AddTag("Uber Role", "SDE")
 	// Specify that workgroup `henry_wu` is used for the following query
@@ -1189,6 +1189,17 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 - [Go sql connection pool](http://go-database-sql.org/connection-pool.html)
 - [Common Pitfalls When Using database/sql in Go](https://www.vividcortex.com/blog/2015/09/22/common-pitfalls-go/)
 - [Implement Sql Database Driver in 100 Lines of Go](https://vyskocil.org/blog/implement-sql-database-driver-in-100-lines-of-go/)
+
+## ChangeLog
+
+### v1.1.14 - Merge community contribution (August 19, 2022)
+
+  - Adding default AWS SDK credential resolution to connector (@dfreiman-hbo, Dan Freiman)
+  - Bump go-pretty version to most recent version (@nyergler, Nathan Yergler)
+  - Expose DriverTracer factory functions (@andresmgot, Andres Martinez Gotor)
+  - Add support to go 1.17+ (@henrywoo, Henry Fuheng Wu)
+  - README cleanup (@henrywoo, Henry Fuheng Wu)
+
 
 ----
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,12 @@ package main
 
 import (
 	"context"
+	"strings"
+
 	drv "github.com/uber/athenadriver/go"
 	"github.com/uber/athenadriver/lib/configfx"
 	"github.com/uber/athenadriver/lib/queryfx"
 	"go.uber.org/fx"
-	"strings"
 )
 
 func main() {

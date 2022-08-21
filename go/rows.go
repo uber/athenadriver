@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -262,7 +262,9 @@ func (r *Rows) convertRow(columns []*athena.ColumnInfo, rdata []*athena.Datum, r
 // https://docs.aws.amazon.com/en_pv/athena/latest/ug/data-types.html
 // https://docs.aws.amazon.com/athena/latest/ug/geospatial-input-data-formats-supported-geometry-types.html#geometry-data-types
 // varbinary is undocumented above, but appears in geo query like:
-//   SELECT ST_POINT(-74.006801, 40.705220).
+//
+//	SELECT ST_POINT(-74.006801, 40.705220).
+//
 // json is also undocumented above, but appears here https://docs.aws.amazon.com/athena/latest/ug/querying-JSON.html
 // The full list is here: https://prestodb.io/docs/0.172/language/types.html
 // Include ipaddress for forward compatibility.

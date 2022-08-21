@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,10 @@ package main
 
 import (
 	"database/sql"
+	"log"
+
 	secret "github.com/uber/athenadriver/examples/constants"
 	"go.uber.org/zap"
-	"log"
 
 	drv "github.com/uber/athenadriver/go"
 )

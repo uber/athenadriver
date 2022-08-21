@@ -1,9 +1,9 @@
 v1.1.14 - Merge community contribution (August 19, 2022)
-    - Adding default AWS SDK credential resolution to connector
-    - Bump go-pretty version to most recent version
-    - Expose DriverTracer factory functions
-    - Add support to go 1.17+
-    - README cleanup
+    - Adding default AWS SDK credential resolution to connector (dfreiman-hbo, Dan Freiman)
+    - Bump go-pretty version to most recent version (nyergler, Nathan Yergler)
+    - Expose DriverTracer factory functions (andresmgot, Andres Martinez Gotor)
+    - Add support to go 1.17+ (henrywoo, Henry Fuheng Wu)
+    - README cleanup (henrywoo, Henry Fuheng Wu)
 
 v1.1.13 - Merge community contribution (July 16, 2021)
     - Overriding Athena Service Limits for Query Timeout
