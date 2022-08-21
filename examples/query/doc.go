@@ -44,7 +44,13 @@
 //
 // 2. Installation athenadriver.
 //
-//	go get github.com/uber/athenadriver
+// Before Go 1.17, go get can be used to install athenadriver:
+//
+//	go get -u github.com/uber/athenadriver
+//
+// Starting in Go 1.17, installing executables with go get is deprecated. go install may be used instead.
+//
+//	go install github.com/uber/athenadriver@latest
 //
 // 3. Integration Test.
 //
