@@ -27,8 +27,6 @@ advanced features like Athena workgroup and tagging creation, driver read-only m
 
 The PDF version of AthenaDriver document is available at [ :scroll: ](resources/athenadriver.pdf)
 
-Athenadriver is created and maintained by [Henry Fuheng Wu](wufuheng@gmail.com).
-
 ## Features
 
 Except the basic features provided by Go `database/sql` like error handling, database pool and reconnection, `athenadriver` supports the following features out of box:
@@ -1194,9 +1192,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 ----
 
-`athenadriver` is brought to you by Uber. Copyright (c) 2020 Uber Technologies, Inc.
-
-
+💡 `athenadriver` and `athenareader` are created and maintained by [Henry Fuheng Wu](mailto:wufuheng@gmail.com) and brought to you by [Uber Technologies](https://en.wikipedia.org/wiki/Uber).
 
 
 [doc-img]: https://img.shields.io/badge/GoDoc-Reference-red.svg
