@@ -1190,6 +1190,17 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 - [Common Pitfalls When Using database/sql in Go](https://www.vividcortex.com/blog/2015/09/22/common-pitfalls-go/)
 - [Implement Sql Database Driver in 100 Lines of Go](https://vyskocil.org/blog/implement-sql-database-driver-in-100-lines-of-go/)
 
+## ChangeLog
+
+### v1.1.14 - Merge community contribution (August 19, 2022)
+
+  - Adding default AWS SDK credential resolution to connector (@dfreiman-hbo, Dan Freiman)
+  - Bump go-pretty version to most recent version (@nyergler, Nathan Yergler)
+  - Expose DriverTracer factory functions (@andresmgot, Andres Martinez Gotor)
+  - Add support to go 1.17+ (@henrywoo, Henry Fuheng Wu)
+  - README cleanup (@henrywoo, Henry Fuheng Wu)
+
+
 ----
 
 💡 `athenadriver` and `athenareader` are created and maintained by [Henry Fuheng Wu](mailto:wufuheng@gmail.com) and brought to you by [Uber Technologies](https://en.wikipedia.org/wiki/Uber).

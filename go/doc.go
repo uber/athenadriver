@@ -19,7 +19,7 @@
 // THE SOFTWARE.
 
 // Package athenadriver is a fully-featured Go database/sql driver for
-// Amazon AWS Athena developed by Henry Fuheng Wu at Uber Technologies Inc.
+// Amazon AWS Athena developed at Uber Technologies Inc.
 //
 // It provides a hassle-free way of querying AWS Athena database with Go
 // standard library. It not only provides basic features of Athena Go SDK, but
@@ -47,4 +47,5 @@
 // serverless, so there is no infrastructure to set up or manage. You pay only
 // for the queries you run. Athena scales automatically—executing queries
 // in parallel—so results are fast, even with large datasets and complex queries.
+// Author: Henry Fuheng Wu (wufuheng@gmail.com, henry.wu@uber.com)
 package athenadriver
