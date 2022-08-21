@@ -27,6 +27,8 @@ advanced features like Athena workgroup and tagging creation, driver read-only m
 
 The PDF version of AthenaDriver document is available at [ :scroll: ](resources/athenadriver.pdf)
 
+Athenadriver is created and maintained by [Henry Fuheng Wu](wufuheng@gmail.com).
+
 ## Features
 
 Except the basic features provided by Go `database/sql` like error handling, database pool and reconnection, `athenadriver` supports the following features out of box:
@@ -80,9 +82,18 @@ For more details on `athenadriver`'s support on AWS credentials & S3 query resul
 
 ### Installation
 
+Before Go 1.17, `go get` can be used to install athenadriver:
+
 ```go
 go get -u github.com/uber/athenadriver
 ```
+
+Starting in Go 1.17, installing executables with `go get` is deprecated. `go install` may be used instead.
+
+```go
+go install github.com/uber/athenadriver@latest
+```
+
 
 ### Tests
 
