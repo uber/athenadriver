@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -347,7 +347,7 @@ func TestConnection_QueryContext3(t *testing.T) {
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber Asset", "abc.efg")
 	wg := NewDefaultWG("henry_wu", nil, wgTags)
 	testConf := NewNoOpsConfig()
@@ -355,7 +355,7 @@ func TestConnection_QueryContext3(t *testing.T) {
 	assert.Nil(t, err)
 	err = testConf.SetRegion("us-east-1")
 	assert.Nil(t, err)
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB("default") // default
 
 	_ = testConf.SetWorkGroup(wg)
@@ -377,7 +377,7 @@ func TestConnection_QueryContext4(t *testing.T) {
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber Asset", "abc.efg")
 	wg := NewDefaultWG("henry_wu", nil, wgTags)
 	testConf := NewNoOpsConfig()
@@ -385,7 +385,7 @@ func TestConnection_QueryContext4(t *testing.T) {
 	assert.Nil(t, err)
 	err = testConf.SetRegion("us-east-1")
 	assert.Nil(t, err)
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB("default") // default
 
 	_ = testConf.SetWorkGroup(wg)
@@ -410,13 +410,13 @@ func TestConnection_QueryContext5(t *testing.T) {
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber Asset", "abc.efg")
 	wg := NewDefaultWG("henry_wu", nil, wgTags)
 	testConf := NewNoOpsConfig()
 	_ = testConf.SetOutputBucket(s3bucket)
 	_ = testConf.SetRegion("us-east-1")
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB("default") // default
 	_ = testConf.SetWorkGroup(wg)
 	c.connector.config = testConf
@@ -437,7 +437,7 @@ func TestConnection_QueryContext6(t *testing.T) {
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber Asset", "abc.efg")
 	wg := NewDefaultWG("henry_wu", nil, wgTags)
 	testConf := NewNoOpsConfig()
@@ -445,7 +445,7 @@ func TestConnection_QueryContext6(t *testing.T) {
 	assert.Nil(t, err)
 	err = testConf.SetRegion("us-east-1")
 	assert.Nil(t, err)
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB("default") // default
 	testConf.SetWGRemoteCreationAllowed(false)
 
@@ -577,13 +577,13 @@ func createConnectionFixture() *Connection {
 	}
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber Author", "henry.wu@uber.com")
+	wgTags.AddTag("Uber Author", "henry.wu")
 	wgTags.AddTag("Uber Role", "Engineer")
 	wg := NewDefaultWG("henry_wu", nil, wgTags)
 	testConf := NewNoOpsConfig()
 	_ = testConf.SetOutputBucket(s3bucket)
 	_ = testConf.SetRegion(regions[rand.Int31n(int32(len(regions)))])
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB(randString(8)) // default
 	testConf.SetWGRemoteCreationAllowed(true)
 	nm.CreateWGStatus = true
@@ -602,7 +602,7 @@ func TestMoneyWise(t *testing.T) {
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber Asset", "abc.efg")
 	wg := NewDefaultWG(DefaultWGName, nil, wgTags)
 	testConf := NewNoOpsConfig()
@@ -610,7 +610,7 @@ func TestMoneyWise(t *testing.T) {
 	assert.Nil(t, err)
 	err = testConf.SetRegion("us-east-1")
 	assert.Nil(t, err)
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB("default") // default
 
 	_ = testConf.SetWorkGroup(wg)
@@ -653,7 +653,7 @@ func TestConnection_CachedQuery(t *testing.T) {
 	assert.Nil(t, err)
 	err = testConf.SetRegion("us-east-1")
 	assert.Nil(t, err)
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB("default") // default
 	testConf.SetMoneyWise(true)
 	c.connector.config = testConf
@@ -672,7 +672,7 @@ func Test_PseudoCommand(t *testing.T) {
 	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber Asset", "abc.efg")
 	wg := NewDefaultWG(DefaultWGName, nil, wgTags)
 	testConf := NewNoOpsConfig()
@@ -680,7 +680,7 @@ func Test_PseudoCommand(t *testing.T) {
 	assert.Nil(t, err)
 	err = testConf.SetRegion("us-east-1")
 	assert.Nil(t, err)
-	testConf.SetUser("henry.wu@uber.com")
+	testConf.SetUser("henry.wu")
 	testConf.SetDB("default") // default
 
 	_ = testConf.SetWorkGroup(wg)

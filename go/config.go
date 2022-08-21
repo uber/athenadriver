@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,6 @@ func NewConfig(s string) (*Config, error) {
 	return &a, err
 }
 
-//
 func (c *Config) isValid() bool {
 	return c.dsn.Scheme == "s3" && c.values.Get("region") != ""
 }
@@ -222,8 +221,8 @@ func (c *Config) SetAccessID(o string) error {
 }
 
 // GetAccessID is a getter of AWS Access ID. It will try to get access ID from:
-//   1. string stored in c.values
-//   2. environmental variable ${AWS_ACCESS_KEY_ID} or ${AWS_ACCESS_KEY}
+//  1. string stored in c.values
+//  2. environmental variable ${AWS_ACCESS_KEY_ID} or ${AWS_ACCESS_KEY}
 func (c *Config) GetAccessID() string {
 	if val := c.values.Get("accessID"); val != "" {
 		return val

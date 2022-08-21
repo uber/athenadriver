@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,36 +28,33 @@
 // You can get it from AWS Security Credentials section of Identity and Access Management (IAM).
 // If you don't have one, please create it.
 //
-//
 // In addition to AWS credentials, you also need an s3 bucket to store query result.
 // Just go to AWS S3 web console page to create one. In the examples below,
 // the s3 bucket I use is s3://henrywuqueryresults/.
 //
 // In most cases, you need the following 4 prerequisites :
 //
-//     S3 Output bucket
-//     access key ID
-//     secret access key
-//     AWS region
+//	S3 Output bucket
+//	access key ID
+//	secret access key
+//	AWS region
 //
 // For more details on athenadriver's support on AWS credentials & S3 query result bucket,
 // please refer to README section Support Multiple AWS Authorization Methods.
 //
 // 2. Installation athenadriver.
 //
-//     go get github.com/uber/athenadriver
+//	go get github.com/uber/athenadriver
 //
 // 3. Integration Test.
 //
 // To Build it:
 //
-//     $cd $GOPATH/src/github.com/uber/athenadriver
-//     $go build examples/query/dml_select_simple.go
-//
+//	$cd $GOPATH/src/github.com/uber/athenadriver
+//	$go build examples/query/dml_select_simple.go
 //
 // Run it and you can see output like:
 //
-//    $./dml_select_simple
-//    https://www.example.com/jobs/433
-//
+//	$./dml_select_simple
+//	https://www.example.com/jobs/433
 package main

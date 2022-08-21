@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -257,23 +257,31 @@ func PrettyPrintFancy(rows *sql.Rows) {
 // Some Sample Queries are like:
 //
 // USING FUNCTION predict_customer_registration(age INTEGER)
-//     RETURNS DOUBLE TYPE
-//     SAGEMAKER_INVOKE_ENDPOINT WITH (sagemaker_endpoint = 'xgboost-2019-09-20-04-49-29-303')
+//
+//	RETURNS DOUBLE TYPE
+//	SAGEMAKER_INVOKE_ENDPOINT WITH (sagemaker_endpoint = 'xgboost-2019-09-20-04-49-29-303')
+//
 // SELECT predict_customer_registration(age) AS probability_of_enrolling, customer_id
-//      FROM "sampledb"."ml_test_dataset"
-//      WHERE predict_customer_registration(age) < 0.5;
+//
+//	FROM "sampledb"."ml_test_dataset"
+//	WHERE predict_customer_registration(age) < 0.5;
 //
 // USING FUNCTION decompress(col1 VARCHAR)
-//      RETURNS VARCHAR TYPE
-//      LAMBDA_INVOKE WITH (lambda_name = 'MyAthenaUDFLambda')
+//
+//	RETURNS VARCHAR TYPE
+//	LAMBDA_INVOKE WITH (lambda_name = 'MyAthenaUDFLambda')
+//
 // SELECT
-//      decompress('ewLLinKzEsPyXdKdc7PLShKLS5OTQEAUrEH9w==');
+//
+//	decompress('ewLLinKzEsPyXdKdc7PLShKLS5OTQEAUrEH9w==');
 //
 // WITH
 // dataset AS (
-//   SELECT
-//     ARRAY ['hello', 'amazon', 'athena'] AS words,
-//     ARRAY ['hi', 'alexa'] AS alexa
+//
+//	SELECT
+//	  ARRAY ['hello', 'amazon', 'athena'] AS words,
+//	  ARRAY ['hi', 'alexa'] AS alexa
+//
 // )
 // SELECT concat(words, alexa) AS welcome_msg FROM dataset
 func colInFirstPage(query string) bool {

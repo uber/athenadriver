@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,14 @@ package athenadriver
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewWG(t *testing.T) {
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber ID", "123456")
 	wgTags.AddTag("Uber Role", "SDE")
 	wg := NewWG("henry_wu", nil, wgTags)
@@ -54,7 +55,7 @@ func TestGetWG(t *testing.T) {
 
 func TestWorkgroup_CreateWGRemotely(t *testing.T) {
 	wgTags := NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber ID", "123456")
 	wgTags.AddTag("Uber Role", "SDE")
 	wg := NewWG("henry_wu", nil, wgTags)

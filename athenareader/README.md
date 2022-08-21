@@ -286,7 +286,7 @@ writing to Athena database is disallowed in read-only mode
 	
 AUTHOR
 
-	Henry Fuheng Wu (henry.wu@uber.com)
+	Henry Fuheng Wu (wufuheng@gmail.com)
 
 REPORTING BUGS
 

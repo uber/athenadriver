@@ -19,7 +19,7 @@
 
 (This project is a sandbox project and the development status is STABLE.)
 
-`athenadriver` is a fully-featured AWS Athena database driver for Go developed at Uber ATG.
+`athenadriver` is a fully-featured AWS Athena database driver for Go developed at Uber Technologies Inc.
 It provides a hassle-free way of querying AWS Athena database with Go standard
 library. It not only provides basic features of Athena Go SDK, but 
 addresses some SDK's limitation, improves and extends it. Moreover, it also includes
@@ -383,7 +383,7 @@ func main() {
 	conf, _ := drv.NewDefaultConfig("s3://myqueryresults/",
 		"us-east-2", "DummyAccessID", "DummySecretAccessKey")
 	wgTags := drv.NewWGTags()
-	wgTags.AddTag("Uber User", "henry.wu@uber.com")
+	wgTags.AddTag("Uber User", "henry.wu")
 	wgTags.AddTag("Uber ID", "123456")
 	wgTags.AddTag("Uber Role", "SDE")
 	// Specify that workgroup `henry_wu` is used for the following query

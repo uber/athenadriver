@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
+	"sync"
+	"time"
+
 	secret "github.com/uber/athenadriver/examples/constants"
 	drv "github.com/uber/athenadriver/go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
-	"sync"
-	"time"
 )
 
 func main() {

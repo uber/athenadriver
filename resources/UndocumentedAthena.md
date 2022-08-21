@@ -192,7 +192,7 @@ However, the `Database` in line #4 bahaves inconsistently for different statemen
 As this Athena use `default` as its default database name, but I figured out the best practice is actually setting it as `default`.
 
 
-# Effective AWS Athena with `athenadriver` at Uber ATG
+# Effective AWS Athena with `athenadriver` at Uber Technologies Inc
 
 The following is an AWS Athena version of Scott Mayer's Effecitve C++.
 
@@ -353,5 +353,5 @@ If the s3 bucket owner and the account owner are different, you need to do [Cros
 
 ## Contributing
 
-As always, we welcome feedback and contributions. If you have any tips and findings about Athena, please feel free to contact [Henry Wu](mailto:henry.wu@uber.com) or [ATG Data Infra Team](atg-infra-data-group@uber.com).
+As always, we welcome feedback and contributions. If you have any tips and findings about Athena, please feel free to contact [Henry Fuheng Wu](mailto:wufuheng@gmail.com).
 

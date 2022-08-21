@@ -33,7 +33,7 @@ func setUpFlagUsage(context.Context) error {
 			"\n\tAdd '-a' to enable admin mode. Database write is enabled at driver level under admin mode.\n\n" +
 			"\t$ athenareader -b s3://athena-query-result -q 'DROP TABLE IF EXISTS depreacted_table' -a\n" +
 			"\t\n" +
-			"AUTHOR\n\tHenry Fuheng Wu (henry.wu@uber.com)\n\n" +
+			"AUTHOR\n\tHenry Fuheng Wu (wufuheng@gmail.com)\n\n" +
 			"REPORTING BUGS\n\thttps://github.com/uber/athenadriver\n"
 		fmt.Fprintf(commandLine.Output(), preBody)
 		fmt.Fprintf(commandLine.Output(),
