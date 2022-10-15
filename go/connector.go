@@ -35,6 +35,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 // SQLConnector is the connector for AWS Athena Driver.
@@ -73,16 +74,16 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 		c.tracer.SetLogger(logger)
 	}
 
-	var awsAthenaSession *session.Session
+	var awsSession *session.Session
 	var err error
 	// respect AWS_SDK_LOAD_CONFIG and local ~/.aws/credentials, ~/.aws/config
 	if ok, _ := strconv.ParseBool(os.Getenv("AWS_SDK_LOAD_CONFIG")); ok {
 		if profile := c.config.GetAWSProfile(); profile != "" {
-			awsAthenaSession, err = session.NewSession(&aws.Config{
+			awsSession, err = session.NewSession(&aws.Config{
 				Credentials: credentials.NewSharedCredentials("", profile),
 			})
 		} else {
-			awsAthenaSession, err = session.NewSession(&aws.Config{})
+			awsSession, err = session.NewSession(&aws.Config{})
 		}
 	} else if c.config.GetAccessID() != "" {
 		staticCredentials := credentials.NewStaticCredentials(c.config.GetAccessID(),
@@ -92,9 +93,9 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 			Region:      aws.String(c.config.GetRegion()),
 			Credentials: staticCredentials,
 		}
-		awsAthenaSession, err = session.NewSession(awsConfig)
+		awsSession, err = session.NewSession(awsConfig)
 	} else {
-		awsAthenaSession, err = session.NewSession(&aws.Config{
+		awsSession, err = session.NewSession(&aws.Config{
 			Region: aws.String(c.config.GetRegion()),
 		})
 	}
@@ -103,10 +104,12 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 		return nil, err
 	}
 
-	athenaAPI := athena.New(awsAthenaSession)
+	athenaAPI := athena.New(awsSession)
+	s3API := s3.New(awsSession)
 	timeConnect := time.Since(now)
 	conn := &Connection{
 		athenaAPI: athenaAPI,
+		s3:        s3API,
 		connector: c,
 	}
 	c.tracer.Scope().Timer(DriverName + ".connector.connect").Record(timeConnect)

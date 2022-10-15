@@ -23,23 +23,25 @@ package athenadriver
 import (
 	"context"
 	"database/sql/driver"
+	"encoding/csv"
 	"fmt"
 	"io"
 	"strconv"
 	"strings"
 	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"go.uber.org/zap"
 )
 
 // Rows defines rows in AWS Athena ResultSet.
 type Rows struct {
 	athena          athenaiface.AthenaAPI
+	s3              s3iface.S3API
 	ctx             context.Context
 	queryID         string
 	reachedLastPage bool
@@ -47,13 +49,18 @@ type Rows struct {
 	config          *Config
 	tracer          *DriverTracer
 	pageCount       int64
+
+	resultsCanceler context.CancelFunc
+	resultsFile     io.ReadCloser
+	results         *csv.Reader
 }
 
 // NewNonOpsRows is to create a new Rows.
-func NewNonOpsRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, queryID string, driverConfig *Config,
+func NewNonOpsRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, downloader s3iface.S3API, queryID string, driverConfig *Config,
 	obs *DriverTracer) (*Rows, error) {
 	r := Rows{
 		athena:    athenaAPI,
+		s3:        downloader,
 		ctx:       ctx,
 		queryID:   queryID,
 		config:    driverConfig,
@@ -64,17 +71,23 @@ func NewNonOpsRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, queryID
 }
 
 // NewRows is to create a new Rows.
-func NewRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, queryID string, driverConfig *Config,
+func NewRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, downloader s3iface.S3API, queryID string, driverConfig *Config,
 	obs *DriverTracer) (*Rows, error) {
 	r := Rows{
 		athena:    athenaAPI,
+		s3:        downloader,
 		ctx:       ctx,
 		queryID:   queryID,
 		config:    driverConfig,
 		tracer:    obs,
 		pageCount: -1,
 	}
-	if err := r.fetchNextPage(nil); err != nil {
+	// download the results and open the resulting CSV for reading
+	if err := r.openResults(); err != nil {
+		return nil, err
+	}
+	// fetch the first result so we have column metadata
+	if err := r.fetchNextPage(); err != nil {
 		return nil, err
 	}
 	return &r, nil
@@ -105,39 +118,67 @@ func (r *Rows) Next(dest []driver.Value) error {
 	if r.reachedLastPage {
 		return io.EOF
 	}
-	if len(r.ResultOutput.ResultSet.Rows) == 0 {
-		if r.ResultOutput.NextToken == nil || *r.ResultOutput.NextToken == "" {
-			// this means we reach the last page - no token and no rows
-			r.reachedLastPage = true
-			return io.EOF
-		}
 
-		if err := r.fetchNextPage(r.ResultOutput.NextToken); err != nil {
-			return err
-		}
-		if r.reachedLastPage {
-			return io.EOF
-		}
-	}
-
-	// Shift to next row
-	cur := r.ResultOutput.ResultSet.Rows[0]
-	columns := r.ResultOutput.ResultSet.ResultSetMetadata.ColumnInfo
-	if err := r.convertRow(columns, cur.Data, dest, r.config); err != nil {
+	next, err := r.results.Read()
+	if err != nil {
 		return err
 	}
-	r.ResultOutput.ResultSet.Rows = r.ResultOutput.ResultSet.Rows[1:]
+
+	columns := r.ResultOutput.ResultSet.ResultSetMetadata.ColumnInfo
+	if err := r.convertRecord(columns, next, dest, r.config); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-// fetchNextPage is to get next result set page with a specific token.
-func (r *Rows) fetchNextPage(token *string) error {
-	var err error
-	r.ResultOutput, err = r.athena.GetQueryResultsWithContext(r.ctx,
-		&athena.GetQueryResultsInput{
-			QueryExecutionId: aws.String(r.queryID),
-			NextToken:        token,
+func (r *Rows) openResults() error {
+	ctx, cancel := context.WithCancel(context.Background())
+	resp, err := r.s3.GetObjectWithContext(
+		ctx,
+		&s3.GetObjectInput{
+			Bucket: aws.String(r.config.GetOutputBucketname()),
+			Key:    aws.String(r.config.GetQueryResultKey(r.queryID)),
 		})
+	if err != nil {
+		cancel()
+		return err
+	}
+
+	r.resultsCanceler = cancel
+	r.resultsFile = resp.Body
+	r.results = csv.NewReader(r.resultsFile)
+
+	// burn off the first row with headings
+	_, err = r.results.Read()
+	return err
+}
+
+type pageOpt func(*athena.GetQueryResultsInput)
+
+func withToken(t *string) pageOpt {
+	return func(i *athena.GetQueryResultsInput) {
+		i.NextToken = t
+	}
+}
+
+func withMaxResults(len int64) pageOpt {
+	return func(i *athena.GetQueryResultsInput) {
+		i.MaxResults = &len
+	}
+}
+
+// fetchNextPage is to get next result set page; a pagination token may be
+// passed via withToken.
+func (r *Rows) fetchNextPage(pageOpts ...pageOpt) error {
+	var err error
+	resultsInput := &athena.GetQueryResultsInput{
+		QueryExecutionId: aws.String(r.queryID),
+	}
+	for _, opt := range pageOpts {
+		opt(resultsInput)
+	}
+	r.ResultOutput, err = r.athena.GetQueryResultsWithContext(r.ctx, resultsInput)
 	if err != nil {
 		r.tracer.Scope().Counter(DriverName + ".failure.fetchnextpage.getqueryresults").Inc(1)
 		r.tracer.Log(ErrorLevel, "GetQueryResults failed", zap.String("error", err.Error()))
@@ -231,6 +272,13 @@ func (r *Rows) Close() error {
 		r.tracer.Log(WarnLevel, "rows close prematurely, queryID: "+r.queryID)
 		r.ResultOutput = nil
 	}
+	if r.resultsFile != nil {
+		r.resultsFile.Close()
+		r.results = nil
+	}
+	if r.resultsCanceler != nil {
+		r.resultsCanceler()
+	}
 	r.reachedLastPage = true
 	return nil
 }
@@ -243,6 +291,30 @@ func (r *Rows) convertRow(columns []*athena.ColumnInfo, rdata []*athena.Datum, r
 			return ErrAthenaNilDatum
 		}
 		value, err := r.athenaTypeToGoType(columns[i], val.VarCharValue, driverConfig)
+		if err != nil {
+			r.tracer.Log(ErrorLevel, "convertrow failed", zap.String("error", err.Error()))
+			r.tracer.Scope().Counter(DriverName + ".failure.convertrow").Inc(1)
+			return err
+		}
+		/*r.tracer.Log(DebugLevel, "TM",
+			zap.String("athenaType", *columns[i].Type),
+			zap.String("goType", reflect.TypeOf(value).String()),
+			zap.String("str", *val.VarCharValue),
+		)*/
+		ret[i] = value
+	}
+	return nil
+}
+
+// convertRow is to convert data from Athena type to Golang SQL type and put them into an array of driver.Value.
+func (r *Rows) convertRecord(columns []*athena.ColumnInfo, rdata []string, ret []driver.Value,
+	driverConfig *Config) error {
+	for i, val := range rdata {
+		v := &val
+		if val == "" && columns[i].Nullable != nil && aws.StringValue(columns[i].Nullable) == "NULLABLE" {
+			v = nil
+		}
+		value, err := r.athenaTypeToGoType(columns[i], v, driverConfig)
 		if err != nil {
 			r.tracer.Log(ErrorLevel, "convertrow failed", zap.String("error", err.Error()))
 			r.tracer.Scope().Counter(DriverName + ".failure.convertrow").Inc(1)

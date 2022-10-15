@@ -21,7 +21,9 @@
 package athenadriver
 
 import (
+	"fmt"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -156,6 +158,10 @@ func (c *Config) SetOutputBucket(o string) error {
 	return nil
 }
 
+func (c *Config) SetScratchDir(d string) {
+	c.values.Set("scratchDir", d)
+}
+
 // SetRegion is to set region.
 func (c *Config) SetRegion(o string) error {
 	if len(o) == 0 {
@@ -271,6 +277,33 @@ func (c *Config) GetOutputBucket() string {
 		return c.dsn.Scheme + "://" + c.dsn.Host + c.dsn.Path
 	}
 	return c.dsn.Scheme + "://" + c.dsn.Host + "/" + c.dsn.Path
+}
+
+func (c *Config) GetOutputBucketname() string {
+	return c.dsn.Host
+}
+
+func (c *Config) GetQueryResultKey(qid string) string {
+	var key []string
+	path := strings.TrimPrefix(c.dsn.Path, "/")
+	if path != "" {
+		key = []string{path, qid}
+	} else {
+		key = []string{qid}
+	}
+
+	return fmt.Sprintf("%s.csv", strings.Join(key, "/"))
+}
+
+// GetScratchDir returns the directory where results will be downloaded. If not
+// set the system temporary directory will be returned.
+func (c *Config) GetScratchDir() string {
+	dir := c.values.Get("scratchDir")
+	if dir != "" {
+		return dir
+	}
+
+	return os.TempDir()
 }
 
 // GetWorkgroup is getter of Workgroup.

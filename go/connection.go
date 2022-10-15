@@ -32,6 +32,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 
 	"go.uber.org/zap"
 
@@ -43,6 +44,7 @@ import (
 // Connection is assumed to be stateful.
 type Connection struct {
 	athenaAPI athenaiface.AthenaAPI
+	s3        s3iface.S3API
 	connector *SQLConnector
 	numInput  int
 }
@@ -206,11 +208,11 @@ func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, 
 	if wg.Name == "" {
 		wg.Name = DefaultWGName
 	}
-	return NewRows(ctx, c.athenaAPI, QID, c.connector.config, c.connector.tracer)
+	return NewRows(ctx, c.athenaAPI, c.s3, QID, c.connector.config, c.connector.tracer)
 }
 
 func (c *Connection) getHeaderlessSingleRowResultPage(ctx context.Context, qid string) (driver.Rows, error) {
-	r, err := NewNonOpsRows(ctx, c.athenaAPI, qid, c.connector.config, c.connector.tracer)
+	r, err := NewNonOpsRows(ctx, c.athenaAPI, c.s3, qid, c.connector.config, c.connector.tracer)
 	colName := "_col0"
 	columnNames := []*string{&colName}
 	columnTypes := []string{"string"}
@@ -445,7 +447,7 @@ WAITING_FOR_RESULT:
 		}
 	}
 
-	return NewRows(ctx, c.athenaAPI, queryID, c.connector.config, obs)
+	return NewRows(ctx, c.athenaAPI, c.s3, queryID, c.connector.config, obs)
 }
 
 // Ping implements driver.Pinger interface.
