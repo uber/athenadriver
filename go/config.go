@@ -307,6 +307,11 @@ func (c *Config) IsMissingAsDefault() bool {
 	return c.values.Get("missingAsDefault") == "true"
 }
 
+// IsMissingAsNil return true if missing value is set to be returned as nil.
+func (c *Config) IsMissingAsNil() bool {
+	return c.values.Get("missingAsNil") == "true"
+}
+
 // SetMissingAsEmptyString is to set if missing value is returned as empty string.
 func (c *Config) SetMissingAsEmptyString(b bool) {
 	missingAsEmptyString := "true"
@@ -324,6 +329,15 @@ func (c *Config) SetMissingAsDefault(b bool) {
 		c.values.Set("missingAsDefault", "false")
 	}
 
+}
+
+// SetMissingAsNil is to set if missing value is returned as nil.
+func (c *Config) SetMissingAsNil(b bool) {
+	if b {
+		c.values.Set("missingAsNil", "true")
+	} else {
+		c.values.Set("missingAsNil", "false")
+	}
 }
 
 // CheckColumnMasked is to check if a specific column has been masked by some value.
