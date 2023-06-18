@@ -49,6 +49,20 @@ func TestDateTime_ScanTimeStamp(t *testing.T) {
 
 }
 
+func TestDateTime_ScanTimeStampWithMicroseconds(t *testing.T) {
+	r, e := scanTime("2001-08-22 03:04:05.321456")
+	assert.Nil(t, e)
+	assert.True(t, r.Valid)
+	assert.NotEqual(t, r.Time.String(), ZeroDateTimeString)
+}
+
+func TestDateTime_ScanTimeStampWithNanoseconds(t *testing.T) {
+	r, e := scanTime("2001-08-22 03:04:05.321456789")
+	assert.Nil(t, e)
+	assert.True(t, r.Valid)
+	assert.NotEqual(t, r.Time.String(), ZeroDateTimeString)
+}
+
 func TestDateTime_ScanTimeStampWithTimeZone(t *testing.T) {
 	r, e := scanTime("2001-08-22 03:04:05.321 America/Los_Angeles")
 	assert.Nil(t, e)
