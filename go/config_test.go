@@ -172,6 +172,14 @@ func TestConfig_IsMissingAsDefault(t *testing.T) {
 	assert.False(t, testConf.IsMissingAsDefault())
 }
 
+func TestConfig_IsMissingAsNil(t *testing.T) {
+	testConf := NewNoOpsConfig()
+	testConf.SetMissingAsNil(true)
+	assert.True(t, testConf.IsMissingAsNil())
+	testConf.SetMissingAsDefault(false)
+	assert.False(t, testConf.IsMissingAsNil())
+}
+
 func TestConfig_IsWGRemoteCreationAllowed(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	testConf.SetWGRemoteCreationAllowed(true)

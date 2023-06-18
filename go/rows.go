@@ -278,7 +278,9 @@ func (r *Rows) athenaTypeToGoType(columnInfo *athena.ColumnInfo, rawValue *strin
 			zap.String("columnInfo.Name", *columnInfo.Name),
 			zap.String("queryID", r.queryID),
 			zap.String("workgroup", driverConfig.GetWorkgroup().Name))
-		if driverConfig.IsMissingAsEmptyString() {
+		if driverConfig.IsMissingAsNil() {
+			return nil, nil
+		} else if driverConfig.IsMissingAsEmptyString() {
 			return "", nil
 		} else if driverConfig.IsMissingAsDefault() {
 			return r.getDefaultValueForColumnType(*columnInfo.Type), nil

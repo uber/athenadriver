@@ -735,8 +735,8 @@ func main() {
 ### Missing Value Handling 
 
 It is common to have missing values in S3 file, or Athena DB. When this happens, you can specify if you want to use
- `empty string` or `default data` as the missing value, whichever is better to facilitate your data processing or ETL job. The default data for Athena column type are defined as below:
- 
+`empty string`, `default data`, or `nil` as the missing value, whichever is better to facilitate your data processing or ETL job. The default data for Athena column type are defined as below:
+
 ```go
 func (r *Rows) getDefaultValueForColumnType(athenaType string) interface{} {
 	switch athenaType {
@@ -755,16 +755,23 @@ func (r *Rows) getDefaultValueForColumnType(athenaType string) interface{} {
 }
 ```
 
-By default, we use empty string to replace missing values and empty string is preferred to default data. To use
- `default data`, you have to explicitly call:
+By default, we use empty string to replace missing values and empty string is preferred to default data, or `nil`. To use
+`default data`, you have to explicitly call:
 
 ```go
 Config.SetMissingAsEmptyString(false)
 Config.SetMissingAsDefault(true)
 ```
 
-But if you are strict with your data integrity and want an error raised when data are missing, you can set both of
- them `false`.
+If you need to use `nil` as missing value, you can call:
+
+```go
+Config.SetMissingAsEmptyString(false)
+Config.SetMissingAsDefault(false)
+Config.SetMissingAsNil(true)
+```
+
+But if you are strict with your data integrity and want an error raised when data are missing, you can set all three of them to `false`.
 
 
 ### Read-Only Mode 

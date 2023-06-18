@@ -417,12 +417,21 @@ func TestRows_AthenaTypeToGoType(t *testing.T) {
 
 	testConf.SetMissingAsEmptyString(false)
 	testConf.SetMissingAsDefault(true)
+	testConf.SetMissingAsNil(false)
 	g, e = r.athenaTypeToGoType(c, nil, testConf)
 	assert.Nil(t, e)
 	assert.Equal(t, g, 0)
 
 	testConf.SetMissingAsEmptyString(false)
 	testConf.SetMissingAsDefault(false)
+	testConf.SetMissingAsNil(true)
+	g, e = r.athenaTypeToGoType(c, nil, testConf)
+	assert.Nil(t, e)
+	assert.Nil(t, g)
+
+	testConf.SetMissingAsEmptyString(false)
+	testConf.SetMissingAsDefault(false)
+	testConf.SetMissingAsNil(false)
 	g, e = r.athenaTypeToGoType(c, nil, testConf)
 	assert.NotNil(t, e)
 	assert.Nil(t, g)
