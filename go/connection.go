@@ -363,6 +363,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		return c.getHeaderlessSingleRowResultPage(ctx, queryID)
 	}
 WAITING_FOR_RESULT:
+	pollInterval := c.connector.config.GetResultPollIntervalSeconds()
 	for {
 		statusResp, err := c.athenaAPI.GetQueryExecutionWithContext(ctx, &athena.GetQueryExecutionInput{
 			QueryExecutionId: aws.String(queryID),
@@ -432,7 +433,7 @@ WAITING_FOR_RESULT:
 			obs.Scope().Timer(DriverName + ".query.StopQueryExecution").Record(timeStopQueryExecution)
 			obs.Log(ErrorLevel, "query canceled", zap.String("queryID", queryID))
 			return nil, ctx.Err()
-		case <-time.After(PoolInterval * time.Second):
+		case <-time.After(pollInterval):
 			if isQueryTimeOut(startOfStartQueryExecution, *statusResp.QueryExecution.StatementType, c.connector.config.GetServiceLimitOverride()) {
 				obs.Log(ErrorLevel, "Query timeout failure",
 					zap.String("workgroup", wg.Name),

@@ -24,6 +24,8 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"strconv"
+	"time"
 )
 
 // Config is for AWS Athena Driver Config.
@@ -189,6 +191,19 @@ func (c *Config) GetDB() string {
 		return val
 	}
 	return DefaultDBName
+}
+
+// SetResultPollIntervalSeconds is a setter of Overriding poll interval.
+func (c *Config) SetResultPollIntervalSeconds(n int) {
+	c.values.Set("resultPollIntervalSeconds", n)
+}
+
+// GetResultPollIntervalSeconds is getter of resultPollIntervalSeconds.
+func (c *Config) GetResultPollIntervalSeconds() time.Duration {
+	if val := c.values.Get("resultPollIntervalSeconds"); val != "" {
+		return strconv.Atoi(val) * time.Seconds
+	}
+	return PoolInterval * time.Seconds
 }
 
 // SetWorkGroup is a setter of WorkGroup.

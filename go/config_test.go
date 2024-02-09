@@ -23,7 +23,7 @@ package athenadriver
 import (
 	"net/url"
 	"testing"
-
+	"time"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -319,4 +319,19 @@ func TestConfig_SetServiceLimitOverride(t *testing.T) {
 
 	expected = "s3://query-results-henry-wu-us-east-2?DDLQueryTimeout=60000&DMLQueryTimeout=3600&WGRemoteCreation=true&db=default&missingAsEmptyString=true&region=us-east-1"
 	assert.Equal(t, expected, testConf.Stringify())
+}
+
+func TestConfig_ResultPollIntervalOverride(t *testing.T) {
+	resultPollInterval := 1
+	testConf := NewNoOpsConfig()
+	testConf.SetResultPollIntervalSeconds(1)
+	interval := testConf.GetResultPollIntervalSeconds()
+	assert.Equal(t, time.Second*1, interval)
+}
+
+func TestConfig_ResultPollIntervalDefault(t *testing.T) {
+	resultPollInterval := 1
+	testConf := NewNoOpsConfig()
+	interval := testConf.GetResultPollIntervalSeconds()
+	assert.Equal(t, time.Second*PoolInterval, interval)
 }
