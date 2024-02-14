@@ -363,8 +363,8 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		return c.getHeaderlessSingleRowResultPage(ctx, queryID)
 	}
 WAITING_FOR_RESULT:
-	pollInterval := c.connector.config.GetResultPollIntervalSeconds()
 	for {
+		pollInterval := c.connector.config.GetResultPollIntervalSeconds()
 		statusResp, err := c.athenaAPI.GetQueryExecutionWithContext(ctx, &athena.GetQueryExecutionInput{
 			QueryExecutionId: aws.String(queryID),
 		})

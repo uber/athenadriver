@@ -78,6 +78,7 @@ func NewDefaultConfig(outputBucket string, region string, accessID string,
 		return nil, err
 	}
 	err = conf.SetSecretAccessKey(secretAccessKey)
+	conf.SetResultPollIntervalSeconds(PoolInterval)
 	return conf, err
 }
 
@@ -195,15 +196,19 @@ func (c *Config) GetDB() string {
 
 // SetResultPollIntervalSeconds is a setter of Overriding poll interval.
 func (c *Config) SetResultPollIntervalSeconds(n int) {
-	c.values.Set("resultPollIntervalSeconds", n)
+	c.values.Set("resultPollIntervalSeconds", strconv.Itoa(n))
 }
 
 // GetResultPollIntervalSeconds is getter of resultPollIntervalSeconds.
 func (c *Config) GetResultPollIntervalSeconds() time.Duration {
 	if val := c.values.Get("resultPollIntervalSeconds"); val != "" {
-		return strconv.Atoi(val) * time.Seconds
+		n, err := strconv.Atoi(val)
+		if err != nil {
+			return time.Duration(PoolInterval) * time.Second
+		}
+		return time.Duration(n) * time.Second
 	}
-	return PoolInterval * time.Seconds
+	return time.Duration(PoolInterval) * time.Second
 }
 
 // SetWorkGroup is a setter of WorkGroup.

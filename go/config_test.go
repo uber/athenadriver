@@ -322,16 +322,14 @@ func TestConfig_SetServiceLimitOverride(t *testing.T) {
 }
 
 func TestConfig_ResultPollIntervalOverride(t *testing.T) {
-	resultPollInterval := 1
 	testConf := NewNoOpsConfig()
 	testConf.SetResultPollIntervalSeconds(1)
 	interval := testConf.GetResultPollIntervalSeconds()
-	assert.Equal(t, time.Second*1, interval)
+	assert.Equal(t, time.Duration(1)*time.Second, interval)
 }
 
 func TestConfig_ResultPollIntervalDefault(t *testing.T) {
-	resultPollInterval := 1
 	testConf := NewNoOpsConfig()
 	interval := testConf.GetResultPollIntervalSeconds()
-	assert.Equal(t, time.Second*PoolInterval, interval)
+	assert.Equal(t, time.Second*time.Duration(PoolInterval), interval)
 }
