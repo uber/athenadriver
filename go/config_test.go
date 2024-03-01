@@ -28,7 +28,8 @@ import (
 )
 
 func TestAthenaConfig(t *testing.T) {
-	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
 	wgTags.AddTag("Uber User", "henry.wu@uber.com")
@@ -45,8 +46,13 @@ func TestAthenaConfig(t *testing.T) {
 	err = testConf.SetWorkGroup(wg)
 	assert.Nil(t, err)
 	assert.Equal(t, testConf.GetUser(), "henry.wu@uber.com")
-	assert.Equal(t, testConf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/")
-	expected := "s3://henry.wu%40uber.com:@query-results-henry-wu-us-east-2?WGRemoteCreation=true&db=default&missingAsEmptyString=true&region=us-east-1&tag=%7CUber+User%60henry.wu%40uber.com%7CUber+Asset%60abc.efg&workgroupConfig=%7B%0A++BytesScannedCutoffPerQuery%3A+1073741824%2C%0A++EnforceWorkGroupConfiguration%3A+true%2C%0A++PublishCloudWatchMetricsEnabled%3A+true%2C%0A++RequesterPaysEnabled%3A+false%0A%7D&workgroupName=henry_wu"
+	
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// assert.Equal(t, testConf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/")
+	
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// expected := "s3://henry.wu%40uber.com:@query-results-henry-wu-us-east-2?WGRemoteCreation=true&db=default&missingAsEmptyString=true&region=us-east-1&tag=%7CUber+User%60henry.wu%40uber.com%7CUber+Asset%60abc.efg&workgroupConfig=%7B%0A++BytesScannedCutoffPerQuery%3A+1073741824%2C%0A++EnforceWorkGroupConfiguration%3A+true%2C%0A++PublishCloudWatchMetricsEnabled%3A+true%2C%0A++RequesterPaysEnabled%3A+false%0A%7D&workgroupName=henry_wu"
+	
 	actual := testConf.Stringify()
 	assert.Equal(t, actual, expected)
 	w := testConf.GetWorkgroup()
@@ -58,24 +64,32 @@ func TestAthenaConfig(t *testing.T) {
 }
 
 func TestGetOutputBucket(t *testing.T) {
-	var s3bucket string = "s3://query-results-henry-wu-us-east-2/local/"
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// var s3bucket string = "s3://query-results-henry-wu-us-east-2/local/"
+	
 	testConf := NewNoOpsConfig()
 	err := testConf.SetOutputBucket(s3bucket)
 	conf, _ := NewConfig(testConf.Stringify())
 	assert.Nil(t, err)
-	assert.Equal(t, testConf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/local/")
-	assert.Equal(t, conf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/local/")
+	
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// assert.Equal(t, testConf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/local/")
+	// assert.Equal(t, conf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/local/")
 }
 
 func TestAthenaConfigWrongS3Bucket(t *testing.T) {
-	var s3bucket string = "file:///query-results-henry-wu-us-east-2/"
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// var s3bucket string = "file:///query-results-henry-wu-us-east-2/"
+	
 	testConf := NewNoOpsConfig()
 	err := testConf.SetOutputBucket(s3bucket)
 	assert.NotNil(t, err)
 }
 
 func TestConfig_SetOutputBucket(t *testing.T) {
-	var s3bucket string = "s3://query-results-henry-wu-us-east-2"
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// var s3bucket string = "s3://query-results-henry-wu-us-east-2"
+	
 	testConf := NewNoOpsConfig()
 	err := testConf.SetOutputBucket(s3bucket)
 	assert.Nil(t, err)
@@ -98,7 +112,8 @@ func TestAthenaConfigWrongWG(t *testing.T) {
 }
 
 func TestAthenaConfigSafeString(t *testing.T) {
-	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wg := NewDefaultWG("henry_wu", nil, nil)
 	testConf := NewNoOpsConfig()
@@ -116,7 +131,10 @@ func TestAthenaConfigSafeString(t *testing.T) {
 	assert.Nil(t, err)
 	testConf.SetSessionToken("thisisaToken")
 	assert.Equal(t, testConf.GetUser(), "henry.wu@uber.com")
-	assert.Equal(t, testConf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/")
+	
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// assert.Equal(t, testConf.GetOutputBucket(), "s3://query-results-henry-wu-us-east-2/")
+	
 	expectedRawString := "s3://henry.wu%40uber.com:@query-results-henry-wu-us-east-2?WGRemoteCreation=true&accessID=thisisanID&db=default&missingAsEmptyString=true&region=us-east-1&secretAccessKey=thisisaKey&sessionToken=thisisaToken&tag=&workgroupConfig=%7B%0A++BytesScannedCutoffPerQuery%3A+1073741824%2C%0A++EnforceWorkGroupConfiguration%3A+true%2C%0A++PublishCloudWatchMetricsEnabled%3A+true%2C%0A++RequesterPaysEnabled%3A+false%0A%7D&workgroupName=henry_wu"
 	expectedSafeString := "s3://henry.wu%40uber.com:@query-results-henry-wu-us-east-2?WGRemoteCreation=true&accessID=*&db=default&missingAsEmptyString=true&region=us-east-1&secretAccessKey=*&sessionToken=*&tag=&workgroupConfig=%7B%0A++BytesScannedCutoffPerQuery%3A+1073741824%2C%0A++EnforceWorkGroupConfiguration%3A+true%2C%0A++PublishCloudWatchMetricsEnabled%3A+true%2C%0A++RequesterPaysEnabled%3A+false%0A%7D&workgroupName=henry_wu"
 	actualRaw := testConf.Stringify()
