@@ -1199,6 +1199,13 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 ## ChangeLog
 
+### v1.1.15 - Merge community contribution (March 03, 2024)
+
+  - Rename S3 bucket in test code (@jonathanbaker7 Jonathan Baker, @henrywoo)
+  - Make poll interval configurable (@keshav-dataco Keshav Murthy)
+  - Add microseconds and nanosecond time format parsing (@Sly1024 Szilveszter Safar)
+  - Add option to return missing values as nil (@kevinwcyu Kevin Yu)
+
 ### v1.1.14 - Merge community contribution (August 19, 2022)
 
   - Adding default AWS SDK credential resolution to connector (@dfreiman-hbo, Dan Freiman)
@@ -1219,7 +1226,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 [cov-img]: https://codecov.io/gh/uber/athenadriver/branch/master/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/athenadriver
 
-[release-img]: https://img.shields.io/badge/release-v1.1.14-red
+[release-img]: https://img.shields.io/badge/release-v1.1.15-red
 [release]: https://github.com/uber/athenadriver/releases
 
 [report-card-img]: https://goreportcard.com/badge/github.com/uber/athenadriver
