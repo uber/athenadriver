@@ -344,7 +344,8 @@ func TestConnection_QueryContext3(t *testing.T) {
 		athenaAPI: newMockAthenaClient(),
 		connector: NoopsSQLConnector(),
 	}
-	var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
+	// The Amazon S3 bucket query-results-henry-wu-us-east-2 has been compromised, and should not be used.
+	// var s3bucket string = "s3://query-results-henry-wu-us-east-2/"
 
 	wgTags := NewWGTags()
 	wgTags.AddTag("Uber User", "henry.wu")
