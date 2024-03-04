@@ -176,7 +176,7 @@ func TestConfig_IsMissingAsNil(t *testing.T) {
 	testConf := NewNoOpsConfig()
 	testConf.SetMissingAsNil(true)
 	assert.True(t, testConf.IsMissingAsNil())
-	testConf.SetMissingAsDefault(false)
+	testConf.SetMissingAsNil(false)
 	assert.False(t, testConf.IsMissingAsNil())
 }
 
