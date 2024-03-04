@@ -1,3 +1,9 @@
+v1.1.15 - Merge community contribution (March 03, 2024)
+  - Rename S3 bucket in test code (@jonathanbaker7 Jonathan Baker, @henrywoo)
+  - Make poll interval configurable (@keshav-dataco Keshav Murthy)
+  - Add microseconds and nanosecond time format parsing (@Sly1024 Szilveszter Safar)
+  - Add option to return missing values as nil (@kevinwcyu Kevin Yu)
+
 v1.1.14 - Merge community contribution (August 19, 2022)
     - Adding default AWS SDK credential resolution to connector (dfreiman-hbo, Dan Freiman)
     - Bump go-pretty version to most recent version (nyergler, Nathan Yergler)
