@@ -21,10 +21,10 @@
 package athenadriver
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
 	"time"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAthenaConfig(t *testing.T) {
