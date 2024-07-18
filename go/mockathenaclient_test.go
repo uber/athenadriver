@@ -142,7 +142,8 @@ func (m *mockAthenaClient) StartQueryExecution(s *athena.
 		}, nil
 	}
 	if *s.QueryString == "SELECTQueryContext_OK" ||
-		*s.QueryString == "SELECTQueryContext_'OK'" { // Ping
+		*s.QueryString == "SELECTQueryContext_'OK'" ||
+		*s.QueryString == "SELECTQueryContext_?" { // Ping
 		qid := "SELECTQueryContext_OK_QID"
 		return &athena.StartQueryExecutionOutput{
 			QueryExecutionId: &qid,

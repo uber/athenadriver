@@ -238,8 +238,11 @@ func TestEscapeBytesBackslash(t *testing.T) {
 	r = escapeBytesBackslash([]byte{}, []byte{'\x1a'})
 	assert.Equal(t, string(r), "\\Z")
 
+	// Single quotes can be escaped by adding another single quote.
+	// https://docs.aws.amazon.com/athena/latest/ug/select.html#select-escaping
+	// https://docs.aws.amazon.com/athena/latest/ug/data-types.html#data-types-considerations
 	r = escapeBytesBackslash([]byte{}, []byte{'\''})
-	assert.Equal(t, string(r), `\'`)
+	assert.Equal(t, string(r), `''`)
 
 	r = escapeBytesBackslash([]byte{}, []byte{'"'})
 	assert.Equal(t, string(r), `\"`)
@@ -463,4 +466,62 @@ func Test_newHeaderResultPage(t *testing.T) {
 	data[0] = []*string{&qid}
 	page := newHeaderResultPage(columnNames, columnTypes, data)
 	assert.NotNil(t, page)
+}
+
+func TestFormatString(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Empty string",
+			input:    "",
+			expected: "''",
+		},
+		{
+			name:     "No special characters",
+			input:    "This is a description string with no special characters",
+			expected: "'This is a description string with no special characters'",
+		},
+		{
+			name:     "Special characters are escaped",
+			input:    "Athena's query's param\n",
+			expected: "'Athena''s query''s param\\n'",
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, FormatString(tc.input))
+		})
+	}
+}
+
+func TestFormatBytes(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []byte
+		expected []byte
+	}{
+		{
+			name:     "Empty byte slice",
+			input:    []byte{},
+			expected: []byte("_binary''"),
+		},
+		{
+			name:     "No special characters",
+			input:    []byte("This is a description string with no special characters"),
+			expected: []byte("_binary'This is a description string with no special characters'"),
+		},
+		{
+			name:     "Special characters are escaped",
+			input:    []byte("Athena's query's param\n"),
+			expected: []byte("_binary'Athena''s query''s param\\n'"),
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, FormatBytes(tc.input))
+		})
+	}
 }
