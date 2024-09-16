@@ -22,7 +22,7 @@ func setUpFlagUsage(context.Context) error {
 			"\t$ athenareader -d sampledb -q \"select request_timestamp,elb_name from elb_logs limit 2\" -r\n" +
 			"\t2015-01-05T20:00:01.206255Z,elb_demo_002\n" +
 			"\t2015-01-05T20:00:01.612598Z,elb_demo_008\n\n" +
-			"\t$ athenareader -d sampledb -b s3://my-athena-query-result -q tools/query.sql\n" +
+			"\t$ athenareader -d sampledb -b s3://example-athena-query-result -q tools/query.sql\n" +
 			"\trequest_timestamp,elb_name\n" +
 			"\t2015-01-06T00:00:00.516940Z,elb_demo_009\n\n" +
 			"\n\tAdd '-m' to enable moneywise mode. The first line will display query cost under moneywise mode.\n\n" +

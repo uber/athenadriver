@@ -260,7 +260,7 @@ $ athenareader -d sampledb -q "select request_timestamp,elb_name from elb_logs l
 - Put complex query in a local file
 
 ```
-$ athenareader -d sampledb -b s3://my-athena-query-result -q tools/query.sql
+$ athenareader -d sampledb -b s3://example-athena-query-result -q tools/query.sql
 request_timestamp,elb_name
 2015-01-06T00:00:00.516940Z,elb_demo_009
 ```
