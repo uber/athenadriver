@@ -619,7 +619,10 @@ func escapeBytesBackslash(buf, v []byte) []byte {
 			buf[pos+1] = 'Z'
 			pos += 2
 		case '\'':
-			buf[pos] = '\\'
+			// Single quotes can be escaped by adding another single quote.
+			// https://docs.aws.amazon.com/athena/latest/ug/select.html
+			// https://docs.aws.amazon.com/athena/latest/ug/data-types.html#data-types-considerations
+			buf[pos] = '\''
 			buf[pos+1] = '\''
 			pos += 2
 		case '"':
@@ -806,4 +809,28 @@ func GetTidySQL(query string) string {
 // https://aws.amazon.com/premiumsupport/knowledge-center/access-download-athena-query-results/
 func IsQID(q string) bool {
 	return qIDPattern.MatchString(q)
+}
+
+// FormatString formats a string type query argument for Athena by escaping special characters and surrounding the
+// string with single quotes. Using FormatString allows for selective formatting of the query argument, if
+// typecasting or function calls are part of the query argument.
+//
+// Example usage:
+// query := "SELECT * FROM my_table WHERE description = ? AND created > ?"
+//
+//	args := []any{
+//		 aws.String(athenadriver.FormatString("The bunny's eating a carrot")),
+//		 aws.String(fmt.Sprintf("TIMESTAMP %s", athenadriver.FormatString("2024-07-01 00:00:00")))
+//	}
+func FormatString(v string) string {
+	return fmt.Sprintf("'%s'", escapeBytesBackslash([]byte{}, []byte(v)))
+}
+
+// FormatBytes formats a byte slice query argument for Athena by escaping special characters and surrounding it with
+// single quotes.
+func FormatBytes(v []byte) []byte {
+	buf := append([]byte{}, "_binary'"...)
+	buf = escapeBytesBackslash(buf, v)
+	buf = append(buf, '\'')
+	return buf
 }

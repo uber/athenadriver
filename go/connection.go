@@ -39,12 +39,78 @@ import (
 	"github.com/aws/aws-sdk-go/service/athena"
 )
 
+// timestampFormatDriverMicro is the string format we transform Go time.Time objects into. This is not meant for
+// TIMESTAMP columns, as Athena timestamp columns only have a millisecond granularity.
+const timestampFormatDriverMicro = "2006-01-02 15:04:05.000000"
+
 // Connection is a connection to AWS Athena. It is not used concurrently by multiple goroutines.
 // Connection is assumed to be stateful.
 type Connection struct {
 	athenaAPI athenaiface.AthenaAPI
 	connector *SQLConnector
 	numInput  int
+}
+
+// buildExecutionParams converts Go data types into strings for query arguments in parameterized queries.
+func (c *Connection) buildExecutionParams(args []driver.Value) ([]*string, error) {
+	executionParams := []*string{}
+	for _, arg := range args {
+		if arg == nil {
+			val := "NULL"
+			executionParams = append(executionParams, aws.String(val))
+			continue
+		}
+		// type switches of arg to handle different query parameter types
+		val := ""
+		switch v := arg.(type) {
+		case int64:
+			val = strconv.FormatInt(v, 10)
+		case uint64:
+			val = strconv.FormatUint(v, 10)
+		case float64:
+			val = strconv.FormatFloat(v, 'g', -1, 64)
+		case bool:
+			if v {
+				val = "1"
+			} else {
+				val = "0"
+			}
+		case time.Time:
+			// Note: time.Time objects are transformed into strings for a STRING/CHAR/VARCHAR type column.
+			// To maintain compatibility with the current interpolateParams() behavior, this function produces a string
+			// up to microsecond granularity, which Athena does not support in TIMESTAMP columns (up to milliseconds).
+			// For DATE/TIME/TIMESTAMP, it is better to pass in string arguments with a typecast. Refer to the string
+			// case below.
+			// Matches interpolateParams() behavior.
+			val = "'0000-00-00'" // Special-cased.
+			if !v.IsZero() {
+				v := v.In(time.UTC)
+				v = v.Add(time.Nanosecond * 500) // To round under microsecond
+				dateFormat := timestampFormatDriverMicro
+				if v.Nanosecond()/1000 == 0 {
+					// Omit microseconds if that part is zero
+					dateFormat = time.DateTime
+				}
+				val = fmt.Sprintf("'%s'", v.Format(dateFormat))
+			}
+		case []byte:
+			// Note: Different from interpolateParams() behavior.
+			// Like the string case below, enclosing in single quotes would prevent typecasting or function calls in
+			// execution parameters. Prior to passing in query arguments, Format* functions in utils.go can be used.
+			val = string(v)
+		case string:
+			// Note: Different from interpolateParams() behavior.
+			// For parameterized queries, typecasting or function calls go in the execution parameters. For example,
+			// `WHERE created = TIMESTAMP '2024-07-01 00:00:00'` should be formatted as: `WHERE created = ?` (query) and
+			// `TIMESTAMP '2024-07-01 00:00:00.000'` (arg). Therefore, we cannot simply enclose the full string with
+			// single quotes here. Users should use the Format* functions in utils.go to format input string arguments.
+			val = v
+		default:
+			return []*string{}, ErrQueryUnknownType
+		}
+		executionParams = append(executionParams, aws.String(val))
+	}
+	return executionParams, nil
 }
 
 func (c *Connection) interpolateParams(query string, args []driver.Value) (string, error) {
@@ -256,6 +322,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	}
 	now := time.Now()
 	args := namedValueToValue(namedArgs)
+	queryWithPlaceholders := query // For parameterized queries
 	var err error
 	if len(namedArgs) > 0 {
 		query, err = c.interpolateParams(query, args)
@@ -335,8 +402,13 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	}
 
 	//  case 2 - TODO
+	executionParams, err := c.buildExecutionParams(args)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.athenaAPI.StartQueryExecution(&athena.StartQueryExecutionInput{
-		QueryString: aws.String(query),
+		QueryString:         aws.String(queryWithPlaceholders),
+		ExecutionParameters: executionParams,
 		QueryExecutionContext: &athena.QueryExecutionContext{
 			Database: aws.String(c.connector.config.GetDB()),
 		},
