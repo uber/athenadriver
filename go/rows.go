@@ -109,7 +109,7 @@ func (r *Rows) DownloadResultFromS3() (*csv.Reader, error) {
 
 	client := s3.NewFromConfig(cfg)
 
-	bucket := r.config.GetOutputBucket()
+	bucket := r.config.GetS3OutputBucket()
 	path := fmt.Sprintf("%s/%s.csv", r.config.GetS3ResultPrefix(), r.queryID)
 
 	output, err := client.GetObject(context.TODO(), &s3.GetObjectInput{

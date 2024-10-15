@@ -213,6 +213,23 @@ func (c *Config) GetS3ResultPrefix() string {
 	return GetFromEnvVal(s3ResultPrefixEnvKey)
 }
 
+// SetS3OutputBucket is setter for S3 output bucket
+func (c *Config) SetS3OutputBucket(o string) error {
+	if len(o) == 0 {
+		return ErrConfigS3OutputBucket
+	}
+	c.values.Set("s3_output_bucket", o)
+	return nil
+}
+
+// GetS3OutputBucket is getter of s3 output bucket
+func (c *Config) GetS3OutputBucket() string {
+	if val := c.values.Get("s3_output_bucket"); val != "" {
+		return val
+	}
+	return ""
+}
+
 // SetUser is a setter of User.
 func (c *Config) SetUser(o string) {
 	c.dsn.User = url.UserPassword(o, "")

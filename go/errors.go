@@ -32,6 +32,7 @@ var (
 	ErrConfigOutputLocation         = errors.New("output location must starts with s3")
 	ErrConfigRegion                 = errors.New("region is required")
 	ErrConfigS3ResultPrefix         = errors.New("S3 result prefix is required")
+	ErrConfigS3OutputBucket         = errors.New("S3 output bucket is required")
 	ErrConfigWGPointer              = errors.New("workgroup pointer is nil")
 	ErrConfigAccessIDRequired       = errors.New("AWS access ID is required")
 	ErrConfigAccessKeyRequired      = errors.New("AWS access Key is required")
