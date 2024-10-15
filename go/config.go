@@ -23,8 +23,8 @@ package athenadriver
 import (
 	"net/url"
 	"regexp"
-	"strings"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -55,6 +55,9 @@ var (
 	regionEnvKeys = []string{
 		"AWS_REGION",
 		"AWS_DEFAULT_REGION", // Only read if AWS_SDK_LOAD_CONFIG is also set
+	}
+	s3ResultPrefixEnvKey = []string{
+		"AWS_S3_ATHENA_RESULT_PREFIX",
 	}
 	stsRegionalEndpointKey = []string{
 		"AWS_STS_REGIONAL_ENDPOINTS",
@@ -174,6 +177,40 @@ func (c *Config) GetRegion() string {
 		return val
 	}
 	return GetFromEnvVal(regionEnvKeys)
+}
+
+// SetS3Region is to set S3 region.
+func (c *Config) SetS3Region(o string) error {
+	if len(o) == 0 {
+		return ErrConfigRegion
+	}
+	c.values.Set("s3_region", o)
+	return nil
+}
+
+// GetS3Region is getter of S3 region.
+func (c *Config) GetS3Region() string {
+	if val := c.values.Get("s3_region"); val != "" {
+		return val
+	}
+	return GetFromEnvVal(regionEnvKeys)
+}
+
+// SetS3ResultPrefix is to set key prefix for athena result.
+func (c *Config) SetS3ResultPrefix(o string) error {
+	if len(o) == 0 {
+		return ErrConfigS3ResultPrefix
+	}
+	c.values.Set("s3_result_prefix", o)
+	return nil
+}
+
+// GetS3ResultPrefix is getter of key prefix for athena result.
+func (c *Config) GetS3ResultPrefix() string {
+	if val := c.values.Get("s3_result_prefix"); val != "" {
+		return val
+	}
+	return GetFromEnvVal(s3ResultPrefixEnvKey)
 }
 
 // SetUser is a setter of User.

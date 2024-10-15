@@ -31,6 +31,7 @@ var (
 	ErrConfigInvalidConfig          = errors.New("driver config is invalid")
 	ErrConfigOutputLocation         = errors.New("output location must starts with s3")
 	ErrConfigRegion                 = errors.New("region is required")
+	ErrConfigS3ResultPrefix         = errors.New("S3 result prefix is required")
 	ErrConfigWGPointer              = errors.New("workgroup pointer is nil")
 	ErrConfigAccessIDRequired       = errors.New("AWS access ID is required")
 	ErrConfigAccessKeyRequired      = errors.New("AWS access Key is required")

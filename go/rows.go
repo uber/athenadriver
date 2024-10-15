@@ -23,6 +23,7 @@ package athenadriver
 import (
 	"context"
 	"database/sql/driver"
+	"encoding/csv"
 	"fmt"
 	"io"
 	"strconv"
@@ -31,6 +32,8 @@ import (
 
 	"go.uber.org/zap"
 
+	aws_v2_cfg "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -44,6 +47,7 @@ type Rows struct {
 	queryID         string
 	reachedLastPage bool
 	ResultOutput    *athena.GetQueryResultsOutput
+	csvReader       *csv.Reader
 	config          *Config
 	tracer          *DriverTracer
 	pageCount       int64
@@ -77,7 +81,59 @@ func NewRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, queryID strin
 	if err := r.fetchNextPage(nil); err != nil {
 		return nil, err
 	}
+
+	if r.ResultOutput.NextToken == nil || *r.ResultOutput.NextToken == "" {
+		return &r, nil
+	}
+
+	csvReader, err := r.DownloadResultFromS3()
+	if err != nil {
+		return nil, err
+	}
+
+	// The first line is just a list of columns, we don't need that
+	csvReader.Read()
+
+	r.csvReader = csvReader
+
 	return &r, nil
+}
+
+func (r *Rows) DownloadResultFromS3() (*csv.Reader, error) {
+	cfg, err := aws_v2_cfg.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.Region = r.config.GetS3Region()
+
+	client := s3.NewFromConfig(cfg)
+
+	bucket := r.config.GetOutputBucket()
+	path := fmt.Sprintf("%s/%s.csv", r.config.GetS3ResultPrefix(), r.queryID)
+
+	output, err := client.GetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(path),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	defer output.Body.Close()
+
+	// We serialize the query into a string, I faced some issues when I tried to pipe it into the csv directly
+	// (I was not able to close Body when csv completed)
+	var sb strings.Builder
+	_, err = io.Copy(&sb, output.Body)
+	if err != nil {
+		return nil, err
+	}
+	resultString := sb.String()
+
+	reader := csv.NewReader(strings.NewReader(resultString))
+
+	return reader, nil
 }
 
 // Columns return Columns metadata.
@@ -105,6 +161,24 @@ func (r *Rows) Next(dest []driver.Value) error {
 	if r.reachedLastPage {
 		return io.EOF
 	}
+
+	// If there is csvReader available, we should be data from there instead
+	if r.csvReader != nil {
+		lineData, err := r.csvReader.Read()
+		if err != nil {
+			r.reachedLastPage = true
+			return io.EOF
+		}
+
+		cur := newRow(len(lineData), lineData)
+		columns := r.ResultOutput.ResultSet.ResultSetMetadata.ColumnInfo
+		if err := r.convertRow(columns, cur.Data, dest, r.config); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	if len(r.ResultOutput.ResultSet.Rows) == 0 {
 		if r.ResultOutput.NextToken == nil || *r.ResultOutput.NextToken == "" {
 			// this means we reach the last page - no token and no rows
