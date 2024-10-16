@@ -162,7 +162,7 @@ func (r *Rows) Next(dest []driver.Value) error {
 		return io.EOF
 	}
 
-	// If there is csvReader available, we should be data from there instead
+	// If there is csvReader available, we should use data from there instead
 	if r.csvReader != nil {
 		lineData, err := r.csvReader.Read()
 		if err != nil {
