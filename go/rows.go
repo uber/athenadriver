@@ -170,10 +170,13 @@ func (r *Rows) Next(dest []driver.Value) error {
 			return io.EOF
 		}
 
-		for i, v := range lineData {
-			lineData[i] = strings.TrimSpace(v)
-		}
 		cur := newRow(len(lineData), lineData)
+		for i, data := range cur.Data {
+			if r.csvReader.IsValueMissing(i) {
+				data.VarCharValue = nil
+			}
+		}
+
 		columns := r.ResultOutput.ResultSet.ResultSetMetadata.ColumnInfo
 		if err := r.convertRow(columns, cur.Data, dest, r.config); err != nil {
 			return err
