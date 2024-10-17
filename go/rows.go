@@ -23,7 +23,6 @@ package athenadriver
 import (
 	"context"
 	"database/sql/driver"
-	"encoding/csv"
 	"fmt"
 	"io"
 	"strconv"
@@ -35,6 +34,7 @@ import (
 	aws_v2_cfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/athena"
@@ -47,7 +47,7 @@ type Rows struct {
 	queryID         string
 	reachedLastPage bool
 	ResultOutput    *athena.GetQueryResultsOutput
-	csvReader       *csv.Reader
+	csvReader       *Reader
 	config          *Config
 	tracer          *DriverTracer
 	pageCount       int64
@@ -99,7 +99,7 @@ func NewRows(ctx context.Context, athenaAPI athenaiface.AthenaAPI, queryID strin
 	return &r, nil
 }
 
-func (r *Rows) DownloadResultFromS3() (*csv.Reader, error) {
+func (r *Rows) DownloadResultFromS3() (*Reader, error) {
 	cfg, err := aws_v2_cfg.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		return nil, err
@@ -131,7 +131,7 @@ func (r *Rows) DownloadResultFromS3() (*csv.Reader, error) {
 	}
 	resultString := sb.String()
 
-	reader := csv.NewReader(strings.NewReader(resultString))
+	reader := NewReader(strings.NewReader(resultString))
 
 	return reader, nil
 }
@@ -170,6 +170,9 @@ func (r *Rows) Next(dest []driver.Value) error {
 			return io.EOF
 		}
 
+		for i, v := range lineData {
+			lineData[i] = strings.TrimSpace(v)
+		}
 		cur := newRow(len(lineData), lineData)
 		columns := r.ResultOutput.ResultSet.ResultSetMetadata.ColumnInfo
 		if err := r.convertRow(columns, cur.Data, dest, r.config); err != nil {
@@ -343,6 +346,7 @@ func (r *Rows) convertRow(columns []*athena.ColumnInfo, rdata []*athena.Datum, r
 // The full list is here: https://prestodb.io/docs/0.172/language/types.html
 // Include ipaddress for forward compatibility.
 func (r *Rows) athenaTypeToGoType(columnInfo *athena.ColumnInfo, rawValue *string, driverConfig *Config) (interface{}, error) {
+	backend.Logger.Info("converting", "columnInfo", columnInfo, "value", rawValue)
 	if maskedValue, masked := driverConfig.CheckColumnMasked(*columnInfo.Name); masked { // "comma ok" idiom
 		return maskedValue, nil
 	}
