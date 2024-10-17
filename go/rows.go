@@ -34,7 +34,6 @@ import (
 	aws_v2_cfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/athena"
@@ -349,7 +348,6 @@ func (r *Rows) convertRow(columns []*athena.ColumnInfo, rdata []*athena.Datum, r
 // The full list is here: https://prestodb.io/docs/0.172/language/types.html
 // Include ipaddress for forward compatibility.
 func (r *Rows) athenaTypeToGoType(columnInfo *athena.ColumnInfo, rawValue *string, driverConfig *Config) (interface{}, error) {
-	backend.Logger.Info("converting", "columnInfo", columnInfo, "value", rawValue)
 	if maskedValue, masked := driverConfig.CheckColumnMasked(*columnInfo.Name); masked { // "comma ok" idiom
 		return maskedValue, nil
 	}
