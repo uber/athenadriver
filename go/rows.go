@@ -122,7 +122,7 @@ func (r *Rows) DownloadResultFromS3() (*Reader, error) {
 	defer output.Body.Close()
 
 	// Stream the data and monitor size
-	const maxSize = 1024 * 1024 * 1024 // 1GB in bytes
+	const maxSize = 100 * 1024 * 1024 // 100MB in bytes
 	var totalBytes int64
 	builder := &strings.Builder{}
 	buffer := make([]byte, 1024*1024) // 1MB buffer
@@ -134,7 +134,7 @@ func (r *Rows) DownloadResultFromS3() (*Reader, error) {
 		}
 		totalBytes += int64(n)
 		if totalBytes > maxSize {
-			return nil, fmt.Errorf("this query generated more than 1GB of data, please please add LIMIT to your query")
+			return nil, fmt.Errorf("this query generated more than 100MB of data, please please add LIMIT to your query")
 		}
 
 		// Write to the string builder
