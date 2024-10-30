@@ -121,16 +121,31 @@ func (r *Rows) DownloadResultFromS3() (*Reader, error) {
 
 	defer output.Body.Close()
 
-	// We serialize the query into a string, I faced some issues when I tried to pipe it into the csv directly
-	// (I was not able to close Body when csv completed)
-	var sb strings.Builder
-	_, err = io.Copy(&sb, output.Body)
-	if err != nil {
-		return nil, err
-	}
-	resultString := sb.String()
+	// Stream the data and monitor size
+	const maxSize = 1024 * 1024 * 1024 // 1GB in bytes
+	var totalBytes int64
+	builder := &strings.Builder{}
+	buffer := make([]byte, 1024*1024) // 1MB buffer
 
-	reader := NewReader(strings.NewReader(resultString))
+	for {
+		n, err := output.Body.Read(buffer)
+		if err != nil && err != io.EOF {
+			return nil, fmt.Errorf("error reading object data: %w", err)
+		}
+		totalBytes += int64(n)
+		if totalBytes > maxSize {
+			return nil, fmt.Errorf("this query generated more than 1GB of data, please please add LIMIT to your query")
+		}
+
+		// Write to the string builder
+		builder.Write(buffer[:n])
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	reader := NewReader(strings.NewReader(builder.String()))
 
 	return reader, nil
 }
