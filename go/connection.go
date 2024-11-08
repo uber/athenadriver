@@ -352,7 +352,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 			} else {
 				obs.Log(WarnLevel, "workgroup "+DefaultWGName+" is used for "+wg.Name+".")
 				return nil,
-					fmt.Errorf("workgroup %q doesn't exist and workgroup remote creation is disabled", wg.Name)
+					fmt.Errorf("workgroup %q doesn't exist and workgroup remote creation is disabled, due to: %v", wg.Name, err.Error())
 			}
 		} else {
 			if *athenaWG.State != athena.WorkGroupStateEnabled {
