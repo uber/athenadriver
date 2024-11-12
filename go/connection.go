@@ -342,6 +342,9 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		if err != nil {
 			obs.Scope().Counter(DriverName + ".failure.querycontext.getwg").Inc(1)
 			obs.Log(WarnLevel, "Didn't find workgroup "+wg.Name+" due to: "+err.Error())
+			if reqerr, ok := err.(awserr.RequestFailure); !ok || reqerr.Message() != "WorkGroup is not found." {
+				return nil, err
+			}
 			if c.connector.config.IsWGRemoteCreationAllowed() {
 				err = wg.CreateWGRemotely(c.athenaAPI)
 				if err != nil {
