@@ -30,13 +30,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
-
 	"go.uber.org/zap"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
+	"github.com/aws/aws-sdk-go-v2/service/athena"
+	athenatypes "github.com/aws/aws-sdk-go-v2/service/athena/types"
 )
 
 // timestampFormatDriverMicro is the string format we transform Go time.Time objects into. This is not meant for
@@ -46,18 +45,18 @@ const timestampFormatDriverMicro = "2006-01-02 15:04:05.000000"
 // Connection is a connection to AWS Athena. It is not used concurrently by multiple goroutines.
 // Connection is assumed to be stateful.
 type Connection struct {
-	athenaAPI athenaiface.AthenaAPI
+	athenaClient AthenaClient
+
 	connector *SQLConnector
 	numInput  int
 }
 
 // buildExecutionParams converts Go data types into strings for query arguments in parameterized queries.
-func (c *Connection) buildExecutionParams(args []driver.Value) ([]*string, error) {
-	executionParams := []*string{}
+func (c *Connection) buildExecutionParams(args []driver.Value) ([]string, error) {
+	executionParams := []string{}
 	for _, arg := range args {
 		if arg == nil {
-			val := "NULL"
-			executionParams = append(executionParams, aws.String(val))
+			executionParams = append(executionParams, "NULL")
 			continue
 		}
 		// type switches of arg to handle different query parameter types
@@ -106,9 +105,9 @@ func (c *Connection) buildExecutionParams(args []driver.Value) ([]*string, error
 			// single quotes here. Users should use the Format* functions in utils.go to format input string arguments.
 			val = v
 		default:
-			return []*string{}, ErrQueryUnknownType
+			return []string{}, ErrQueryUnknownType
 		}
-		executionParams = append(executionParams, aws.String(val))
+		executionParams = append(executionParams, val)
 	}
 	return executionParams, nil
 }
@@ -260,9 +259,9 @@ func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, 
 	if c.connector.config.IsMoneyWise() {
 		dataScanned := int64(0)
 		printCost(&athena.GetQueryExecutionOutput{
-			QueryExecution: &athena.QueryExecution{
+			QueryExecution: &athenatypes.QueryExecution{
 				QueryExecutionId: &QID,
-				Statistics: &athena.QueryExecutionStatistics{
+				Statistics: &athenatypes.QueryExecutionStatistics{
 					DataScannedInBytes: &dataScanned,
 				},
 			},
@@ -272,13 +271,13 @@ func (c *Connection) cachedQuery(ctx context.Context, QID string) (driver.Rows, 
 	if wg.Name == "" {
 		wg.Name = DefaultWGName
 	}
-	return NewRows(ctx, c.athenaAPI, QID, c.connector.config, c.connector.tracer)
+	return NewRows(ctx, c.athenaClient, QID, c.connector.config, c.connector.tracer)
 }
 
 func (c *Connection) getHeaderlessSingleRowResultPage(ctx context.Context, qid string) (driver.Rows, error) {
-	r, err := NewNonOpsRows(ctx, c.athenaAPI, qid, c.connector.config, c.connector.tracer)
+	r, err := NewNonOpsRows(ctx, c.athenaClient, qid, c.connector.config, c.connector.tracer)
 	colName := "_col0"
-	columnNames := []*string{&colName}
+	columnNames := []string{colName}
 	columnTypes := []string{"string"}
 	data := make([][]*string, 1)
 	data[0] = []*string{&qid}
@@ -338,12 +337,12 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	if wg.Name == "" {
 		wg.Name = DefaultWGName
 	} else if wg.Name != DefaultWGName {
-		athenaWG, err := getWG(ctx, c.athenaAPI, wg.Name)
+		athenaWG, err := getWG(ctx, c.athenaClient, wg.Name)
 		if err != nil {
 			obs.Scope().Counter(DriverName + ".failure.querycontext.getwg").Inc(1)
 			obs.Log(WarnLevel, "Didn't find workgroup "+wg.Name+" due to: "+err.Error())
 			if c.connector.config.IsWGRemoteCreationAllowed() {
-				err = wg.CreateWGRemotely(c.athenaAPI)
+				err = wg.CreateWGRemotely(ctx, c.athenaClient)
 				if err != nil {
 					obs.Scope().Counter(DriverName + ".failure.querycontext.createwgremotely").Inc(1)
 					return nil, err
@@ -355,7 +354,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 					fmt.Errorf("workgroup %q doesn't exist and workgroup remote creation is disabled", wg.Name)
 			}
 		} else {
-			if *athenaWG.State != athena.WorkGroupStateEnabled {
+			if athenaWG.State != athenatypes.WorkGroupStateEnabled {
 				obs.Log(WarnLevel, "workgroup "+DefaultWGName+" is disabled.")
 				obs.Scope().Counter(DriverName + ".failure.querycontext.wgdisabled").Inc(1)
 				return nil, fmt.Errorf("workgroup %q is disabled", wg.Name)
@@ -371,7 +370,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	// case 1 - query directly using QID
 	if IsQID(query) {
 		if pseudoCommand == PCGetQIDStatus {
-			statusResp, err := c.athenaAPI.GetQueryExecutionWithContext(ctx, &athena.GetQueryExecutionInput{
+			statusResp, err := c.athenaClient.GetQueryExecution(ctx, &athena.GetQueryExecutionInput{
 				QueryExecutionId: aws.String(query),
 			})
 			if err != nil {
@@ -382,10 +381,10 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 				obs.Scope().Counter(DriverName + ".failure.querycontext.getqueryexecutionwithcontext").Inc(1)
 				return nil, err
 			}
-			return c.getHeaderlessSingleRowResultPage(ctx, *statusResp.QueryExecution.Status.State)
+			return c.getHeaderlessSingleRowResultPage(ctx, string(statusResp.QueryExecution.Status.State))
 		}
 		if pseudoCommand == PCStopQID {
-			_, err := c.athenaAPI.StopQueryExecutionWithContext(context.Background(), &athena.StopQueryExecutionInput{
+			_, err := c.athenaClient.StopQueryExecution(ctx, &athena.StopQueryExecutionInput{
 				QueryExecutionId: aws.String(query),
 			})
 			if err != nil {
@@ -406,21 +405,23 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.athenaAPI.StartQueryExecution(&athena.StartQueryExecutionInput{
+	resp, err := c.athenaClient.StartQueryExecution(ctx, &athena.StartQueryExecutionInput{
 		QueryString:         aws.String(queryWithPlaceholders),
 		ExecutionParameters: executionParams,
-		QueryExecutionContext: &athena.QueryExecutionContext{
+		QueryExecutionContext: &athenatypes.QueryExecutionContext{
 			Database: aws.String(c.connector.config.GetDB()),
 		},
-		ResultConfiguration: &athena.ResultConfiguration{
+		ResultConfiguration: &athenatypes.ResultConfiguration{
 			OutputLocation: aws.String(c.connector.config.GetOutputBucket()),
 		},
 		WorkGroup: aws.String(wg.Name),
 	})
 	if err != nil {
 		if pseudoCommand == PCGetQID {
-			if reqerr, ok := err.(awserr.RequestFailure); ok {
-				return c.getHeaderlessSingleRowResultPage(ctx, reqerr.RequestID())
+			// FIXME: what is the correct error here?
+			var re *awshttp.ResponseError
+			if errors.As(err, &re) {
+				return c.getHeaderlessSingleRowResultPage(ctx, re.ServiceRequestID())
 			}
 		}
 		return nil, err
@@ -437,7 +438,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 WAITING_FOR_RESULT:
 	for {
 		pollInterval := c.connector.config.GetResultPollIntervalSeconds()
-		statusResp, err := c.athenaAPI.GetQueryExecutionWithContext(ctx, &athena.GetQueryExecutionInput{
+		statusResp, err := c.athenaClient.GetQueryExecution(ctx, &athena.GetQueryExecutionInput{
 			QueryExecutionId: aws.String(queryID),
 		})
 		if err != nil {
@@ -449,8 +450,8 @@ WAITING_FOR_RESULT:
 			return nil, err
 		}
 		//statementType = statusResp.QueryExecution.StatementType
-		switch *statusResp.QueryExecution.Status.State {
-		case athena.QueryExecutionStateCancelled:
+		switch statusResp.QueryExecution.Status.State {
+		case athenatypes.QueryExecutionStateCancelled:
 			timeCanceled := time.Since(now)
 			obs.Log(ErrorLevel, "QueryExecutionStateCancelled",
 				zap.String("workgroup", wg.Name),
@@ -460,7 +461,7 @@ WAITING_FOR_RESULT:
 				printCost(statusResp)
 			}
 			return nil, context.Canceled
-		case athena.QueryExecutionStateFailed:
+		case athenatypes.QueryExecutionStateFailed:
 			reason := *statusResp.QueryExecution.Status.StateChangeReason
 			timeQueryExecutionStateFailed := time.Since(now)
 			obs.Log(ErrorLevel, "QueryExecutionStateFailed",
@@ -469,7 +470,7 @@ WAITING_FOR_RESULT:
 				zap.String("reason", reason))
 			obs.Scope().Timer(DriverName + ".query.queryexecutionstatefailed").Record(timeQueryExecutionStateFailed)
 			return nil, errors.New(reason)
-		case athena.QueryExecutionStateSucceeded:
+		case athenatypes.QueryExecutionStateSucceeded:
 			if c.connector.config.IsMoneyWise() {
 				printCost(statusResp)
 			}
@@ -482,8 +483,8 @@ WAITING_FOR_RESULT:
 
 		select {
 		case <-ctx.Done():
-			_, err := c.athenaAPI.
-				StopQueryExecutionWithContext(context.Background(), &athena.StopQueryExecutionInput{
+			_, err := c.athenaClient.
+				StopQueryExecution(context.Background(), &athena.StopQueryExecutionInput{
 					QueryExecutionId: aws.String(queryID),
 				})
 			if err != nil {
@@ -495,7 +496,7 @@ WAITING_FOR_RESULT:
 				return nil, err
 			}
 			if c.connector.config.IsMoneyWise() {
-				statusRespFinal, _ := c.athenaAPI.GetQueryExecutionWithContext(context.Background(), &athena.GetQueryExecutionInput{
+				statusRespFinal, _ := c.athenaClient.GetQueryExecution(context.Background(), &athena.GetQueryExecutionInput{
 					QueryExecutionId: aws.String(queryID),
 				})
 				printCost(statusRespFinal)
@@ -506,7 +507,7 @@ WAITING_FOR_RESULT:
 			obs.Log(ErrorLevel, "query canceled", zap.String("queryID", queryID))
 			return nil, ctx.Err()
 		case <-time.After(pollInterval):
-			if isQueryTimeOut(startOfStartQueryExecution, *statusResp.QueryExecution.StatementType, c.connector.config.GetServiceLimitOverride()) {
+			if isQueryTimeOut(startOfStartQueryExecution, statusResp.QueryExecution.StatementType, c.connector.config.GetServiceLimitOverride()) {
 				obs.Log(ErrorLevel, "Query timeout failure",
 					zap.String("workgroup", wg.Name),
 					zap.String("queryID", queryID),
@@ -518,7 +519,7 @@ WAITING_FOR_RESULT:
 		}
 	}
 
-	return NewRows(ctx, c.athenaAPI, queryID, c.connector.config, obs)
+	return NewRows(ctx, c.athenaClient, queryID, c.connector.config, obs)
 }
 
 // Ping implements driver.Pinger interface.
@@ -567,7 +568,7 @@ func (c *Connection) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx,
 // do their own connection caching.
 func (c *Connection) Close() error {
 	c.connector = nil
-	c.athenaAPI = nil
+	c.athenaClient = nil
 	c.numInput = -1
 	return nil
 }

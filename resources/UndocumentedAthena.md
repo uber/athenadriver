@@ -146,7 +146,7 @@ For more sample code, please check [ddl_ctas.go](https://github.com/uber/athenad
 
 ## When the Row resultset contains Header
 
-[`GetQueryResults`](https://godoc.org/github.com/aws/aws-sdk-go/service/athena#Athena.GetQueryResults) and [`GetQueryResultsWithContext`](https://godoc.org/github.com/aws/aws-sdk-go/service/athena#Athena.GetQueryResultsWithContext) are the two functions to retrieve all Athena query results.
+[`GetQueryResults`](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/athena?utm_source=godoc#Client.GetQueryResults) is the function to retrieve all Athena query results.
 
 The resultset metadata includes both column and row details. If and Only if the statement is a select statement and the result set page is the first one, the first row is actually the column name strings, aka row header. Understanding this is very important to support all query statements, because when it is a SELECE statement, in order to make database driver behave consistently, we should skip the first row for the first page.
 
@@ -172,10 +172,10 @@ You can find all the statements' examples from [github.com/uber/athenadriver/exa
 ## How should we set `Database` in `athena.QueryExecutionContext{}`?
 
 When queryng Athena, you can embed batabase string in the query when referring to the tables.
-You can also provide the database name in addition to the query string as part of the function [StartQueryExecution](https://godoc.org/github.com/aws/aws-sdk-go/service/athena#Athena.StartQueryExecution)'s parameter like below:
+You can also provide the database name in addition to the query string as part of the function [StartQueryExecution](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/athena?utm_source=godoc#Client.StartQueryExecution)'s parameter like below:
 
-```scala
-resp, err := c.athenaAPI.StartQueryExecution(&athena.StartQueryExecutionInput{
+```go
+resp, err := c.athenaClient.StartQueryExecution(context.Background(), &athena.StartQueryExecutionInput{
 	QueryString: aws.String(query),
 	QueryExecutionContext: &athena.QueryExecutionContext{
 		Database: aws.String(c.connector.AthenaConfig.GetDB()),

@@ -60,10 +60,10 @@ func TestWorkgroup_CreateWGRemotely(t *testing.T) {
 	wgTags.AddTag("Uber Role", "SDE")
 	wg := NewWG("henry_wu", nil, wgTags)
 	athenaClient := newMockAthenaClient()
-	e := wg.CreateWGRemotely(athenaClient)
+	e := wg.CreateWGRemotely(context.Background(), athenaClient)
 	assert.NotNil(t, e)
 	athenaClient.CreateWGStatus = true
-	e = wg.CreateWGRemotely(athenaClient)
+	e = wg.CreateWGRemotely(context.Background(), athenaClient)
 	assert.Nil(t, e)
 }
 
@@ -71,9 +71,9 @@ func TestWorkgroup_CreateWGRemotely2(t *testing.T) {
 	wgTags := NewWGTags()
 	wg := NewWG("henry_wu", nil, wgTags)
 	athenaClient := newMockAthenaClient()
-	e := wg.CreateWGRemotely(athenaClient)
+	e := wg.CreateWGRemotely(context.Background(), athenaClient)
 	assert.NotNil(t, e)
 	athenaClient.CreateWGStatus = true
-	e = wg.CreateWGRemotely(athenaClient)
+	e = wg.CreateWGRemotely(context.Background(), athenaClient)
 	assert.Nil(t, e)
 }

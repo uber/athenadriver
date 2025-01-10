@@ -23,7 +23,7 @@ package athenadriver
 import (
 	"context"
 	"database/sql/driver"
-
+	credentials2 "github.com/aws/aws-sdk-go-v2/credentials"
 	"os"
 	"strconv"
 	"time"
@@ -31,10 +31,9 @@ import (
 	"github.com/uber-go/tally"
 	"go.uber.org/zap"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/athena"
 )
 
 // SQLConnector is the connector for AWS Athena Driver.
@@ -50,6 +49,16 @@ func NoopsSQLConnector() *SQLConnector {
 		config: noopsConfig,
 		tracer: NewDefaultObservability(noopsConfig),
 	}
+}
+
+// AthenaClient is an interface to facilitate testing
+type AthenaClient interface {
+	CreateWorkGroup(context.Context, *athena.CreateWorkGroupInput, ...func(*athena.Options)) (*athena.CreateWorkGroupOutput, error)
+	GetQueryExecution(context.Context, *athena.GetQueryExecutionInput, ...func(*athena.Options)) (*athena.GetQueryExecutionOutput, error)
+	GetQueryResults(context.Context, *athena.GetQueryResultsInput, ...func(*athena.Options)) (*athena.GetQueryResultsOutput, error)
+	GetWorkGroup(context.Context, *athena.GetWorkGroupInput, ...func(*athena.Options)) (*athena.GetWorkGroupOutput, error)
+	StartQueryExecution(context.Context, *athena.StartQueryExecutionInput, ...func(options *athena.Options)) (*athena.StartQueryExecutionOutput, error)
+	StopQueryExecution(context.Context, *athena.StopQueryExecutionInput, ...func(*athena.Options)) (*athena.StopQueryExecutionOutput, error)
 }
 
 // Driver is to construct a new SQLConnector.
@@ -73,41 +82,36 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 		c.tracer.SetLogger(logger)
 	}
 
-	var awsAthenaSession *session.Session
+	var awsCfg aws.Config
 	var err error
 	// respect AWS_SDK_LOAD_CONFIG and local ~/.aws/credentials, ~/.aws/config
 	if ok, _ := strconv.ParseBool(os.Getenv("AWS_SDK_LOAD_CONFIG")); ok {
 		if profile := c.config.GetAWSProfile(); profile != "" {
-			awsAthenaSession, err = session.NewSession(&aws.Config{
-				Credentials: credentials.NewSharedCredentials("", profile),
-			})
-		} else {
-			awsAthenaSession, err = session.NewSession(&aws.Config{})
+			awsCfg, err = config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile(profile))
+			if err != nil {
+				c.tracer.Scope().Counter(DriverName + ".failure.sqlconnector.newsession").Inc(1)
+				return nil, err
+			}
 		}
 	} else if c.config.GetAccessID() != "" {
-		staticCredentials := credentials.NewStaticCredentials(c.config.GetAccessID(),
+		staticCredentials := credentials2.NewStaticCredentialsProvider(c.config.GetAccessID(),
 			c.config.GetSecretAccessKey(),
 			c.config.GetSessionToken())
-		awsConfig := &aws.Config{
-			Region:      aws.String(c.config.GetRegion()),
+		awsCfg = aws.Config{
+			Region:      c.config.GetRegion(),
 			Credentials: staticCredentials,
 		}
-		awsAthenaSession, err = session.NewSession(awsConfig)
 	} else {
-		awsAthenaSession, err = session.NewSession(&aws.Config{
-			Region: aws.String(c.config.GetRegion()),
-		})
-	}
-	if err != nil {
-		c.tracer.Scope().Counter(DriverName + ".failure.sqlconnector.newsession").Inc(1)
-		return nil, err
+		awsCfg = aws.Config{
+			Region: c.config.GetRegion(),
+		}
 	}
 
-	athenaAPI := athena.New(awsAthenaSession)
+	athenaClient := athena.NewFromConfig(awsCfg)
 	timeConnect := time.Since(now)
 	conn := &Connection{
-		athenaAPI: athenaAPI,
-		connector: c,
+		athenaClient: athenaClient,
+		connector:    c,
 	}
 	c.tracer.Scope().Timer(DriverName + ".connector.connect").Record(timeConnect)
 	return conn, nil

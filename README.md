@@ -34,7 +34,7 @@ Except the basic features provided by Go `database/sql` like error handling, dat
 - Support multiple AWS authorization methods [:link:](#support-multiple-aws-authentication-methods)
 - Full support of [Athena Basic Data Types](https://docs.aws.amazon.com/athena/latest/ug/data-types.html)
 - Full support of [Athena Advanced Type](https://docs.aws.amazon.com/athena/latest/ug/querying-athena-tables.html) for queries with Geospatial identifiers, ML and UDFs 
-- Full support of *ALL* Athena Query Statements, including [DDL](https://docs.aws.amazon.com/athena/latest/ug/language-reference.html), [DML](https://docs.aws.amazon.com/athena/latest/ug/functions-operators-reference-section.html) and [UTILITY](https://github.com/aws/aws-sdk-go/blob/master/service/athena/api.go#L5002) [:link:](#full-support-of-all-data-types)
+- Full support of *ALL* Athena Query Statements, including [DDL](https://docs.aws.amazon.com/athena/latest/ug/ddl-reference.html), [DML](https://docs.aws.amazon.com/athena/latest/ug/dml-queries-functions-operators.html) and [UTILITY](https://docs.aws.amazon.com/athena/latest/APIReference/API_QueryExecution.html#athena-Type-QueryExecution-StatementType) [:link:](#full-support-of-all-data-types)
 - Support newly added [`INSERT INTO...VALUES`](https://aws.amazon.com/about-aws/whats-new/2019/09/amazon-athena-adds-support-inserting-data-into-table-results-of-select-query/)
 - Athena workgroup and tagging support including remote workgroup creation [:link:](#query-with-workgroup-and-tag)
 - Go sql's prepared statement support [:link:](#prepared-statement-support-for-athena-db)
@@ -1200,7 +1200,7 @@ For the contributors, the following is `athenadriver` Package's UML Class Diagra
 
 - [Amazon Athena User Guide](https://docs.aws.amazon.com/athena/latest/ug/what-is.html)
 - [Amazon Athena API Reference - Describes the Athena API operations in detail.](https://docs.aws.amazon.com/athena/latest/APIReference/Welcome.html)
-- [Amazon Athena Go Doc](https://godoc.org/github.com/aws/aws-sdk-go/service/athena)
+- [Amazon Athena Go Doc](https://godoc.org/github.com/aws/aws-sdk-go-v2/service/athena)
 - [Data type mappings that the JDBC driver supports between Athena, JDBC, and Java](https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC_2.0.5/docs/Simba+Athena+JDBC+Driver+Install+and+Configuration+Guide.pdf#page=37)
 - [Service Quotas](https://docs.aws.amazon.com/athena/latest/ug/service-limits.html)
 - [Go sql connection pool](http://go-database-sql.org/connection-pool.html)

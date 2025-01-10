@@ -22,21 +22,20 @@ package athenadriver
 
 import (
 	"context"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/athena"
-	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	v2athena "github.com/aws/aws-sdk-go-v2/service/athena"
+	v2athenatypes "github.com/aws/aws-sdk-go-v2/service/athena/types"
 )
 
 // Workgroup is a wrapper of Athena Workgroup.
 type Workgroup struct {
 	Name   string
-	Config *athena.WorkGroupConfiguration
+	Config *v2athenatypes.WorkGroupConfiguration
 	Tags   *WGTags
 }
 
 // NewDefaultWG is to create new default Workgroup.
-func NewDefaultWG(name string, config *athena.WorkGroupConfiguration, tags *WGTags) *Workgroup {
+func NewDefaultWG(name string, config *v2athenatypes.WorkGroupConfiguration, tags *WGTags) *Workgroup {
 	wg := Workgroup{
 		Name:   name,
 		Config: config,
@@ -53,7 +52,7 @@ func NewDefaultWG(name string, config *athena.WorkGroupConfiguration, tags *WGTa
 }
 
 // NewWG is to create a new Workgroup.
-func NewWG(name string, config *athena.WorkGroupConfiguration, tags *WGTags) *Workgroup {
+func NewWG(name string, config *v2athenatypes.WorkGroupConfiguration, tags *WGTags) *Workgroup {
 	return &Workgroup{
 		Name:   name,
 		Config: config,
@@ -62,12 +61,12 @@ func NewWG(name string, config *athena.WorkGroupConfiguration, tags *WGTags) *Wo
 }
 
 // getWG is to get Athena Workgroup from AWS remotely.
-func getWG(ctx context.Context, athenaService athenaiface.AthenaAPI, Name string) (*athena.WorkGroup, error) {
-	if athenaService == nil {
-		return nil, ErrAthenaNilAPI
+func getWG(ctx context.Context, client AthenaClient, Name string) (*v2athenatypes.WorkGroup, error) {
+	if client == nil {
+		return nil, ErrAthenaNilClient
 	}
-	getWorkGroupOutput, err := athenaService.GetWorkGroupWithContext(ctx,
-		&athena.GetWorkGroupInput{
+	getWorkGroupOutput, err := client.GetWorkGroup(ctx,
+		&v2athena.GetWorkGroupInput{
 			WorkGroup: aws.String(Name),
 		})
 	if err != nil {
@@ -77,16 +76,16 @@ func getWG(ctx context.Context, athenaService athenaiface.AthenaAPI, Name string
 }
 
 // CreateWGRemotely is to create a Workgroup remotely.
-func (w *Workgroup) CreateWGRemotely(athenaService athenaiface.AthenaAPI) error {
+func (w *Workgroup) CreateWGRemotely(ctx context.Context, athenaClient AthenaClient) error {
 	tags := w.Tags.Get()
 	var err error
 	if len(tags) == 0 {
-		_, err = athenaService.CreateWorkGroup(&athena.CreateWorkGroupInput{
+		_, err = athenaClient.CreateWorkGroup(ctx, &v2athena.CreateWorkGroupInput{
 			Configuration: w.Config,
 			Name:          aws.String(w.Name),
 		})
 	} else {
-		_, err = athenaService.CreateWorkGroup(&athena.CreateWorkGroupInput{
+		_, err = athenaClient.CreateWorkGroup(ctx, &v2athena.CreateWorkGroupInput{
 			Configuration: w.Config,
 			Name:          aws.String(w.Name),
 			Tags:          w.Tags.Get(),

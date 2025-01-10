@@ -39,7 +39,7 @@ var (
 	ErrQueryTimeout                 = errors.New("query timeout")
 	ErrAthenaTransactionUnsupported = errors.New("Athena doesn't support transaction statements")
 	ErrAthenaNilDatum               = errors.New("*athena.Datum must not be nil")
-	ErrAthenaNilAPI                 = errors.New("athenaAPI must not be nil")
+	ErrAthenaNilClient              = errors.New("athenaClient must not be nil")
 	ErrTestMockGeneric              = errors.New("some_mock_error_for_test")
 	ErrTestMockFailedByAthena       = errors.New("the reason why Athena failed the query")
 	ErrServiceLimitOverride         = fmt.Errorf("service limit override must be greater than %d", PoolInterval)

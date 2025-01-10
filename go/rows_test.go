@@ -23,12 +23,13 @@ package athenadriver
 import (
 	"context"
 	"database/sql/driver"
+	athenatypes "github.com/aws/aws-sdk-go-v2/service/athena/types"
 	"io"
 	"reflect"
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/aws/aws-sdk-go-v2/service/athena"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -449,9 +450,9 @@ func TestRows_ColumnTypeDatabaseTypeName2(t *testing.T) {
 		"SELECT_OK", testConf, NewDefaultObservability(testConf))
 	c := newColumnInfo("a", nil)
 	getQueryResultsOutput := &athena.GetQueryResultsOutput{
-		ResultSet: &athena.ResultSet{
-			ResultSetMetadata: &athena.ResultSetMetadata{
-				ColumnInfo: []*athena.ColumnInfo{
+		ResultSet: &athenatypes.ResultSet{
+			ResultSetMetadata: &athenatypes.ResultSetMetadata{
+				ColumnInfo: []athenatypes.ColumnInfo{
 					c,
 				},
 			},

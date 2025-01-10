@@ -20,20 +20,22 @@
 
 package athenadriver
 
-import "github.com/aws/aws-sdk-go/service/athena"
+import (
+	athenatypes "github.com/aws/aws-sdk-go-v2/service/athena/types"
+)
 
 // WGConfig wraps WorkGroupConfiguration.
 type WGConfig struct {
-	wgConfig *athena.WorkGroupConfiguration
+	wgConfig *athenatypes.WorkGroupConfiguration
 }
 
 // GetDefaultWGConfig to create a default WorkGroupConfiguration.
-func GetDefaultWGConfig() *athena.WorkGroupConfiguration {
+func GetDefaultWGConfig() *athenatypes.WorkGroupConfiguration {
 	var bytesScannedCutoffPerQuery int64 = DefaultBytesScannedCutoffPerQuery
 	var enforceWorkGroupConfiguration bool = true
 	var publishCloudWatchMetricsEnabled bool = true
 	var requesterPaysEnabled bool = false
-	return &athena.WorkGroupConfiguration{
+	return &athenatypes.WorkGroupConfiguration{
 		BytesScannedCutoffPerQuery:      &bytesScannedCutoffPerQuery, // 1G by default
 		EnforceWorkGroupConfiguration:   &enforceWorkGroupConfiguration,
 		PublishCloudWatchMetricsEnabled: &publishCloudWatchMetricsEnabled,
@@ -47,8 +49,8 @@ func NewWGConfig(bytesScannedCutoffPerQuery int64,
 	enforceWorkGroupConfiguration bool,
 	publishCloudWatchMetricsEnabled bool,
 	requesterPaysEnabled bool,
-	resultConfiguration *athena.ResultConfiguration) *athena.WorkGroupConfiguration {
-	return &athena.WorkGroupConfiguration{
+	resultConfiguration *athenatypes.ResultConfiguration) *athenatypes.WorkGroupConfiguration {
+	return &athenatypes.WorkGroupConfiguration{
 		BytesScannedCutoffPerQuery:      &bytesScannedCutoffPerQuery,
 		EnforceWorkGroupConfiguration:   &enforceWorkGroupConfiguration,
 		PublishCloudWatchMetricsEnabled: &publishCloudWatchMetricsEnabled,

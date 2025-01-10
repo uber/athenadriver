@@ -23,6 +23,7 @@ package athenadriver
 import (
 	"database/sql"
 	"database/sql/driver"
+	athenatypes "github.com/aws/aws-sdk-go-v2/service/athena/types"
 	"math"
 	"os"
 	"strconv"
@@ -30,7 +31,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aws/aws-sdk-go/service/athena"
+	"github.com/aws/aws-sdk-go-v2/service/athena"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -166,13 +167,13 @@ func TestRandFloat64(t *testing.T) {
 
 func TestRandRow(t *testing.T) {
 	c1 := newColumnInfo("c1", nil)
-	r := randRow([]*athena.ColumnInfo{c1})
+	r := randRow([]athenatypes.ColumnInfo{c1})
 	assert.Equal(t, len(r.Data), 1)
 	assert.Equal(t, *r.Data[0].VarCharValue, "a\tb")
 
 	for _, ty := range AthenaColumnTypes {
 		c1 := newColumnInfo("c1", ty)
-		r := randRow([]*athena.ColumnInfo{c1})
+		r := randRow([]athenatypes.ColumnInfo{c1})
 		assert.Equal(t, len(r.Data), 1)
 	}
 }
@@ -207,21 +208,21 @@ func TestValueToNamedValue(t *testing.T) {
 }
 
 func TestIsQueryTimeOut(t *testing.T) {
-	assert.False(t, isQueryTimeOut(time.Now(), athena.StatementTypeDdl, nil))
-	assert.False(t, isQueryTimeOut(time.Now(), athena.StatementTypeDml, nil))
-	assert.False(t, isQueryTimeOut(time.Now(), athena.StatementTypeUtility, nil))
+	assert.False(t, isQueryTimeOut(time.Now(), athenatypes.StatementTypeDdl, nil))
+	assert.False(t, isQueryTimeOut(time.Now(), athenatypes.StatementTypeDml, nil))
+	assert.False(t, isQueryTimeOut(time.Now(), athenatypes.StatementTypeUtility, nil))
 	now := time.Now()
 	OneHourAgo := now.Add(-3600 * time.Second)
-	assert.True(t, isQueryTimeOut(OneHourAgo, athena.StatementTypeDml, nil))
-	assert.False(t, isQueryTimeOut(OneHourAgo, athena.StatementTypeDdl, nil))
+	assert.True(t, isQueryTimeOut(OneHourAgo, athenatypes.StatementTypeDml, nil))
+	assert.False(t, isQueryTimeOut(OneHourAgo, athenatypes.StatementTypeDdl, nil))
 	assert.False(t, isQueryTimeOut(OneHourAgo, "UNKNOWN", nil))
 
 	testConf := NewServiceLimitOverride()
 	testConf.SetDMLQueryTimeout(65 * 60) // 65 minutes
-	assert.False(t, isQueryTimeOut(OneHourAgo, athena.StatementTypeDml, testConf))
+	assert.False(t, isQueryTimeOut(OneHourAgo, athenatypes.StatementTypeDml, testConf))
 
 	testConf.SetDDLQueryTimeout(30 * 60) // 30 minutes
-	assert.True(t, isQueryTimeOut(OneHourAgo, athena.StatementTypeDdl, testConf))
+	assert.True(t, isQueryTimeOut(OneHourAgo, athenatypes.StatementTypeDdl, testConf))
 	assert.True(t, isQueryTimeOut(OneHourAgo, "UNKNOWN", testConf))
 }
 
@@ -264,15 +265,15 @@ func TestGetFromEnvVal(t *testing.T) {
 
 func TestPrintCost(t *testing.T) {
 	ping := "SELECTExecContext_OK_QID"
-	stat := athena.QueryExecutionStateSucceeded
+	stat := athenatypes.QueryExecutionStateSucceeded
 	o := &athena.GetQueryExecutionOutput{
-		QueryExecution: &athena.QueryExecution{
+		QueryExecution: &athenatypes.QueryExecution{
 			Query:            &ping,
 			QueryExecutionId: &ping,
-			Status: &athena.QueryExecutionStatus{
-				State: &stat,
+			Status: &athenatypes.QueryExecutionStatus{
+				State: stat,
 			},
-			Statistics: &athena.QueryExecutionStatistics{
+			Statistics: &athenatypes.QueryExecutionStatistics{
 				DataScannedInBytes: nil,
 			},
 		},
@@ -282,11 +283,11 @@ func TestPrintCost(t *testing.T) {
 		QueryExecution: nil,
 	})
 	printCost(&athena.GetQueryExecutionOutput{
-		QueryExecution: &athena.QueryExecution{
+		QueryExecution: &athenatypes.QueryExecution{
 			Query:            &ping,
 			QueryExecutionId: &ping,
-			Status: &athena.QueryExecutionStatus{
-				State: &stat,
+			Status: &athenatypes.QueryExecutionStatus{
+				State: stat,
 			},
 			Statistics: nil,
 		},
