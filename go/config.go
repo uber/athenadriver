@@ -300,6 +300,7 @@ func (c *Config) GetWorkgroup() Workgroup {
 		wg := Workgroup{
 			Name:   c.values.Get("workgroupName"),
 			Config: GetDefaultWGConfig(),
+			Tags:   NewWGTags(),
 		}
 		return wg
 	}
