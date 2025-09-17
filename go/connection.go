@@ -335,10 +335,11 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 		return nil, ErrInvalidQuery
 	}
 	wg := c.connector.config.GetWorkgroup()
+	var athenaWG *athena.WorkGroup
 	if wg.Name == "" {
 		wg.Name = DefaultWGName
 	} else if wg.Name != DefaultWGName {
-		athenaWG, err := getWG(ctx, c.athenaAPI, wg.Name)
+		athenaWG, err = getWG(ctx, c.athenaAPI, wg.Name)
 		if err != nil {
 			obs.Scope().Counter(DriverName + ".failure.querycontext.getwg").Inc(1)
 			obs.Log(WarnLevel, "Didn't find workgroup "+wg.Name+" due to: "+err.Error())
@@ -409,17 +410,26 @@ func (c *Connection) QueryContext(ctx context.Context, query string, namedArgs [
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.athenaAPI.StartQueryExecution(&athena.StartQueryExecutionInput{
+
+	// Build StartQueryExecutionInput
+	startInput := &athena.StartQueryExecutionInput{
 		QueryString:         aws.String(queryWithPlaceholders),
 		ExecutionParameters: executionParams,
 		QueryExecutionContext: &athena.QueryExecutionContext{
 			Database: aws.String(c.connector.config.GetDB()),
 		},
-		ResultConfiguration: &athena.ResultConfiguration{
-			OutputLocation: aws.String(c.connector.config.GetOutputBucket()),
-		},
 		WorkGroup: aws.String(wg.Name),
-	})
+	}
+
+	// Only set ResultConfiguration if awsmanaged bucked is not enabled
+	// This avoids conflicts with workgroups that have awsmanaged bucked enabled
+	if !c.connector.config.GetManagedBucket() {
+		startInput.ResultConfiguration = &athena.ResultConfiguration{
+			OutputLocation: aws.String(c.connector.config.GetOutputBucket()),
+		}
+	}
+
+	resp, err := c.athenaAPI.StartQueryExecution(startInput)
 	if err != nil {
 		if pseudoCommand == PCGetQID {
 			if reqerr, ok := err.(awserr.RequestFailure); ok {
