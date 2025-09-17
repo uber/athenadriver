@@ -168,9 +168,13 @@ import (
 )
 
 func main() {
-	// Step 1. Set AWS Credential in Driver Config.
+	// Step 1. Set AWS Credential in Driver Config (default)
 	conf, _ := drv.NewDefaultConfig("s3://myqueryresults/",
 		"us-east-2", "DummyAccessID", "DummySecretAccessKey")
+		
+	// (optional) - if using aws managed output buckets
+	// conf, _ := drv.NewDefaultConfig("", "us-east-2", "DummyAccessID", "DummySecretAccessKey", true)
+
 	// Step 2. Open Connection.
 	db, _ := sql.Open(drv.DriverName, conf.Stringify())
 	// Step 3. Query and print results

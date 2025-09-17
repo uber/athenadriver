@@ -23,8 +23,8 @@ package athenadriver
 import (
 	"net/url"
 	"regexp"
-	"strings"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -63,12 +63,23 @@ var (
 
 // NewDefaultConfig is to new a Config with some default values.
 func NewDefaultConfig(outputBucket string, region string, accessID string,
-	secretAccessKey string) (*Config, error) {
+	secretAccessKey string, managedBucket ...bool) (*Config, error) {
 	conf := NewNoOpsConfig()
-	err := conf.SetOutputBucket(outputBucket)
-	if err != nil {
-		return nil, err
+	var err error
+
+	if len(managedBucket) == 0 {
+		managedBucket = []bool{false}
 	}
+
+	conf.SetManagedBucket(managedBucket[0])
+
+	if !conf.GetManagedBucket() {
+		err = conf.SetOutputBucket(outputBucket)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err = conf.SetRegion(region)
 	if err != nil {
 		return nil, err
@@ -291,6 +302,20 @@ func (c *Config) GetOutputBucket() string {
 		return c.dsn.Scheme + "://" + c.dsn.Host + c.dsn.Path
 	}
 	return c.dsn.Scheme + "://" + c.dsn.Host + "/" + c.dsn.Path
+}
+
+// GetManagedBucket is getter of ManagedBucket.
+func (c *Config) GetManagedBucket() bool {
+	return c.values.Get("managedBucket") == "true"
+}
+
+// SetManagedBucket is a setter of ManagedBucket.
+func (c *Config) SetManagedBucket(b bool) {
+	if b {
+		c.values.Set("managedBucket", "true")
+	} else {
+		c.values.Set("managedBucket", "false")
+	}
 }
 
 // GetWorkgroup is getter of Workgroup.

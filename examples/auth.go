@@ -114,11 +114,26 @@ func useAWSCLIConfigForAuthProfileByManualSetup(profile string) {
 	os.Unsetenv("AWS_SDK_LOAD_CONFIG")
 }
 
+// To use AthenaDriver Config for authentication with AWS managed bucket enabled
+func useAthenaDriverConfigForAuthWithManagedBucket() {
+	conf, err := drv.NewDefaultConfig(secret.OutputBucketDev, secret.Region,
+		secret.AccessID, secret.SecretAccessKey, true)
+	if err != nil {
+		return
+	}
+
+	db, _ := sql.Open(drv.DriverName, conf.Stringify())
+	var i int
+	_ = db.QueryRow("SELECT 789").Scan(&i)
+	println("with AthenaDriver Config With Managed Bucket:", i)
+}
+
 func main() {
 	useAthenaDriverConfigForAuth()
 	useAWSCLIConfigForAuth()
 	useAWSCLIConfigForAuthProfileByEnv("henry")
 	useAWSCLIConfigForAuthProfileByManualSetup("profile-development")
+	useAthenaDriverConfigForAuthWithManagedBucket()
 }
 
 /*
@@ -126,4 +141,5 @@ Sample Output:
 with AthenaDriver Config: 123
 with AWS CLI Config: 456
 with AWS CLI Config With Profile: 789
+with AthenaDriver Config With Managed Bucket: 789
 */
