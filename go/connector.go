@@ -33,6 +33,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/athena"
 )
@@ -102,6 +103,8 @@ func (c *SQLConnector) Connect(ctx context.Context) (driver.Conn, error) {
 		c.tracer.Scope().Counter(DriverName + ".failure.sqlconnector.newsession").Inc(1)
 		return nil, err
 	}
+
+	awsAthenaSession.Handlers.Build.PushBack(request.MakeAddToUserAgentHandler("athenadriver", DriverVersion, "github.com/uber/athenadriver"))
 
 	athenaAPI := athena.New(awsAthenaSession)
 	timeConnect := time.Since(now)
