@@ -23,9 +23,12 @@ package athenadriver
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/athena"
 	"github.com/stretchr/testify/assert"
 	"github.com/uber-go/tally/v4"
 	"go.uber.org/zap"
@@ -47,6 +50,25 @@ func TestSQLConnector(t *testing.T) {
 	transaction, err := conn.Begin()
 	assert.Nil(t, transaction)
 	assert.Equal(t, err.Error(), "Athena doesn't support transaction statements")
+}
+
+func TestSQLConnector_Connect_UserAgent(t *testing.T) {
+	testConf := NewNoOpsConfig()
+	connector := &SQLConnector{
+		config: testConf,
+		tracer: NewDefaultObservability(testConf),
+	}
+
+	conn, err := connector.Connect(context.Background())
+	assert.Nil(t, err)
+	athenaAPI := conn.(*Connection).athenaAPI.(*athena.Athena)
+	req, _ := athenaAPI.GetQueryExecutionRequest(&athena.GetQueryExecutionInput{
+		QueryExecutionId: aws.String("qid"),
+	})
+	assert.Nil(t, req.Build())
+	ua := req.HTTPRequest.Header.Get("User-Agent")
+	assert.True(t, strings.HasPrefix(ua, "aws-sdk-go/"), ua)
+	assert.True(t, strings.HasSuffix(ua, " athenadriver/"+DriverVersion+" (github.com/uber/athenadriver)"), ua)
 }
 
 func TestSQLConnector_Connect(t *testing.T) {
