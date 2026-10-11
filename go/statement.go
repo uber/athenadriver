@@ -36,12 +36,16 @@ type Statement struct {
 
 // Close is to close an open statement.
 func (s *Statement) Close() error {
-	if s.connection == nil || s.closed {
+	if s.closed {
 		// driver.Stmt.Close can be called more than once, thus this function
 		// has to be idempotent.
 		// See also Issue #450 and golang/go#16019.
+		return nil
+	}
+	if s.connection == nil {
 		return driver.ErrBadConn
 	}
+	s.connection = nil
 	s.query = ""
 	s.closed = true
 	s.numInput = 0
@@ -72,7 +76,6 @@ func (s *Statement) Exec(args []driver.Value) (driver.Result, error) {
 	}
 	r, e := s.connection.ExecContext(context.Background(), s.query,
 		valueToNamedValue(args))
-	s.closed = true
 	return r, e
 }
 
@@ -83,6 +86,5 @@ func (s *Statement) Query(args []driver.Value) (driver.Rows, error) {
 	}
 	r, e := s.connection.QueryContext(context.Background(), s.query,
 		valueToNamedValue(args))
-	s.closed = true
 	return r, e
 }
