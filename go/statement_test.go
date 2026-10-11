@@ -182,3 +182,75 @@ func TestStatement_Close_AfterConnectionClose(t *testing.T) {
 	err := st.Close()
 	assert.Equal(t, err, driver.ErrBadConn)
 }
+
+func TestStatement_Reuse(t *testing.T) {
+	nm := newMockAthenaClient()
+	testConf := NewNoOpsConfig()
+	conn := &Connection{
+		athenaAPI: nm,
+		connector: NoopsSQLConnector(),
+	}
+	testConf.SetOutputBucket("s3://fake-query-results-arbitrary-bucket/")
+	testConf.SetRegion("us-east-1")
+	testConf.SetUser("test.user")
+	testConf.SetDB("default")
+	testConf.SetWGRemoteCreationAllowed(true)
+	conn.connector.config = testConf
+	st := Statement{
+		connection: conn,
+		query:      "SELECTQueryContext_?",
+	}
+	dn := "OK"
+	d := []driver.Value{
+		dn,
+	}
+
+	// First Query - should succeed with mock
+	r1, e1 := st.Query(d)
+	assert.Nil(t, e1) // First query succeeds
+	assert.NotNil(t, r1)
+	r1.Close()
+
+	// Second Query - should also succeed (statement is reusable)
+	r2, e2 := st.Query(d)
+	assert.Nil(t, e2) // Second query also succeeds
+	assert.NotNil(t, r2)
+	r2.Close()
+
+	// Third Query - should also succeed (statement remains reusable)
+	r3, e3 := st.Query(d)
+	assert.Nil(t, e3) // Third query also succeeds
+	assert.NotNil(t, r3)
+	r3.Close()
+
+	// Also test Exec reuse
+	r4, e4 := st.Exec(d)
+	assert.Nil(t, e4) // Exec also succeeds
+	assert.NotNil(t, r4)
+
+	r5, e5 := st.Exec(d)
+	assert.Nil(t, e5) // Second Exec also succeeds
+	assert.NotNil(t, r5)
+}
+
+func TestStatement_Close_Idempotent(t *testing.T) {
+	testConf := NewNoOpsConfig()
+	connector := &SQLConnector{
+		config: testConf,
+		tracer: NewDefaultObservability(testConf),
+	}
+
+	conn, _ := connector.Connect(context.Background())
+	st := Statement{
+		connection: conn.(*Connection),
+		query:      "abc=?",
+	}
+
+	// First Close
+	err1 := st.Close()
+	assert.Equal(t, err1, nil) // First close should succeed
+
+	// Second Close - should be idempotent (return nil, not driver.ErrBadConn)
+	err2 := st.Close()
+	assert.Equal(t, err2, nil) // Should also be nil per driver contract
+}
